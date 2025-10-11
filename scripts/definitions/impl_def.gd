@@ -1,0 +1,2 @@
+abstract extends Resource
+class_name ORC_AImpl_Def

@@ -14,3 +14,16 @@ export_credentials.cfg
 .mono/
 data_*/
 mono_crash.*.json
+
+# GDExtention ignores
+*.o
+*.obj
+*.obj.import
+*.dll
+*.so
+*.dylib
+*.lib
+*.pdb
+*.exp
+*.ilk
+gdextension/.sconsign.dblite
