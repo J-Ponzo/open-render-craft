@@ -3,6 +3,7 @@
 
 #include <godot_cpp/classes/ref_counted.hpp>
 #include <godot_cpp/classes/node.hpp>
+#include "macros.h"
 
 #ifdef ORC_RENDERER_EXPORTS
 #define ORC_API __declspec(dllexport)
@@ -22,10 +23,10 @@ public:
 	ORC_SceneProxyBase();
 	~ORC_SceneProxyBase();
 
-	void setup(Node* scene);
-	void pre_render();
-	void post_render();
-	void cleanup();
+	DECLARE_GD_OVERRIDABLE_METHOD(void, setup, Node*)
+	DECLARE_GD_OVERRIDABLE_METHOD(void, pre_render)
+	DECLARE_GD_OVERRIDABLE_METHOD(void, post_render)
+	DECLARE_GD_OVERRIDABLE_METHOD(void, cleanup)
 };
 
 }
