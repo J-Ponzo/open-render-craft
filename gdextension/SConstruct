@@ -4,40 +4,19 @@ import sys
 
 env = SConscript("godot-cpp/SConstruct")
 
-# For reference:
-# - CCFLAGS are compilation flags shared between C and C++
-# - CFLAGS are for C-specific compilation flags
-# - CXXFLAGS are for C++-specific compilation flags
-# - CPPFLAGS are for pre-processor flags
-# - CPPDEFINES are for pre-processor defines
-# - LINKFLAGS are for linking flags
+env.Append(CPPPATH=["src/public"])
+env.Append(CPPDEFINES=["ORC_RENDERER_EXPORTS"])
+    
+env['OBJSUFFIX'] = '.o'
 
-# tweak this if you want to use different folders, or more folders, to store your source code in.
-env.Append(CPPPATH=["src/"])
-sources = Glob("src/*.cpp")
+src_dir = "src/private"
+obj_dir = "obj"
+VariantDir(obj_dir, src_dir, duplicate=0)
+sources = Glob(os.path.join(obj_dir, "*.cpp"))
 
-if env["platform"] == "macos":
-    library = env.SharedLibrary(
-        "bin/liborc.{}.{}.framework/liborc.{}.{}".format(
-            env["platform"], env["target"], env["platform"], env["target"]
-        ),
-        source=sources,
-    )
-elif env["platform"] == "ios":
-    if env["ios_simulator"]:
-        library = env.StaticLibrary(
-            "bin/liborc.{}.{}.simulator.a".format(env["platform"], env["target"]),
-            source=sources,
-        )
-    else:
-        library = env.StaticLibrary(
-            "bin/liborc.{}.{}.a".format(env["platform"], env["target"]),
-            source=sources,
-        )
-else:
-    library = env.SharedLibrary(
-        "bin/liborc{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
-        source=sources,
-    )
+library = env.SharedLibrary(
+    "bin/liborc{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
+    source=sources,
+)
 
 Default(library)
