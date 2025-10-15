@@ -89,10 +89,20 @@ func _process(delta: float) -> void:
 	else:
 		if active_renderer_idx != INVALID_RENDERER_IDX and active_renderer_idx != NATIVE_RENDERER_IDX:
 			if scene != null:
-				renderers[active_renderer_idx].scene_proxy.pre_render()
-				renderers[active_renderer_idx].pre_render()
-				renderers[active_renderer_idx].render()
-				renderers[active_renderer_idx].scene_proxy.post_render()
+				#renderers[active_renderer_idx].scene_proxy.pre_render()
+				#renderers[active_renderer_idx].pre_render()
+				#renderers[active_renderer_idx].render()
+				#renderers[active_renderer_idx].scene_proxy.post_render()
+				renderers[active_renderer_idx].proc_0_args()
+				renderers[active_renderer_idx].proc_1_args(1)
+				renderers[active_renderer_idx].proc_2_args(1, 2)
+				renderers[active_renderer_idx].proc_3_args(1, 2, 3)
+				renderers[active_renderer_idx].proc_4_args(1, 2, 3, 4)
+				renderers[active_renderer_idx].func_0_args()
+				renderers[active_renderer_idx].func_1_args(1)
+				renderers[active_renderer_idx].func_2_args(1, 2)
+				renderers[active_renderer_idx].func_3_args(1, 2, 3)
+				renderers[active_renderer_idx].func_4_args(1, 2, 3, 4)
 			
 func _unhandled_input(event):
 	if event is InputEventKey:

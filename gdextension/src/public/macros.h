@@ -62,7 +62,7 @@ RET_TYPE CLASS_NAME::gdsuper_##METHOD_NAME(T1 A1) { \
 }
 
 // Define GDScript overridable method with 2 argument
-#define DEFINE_GD_OVERRIDABLE_METHOD_2ARGS(CLASS_NAME, RET_TYPE, METHOD_NAME, T1, A1, T2, A2) \
+#define DEFINE_GD_OVERRIDABLE_METHOD_2_ARGS(CLASS_NAME, RET_TYPE, METHOD_NAME, T1, A1, T2, A2) \
 RET_TYPE CLASS_NAME::gdcall_##METHOD_NAME(T1 A1, T2 A2) { \
     static const StringName override_name(#METHOD_NAME "_override"); \
     if (has_method(override_name)) { \
@@ -89,7 +89,7 @@ RET_TYPE CLASS_NAME::gdsuper_##METHOD_NAME(T1 A1, T2 A2) { \
 }
 
 // Define GDScript overridable method with 3 argument
-#define DEFINE_GD_OVERRIDABLE_METHOD_3ARGS(CLASS_NAME, RET_TYPE, METHOD_NAME, T1, A1, T2, A2, T3, A3) \
+#define DEFINE_GD_OVERRIDABLE_METHOD_3_ARGS(CLASS_NAME, RET_TYPE, METHOD_NAME, T1, A1, T2, A2, T3, A3) \
 RET_TYPE CLASS_NAME::gdcall_##METHOD_NAME(T1 A1, T2 A2, T3 A3) { \
     static const StringName override_name(#METHOD_NAME "_override"); \
     if (has_method(override_name)) { \
@@ -116,7 +116,7 @@ RET_TYPE CLASS_NAME::gdsuper_##METHOD_NAME(T1 A1, T2 A2, T3 A3) { \
 }
 
 // Define GDScript overridable method with 4 argument
-#define DEFINE_GD_OVERRIDABLE_METHOD_4ARGS(CLASS_NAME, RET_TYPE, METHOD_NAME, T1, A1, T2, A2, T3, A3, T4, A4) \
+#define DEFINE_GD_OVERRIDABLE_METHOD_4_ARGS(CLASS_NAME, RET_TYPE, METHOD_NAME, T1, A1, T2, A2, T3, A3, T4, A4) \
 RET_TYPE CLASS_NAME::gdcall_##METHOD_NAME(T1 A1, T2 A2, T3 A3, T4 A4) { \
     static const StringName override_name(#METHOD_NAME "_override"); \
     if (has_method(override_name)) { \
