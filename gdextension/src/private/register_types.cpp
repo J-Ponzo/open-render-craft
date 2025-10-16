@@ -7,6 +7,10 @@
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
 
+#ifdef DEBUG_ENABLED
+#include "gd_overridable_marco_mock.h"
+#endif
+
 using namespace godot;
 
 void initialize_orc_module(ModuleInitializationLevel p_level) {
@@ -16,6 +20,11 @@ void initialize_orc_module(ModuleInitializationLevel p_level) {
 
 	GDREGISTER_RUNTIME_CLASS(ORC_RendererBase);
 	GDREGISTER_RUNTIME_CLASS(ORC_SceneProxyBase);
+
+#ifdef DEBUG_ENABLED
+    UtilityFunctions::print("Registering test classes (DEBUG build)");
+	GDREGISTER_RUNTIME_CLASS(ORCTEST_GDOverridableMacro_Mock);
+#endif
 }
 
 void uninitialize_orc_module(ModuleInitializationLevel p_level) {

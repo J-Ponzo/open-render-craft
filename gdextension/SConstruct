@@ -14,6 +14,13 @@ obj_dir = "obj"
 VariantDir(obj_dir, src_dir, duplicate=0)
 sources = Glob(os.path.join(obj_dir, "*.cpp"))
 
+if env["target"] == "template_debug":
+    print("Building with test sources (DEBUG build)")
+    tests_dir = "src/tests"
+    VariantDir(os.path.join(obj_dir, "tests"), tests_dir, duplicate=0)
+    sources += Glob(os.path.join(obj_dir, "tests", "*.cpp"))
+    env.Append(CPPPATH=[tests_dir])
+
 library = env.SharedLibrary(
     "bin/liborc{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
     source=sources,
