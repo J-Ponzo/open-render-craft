@@ -13,6 +13,10 @@ protected:
 	static void _bind_methods();
 
 public:
+	int internal_state = 0;
+	int get_internal_state() { return internal_state; }
+	void set_internal_state(int internal_state) { this->internal_state = internal_state; }
+
 	DECLARE_GD_OVERRIDABLE_METHOD(void, proc_0_args)
 	DECLARE_GD_OVERRIDABLE_METHOD(void, proc_1_args, int)
 	DECLARE_GD_OVERRIDABLE_METHOD(void, proc_2_args, int, int)
