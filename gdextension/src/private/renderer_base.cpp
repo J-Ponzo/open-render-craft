@@ -10,14 +10,6 @@
 
 using namespace godot;
 
-ORC_RendererBase::ORC_RendererBase() {
-	// Initialize any variables here.
-}
-
-ORC_RendererBase::~ORC_RendererBase() {
-	// Add your cleanup here.
-}
-
 void ORC_RendererBase::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_scene_proxy"), &ORC_RendererBase::get_scene_proxy);
     ClassDB::bind_method(D_METHOD("set_scene_proxy", "scene_proxy"), &ORC_RendererBase::set_scene_proxy);
