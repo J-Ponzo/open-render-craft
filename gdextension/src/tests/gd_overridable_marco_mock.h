@@ -2,7 +2,7 @@
 #define ORCTEST_GDOVERRIDABLEMACROMOCK_H
 
 #include <godot_cpp/classes/ref_counted.hpp>
-#include "macros.h"
+#include <macros.h>
 
 namespace godot {
 

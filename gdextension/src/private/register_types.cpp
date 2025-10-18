@@ -1,14 +1,18 @@
 #include "register_types.h"
 
-#include "renderer_base.h"
-#include "scene_proxy_base.h"
+#include <renderer_base.h>
+#include <scene_proxy_base.h>
+#include <proxy_data.h>
+#include <primary_data.h>
+#include <secondary_data.h>
+#include <proxy_object.h>
 
 #include <gdextension_interface.h>
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
 
 #ifdef DEBUG_ENABLED
-#include "gd_overridable_marco_mock.h"
+#include <gd_overridable_marco_mock.h>
 #endif
 
 using namespace godot;
@@ -20,6 +24,10 @@ void initialize_orc_module(ModuleInitializationLevel p_level) {
 
 	GDREGISTER_RUNTIME_CLASS(ORC_RendererBase);
 	GDREGISTER_RUNTIME_CLASS(ORC_SceneProxyBase);
+	GDREGISTER_RUNTIME_CLASS(ORC_ProxyData);
+	GDREGISTER_RUNTIME_CLASS(ORC_PrimaryData);
+	GDREGISTER_RUNTIME_CLASS(ORC_SecondaryData);
+	GDREGISTER_RUNTIME_CLASS(ORC_ProxyObject);
 
 #ifdef DEBUG_ENABLED
     UtilityFunctions::print("Registering test classes (DEBUG build)");

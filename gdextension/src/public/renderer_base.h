@@ -2,8 +2,8 @@
 #define ORC_RENDERBASE_H
 
 #include <godot_cpp/classes/ref_counted.hpp>
-#include "scene_proxy_base.h"
-#include "macros.h"
+#include <scene_proxy_base.h>
+#include <macros.h>
 
 #ifdef ORC_RENDERER_EXPORTS
 #define ORC_API __declspec(dllexport)
@@ -12,6 +12,8 @@
 #endif
 
 namespace godot {
+
+class ORC_SceneProxyBase;
 
 class ORC_API ORC_RendererBase : public RefCounted {
 	GDCLASS(ORC_RendererBase, RefCounted)

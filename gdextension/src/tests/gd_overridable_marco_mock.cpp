@@ -1,8 +1,8 @@
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 
-#include "gd_overridable_marco_mock.h"
-#include "macros.h"
+#include <gd_overridable_marco_mock.h>
+#include <macros.h>
 
 using namespace godot;
 

@@ -5,8 +5,8 @@
 #include <godot_cpp/classes/rd_texture_format.hpp>
 #include <godot_cpp/classes/rd_texture_view.hpp>
 
-#include "renderer_base.h"
-#include "macros.h"
+#include <renderer_base.h>
+#include <macros.h>
 
 using namespace godot;
 
