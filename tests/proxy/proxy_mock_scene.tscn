@@ -1,0 +1,57 @@
+[gd_scene load_steps=6 format=3 uid="uid://slhydv0tckms"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_n2xit"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_n2xit"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_n2xit"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_2f71r"]
+height = 1.0
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_n2xit"]
+
+[node name="ProxyMockScene" type="Node3D"]
+
+[node name="Cube1" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9659258, 0, -0.25881904, 0, 1, 0, 0.25881904, 0, 0.9659258, 0.11092245, 0, 0.014603227)
+mesh = SubResource("BoxMesh_n2xit")
+
+[node name="Cube2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9659258, 0, -0.25881904, 0, 1, 0, 0.25881904, 0, 0.9659258, 2.042774, 0, 0.53224134)
+mesh = SubResource("BoxMesh_n2xit")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Cube2"]
+transform = Transform3D(1.0000001, 0, 0, 0, 1, 0, 0, 0, 1.0000001, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Cube2/StaticBody3D"]
+shape = SubResource("BoxShape3D_n2xit")
+
+[node name="Sphere" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9659258, 0, -0.25881904, 0, 1, 0, 0.25881904, 0, 0.9659258, -1.8209292, 0, -0.50303483)
+mesh = SubResource("SphereMesh_n2xit")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Sphere"]
+transform = Transform3D(1.0000001, 0, 0, 0, 1, 0, 0, 0, 1.0000001, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Sphere/StaticBody3D"]
+shape = SubResource("CylinderShape3D_2f71r")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.9659259, 0, -0.25881907, 0.066987306, 0.9659258, 0.25, 0.25000003, -0.25881904, 0.93301266, -0.6655347, 1, 2.9123807)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(0.9659259, 0, -0.25881907, 0, 1, 0, 0.25881907, 0, 0.9659258, -0.88907754, 1, 1.0146033)
+
+[node name="SpotLight3D" type="SpotLight3D" parent="."]
+transform = Transform3D(0.9803799, 0.18301271, -0.07322335, -0.18301272, 0.7071068, -0.6830127, -0.07322329, 0.6830128, 0.726727, 0.11092245, -2, 3.0146031)
+spot_angle = 30.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.9659258, 0.1830127, -0.1830127, 0, 0.7071068, 0.7071068, 0.25881907, -0.6830128, 0.6830128, 0.11092245, 2, 0.014603227)
+
+[node name="RigidBody3D" type="RigidBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
+shape = SubResource("CapsuleShape3D_n2xit")

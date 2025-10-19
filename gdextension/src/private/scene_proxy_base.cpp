@@ -10,10 +10,25 @@ void ORC_SceneProxyBase::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_renderer", "renderer"), &ORC_SceneProxyBase::set_renderer);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "renderer", PROPERTY_HINT_RESOURCE_TYPE, "ORC_SceneProxyBase"), "set_renderer", "get_renderer");
 
+	ClassDB::bind_method(D_METHOD("get_proxy_factory"), &ORC_SceneProxyBase::get_proxy_factory);
+	ClassDB::bind_method(D_METHOD("set_proxy_factory", "proxy_factory"), &ORC_SceneProxyBase::set_proxy_factory);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "proxy_factory", PROPERTY_HINT_RESOURCE_TYPE, "ORC_ProxyFactory"), "set_proxy_factory", "get_proxy_factory");
+
 	BIND_GD_OVERRIDABLE_METHOD(ORC_SceneProxyBase, setup, "scene")
 	BIND_GD_OVERRIDABLE_METHOD(ORC_SceneProxyBase, pre_render)
 	BIND_GD_OVERRIDABLE_METHOD(ORC_SceneProxyBase, post_render)
 	BIND_GD_OVERRIDABLE_METHOD(ORC_SceneProxyBase, cleanup)
+}
+
+ORC_SceneProxyBase::ORC_SceneProxyBase() {
+	proxy_cache.instantiate();
+}
+
+// TODO : not sure it's needed to unref here
+ORC_SceneProxyBase::~ORC_SceneProxyBase() {
+	if (proxy_cache.is_valid()) {
+		proxy_cache.unref();
+	}
 }
 
 // TODO func ptr may not be usefull
@@ -31,10 +46,6 @@ static void find_all_in_tree(Node* root, bool(*selector)(Node*), std::vector<Nod
     }
 }
 
-static void on_node_enter_tree(Node* node) {
-	UtilityFunctions::print("ORC_SceneProxyBase.on_node_enter_tree(", node->get_name(), ")");
-}
-
 DEFINE_GD_OVERRIDABLE_METHOD_1_ARGS(ORC_SceneProxyBase, void, setup, Node*, scene)
 void ORC_SceneProxyBase::setup(Node* scene) {
 	this->scene_root = scene;
@@ -47,6 +58,14 @@ void ORC_SceneProxyBase::setup(Node* scene) {
 		on_node_enter_tree(node);
 }
 
+void ORC_SceneProxyBase::on_node_enter_tree(Node* node) {
+	Ref<ORC_ProxyObject> proxy_object = proxy_factory->create_from(node, proxy_cache);
+
+	if (proxy_object == nullptr) return;
+
+	proxy_objects_pool[node] = proxy_object;
+}
+
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_SceneProxyBase, void, pre_render)
 void ORC_SceneProxyBase::pre_render(){
 	UtilityFunctions::print("ORC_SceneProxyBase.pre_render");
@@ -57,8 +76,13 @@ void ORC_SceneProxyBase::post_render() {
 	UtilityFunctions::print("ORC_SceneProxyBase.post_render");
 }
 
-static void on_node_exit_tree(Node* node) {
-	UtilityFunctions::print("ORC_SceneProxyBase.on_node_exit_tree(", node->get_name(), ")");
+void ORC_SceneProxyBase::on_node_exit_tree(Node* node) {
+	auto it = proxy_objects_pool.find(node);
+	if (it == proxy_objects_pool.end()) return;
+	Ref<ORC_ProxyObject> proxy_object = it->second;
+	
+	proxy_factory->free_data(node, proxy_cache);
+	proxy_objects_pool.erase(it);
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_SceneProxyBase, void, cleanup)

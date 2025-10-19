@@ -3,7 +3,7 @@ extends GdUnitTestSuite
 var mock_obj : ORCTEST_GDOverridableMacro_GDDerivedMock
 func before() -> void:
 	mock_obj = ORCTEST_GDOverridableMacro_GDDerivedMock.new()
-	
+
 func test_macro_super_proc_0_args():
 	mock_obj.super_proc_0_args()
 	assert_int(mock_obj.internal_state).is_equal(1)

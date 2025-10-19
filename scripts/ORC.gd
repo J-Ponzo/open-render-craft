@@ -17,7 +17,15 @@ var root_vp_rid : RID
 
 var scene : Node
 
+func _is_running_test() -> bool:
+	Engine.set_meta("gdunit_is_running_test", false)
+	print(Engine.get_meta("gdunit_is_running_test", false))
+	return Engine.get_meta("gdunit_is_running_test", false)
+
 func _enter_tree() -> void:
+	if _is_running_test():
+		return
+	
 	for renderer_def : ORC_Renderer_Def in registry.rederer_defs:
 		var renderer_inst = ORC_RendererFactory.create_renderer(renderer_def)
 		renderers.append(renderer_inst)
@@ -33,6 +41,9 @@ func _enter_tree() -> void:
 	custom_canvas_layer.add_child(texture_rect)
 
 func _ready() -> void:
+	if _is_running_test():
+		return
+		
 	scene = get_tree().current_scene
 	switch_active_renderer(0)
 
@@ -84,7 +95,7 @@ func _put_custom_renderer_online(renderer_idx : int) -> void:
 	custom_canvas_layer.visible = true
 	
 func _process(delta: float) -> void:
-	if Engine.is_editor_hint():
+	if Engine.is_editor_hint() || _is_running_test():	# Check performences of _is_running_test
 		pass
 	else:
 		if active_renderer_idx != INVALID_RENDERER_IDX and active_renderer_idx != NATIVE_RENDERER_IDX:
