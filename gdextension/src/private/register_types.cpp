@@ -53,6 +53,7 @@ GDExtensionBool GDE_EXPORT orc_library_init(GDExtensionInterfaceGetProcAddress p
 	init_obj.register_initializer(initialize_orc_module);
 	init_obj.register_terminator(uninitialize_orc_module);
 	init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_SCENE);
+	// init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_CORE);
 
 	return init_obj.init();
 }

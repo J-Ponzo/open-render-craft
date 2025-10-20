@@ -12,7 +12,7 @@ void ORC_ProxyFactory::_bind_methods() {
     // ClassDB::bind_method(D_METHOD("create_from", "node", "cache"), &ORC_ProxyFactory::create_from);
     ClassDB::bind_method(D_METHOD("free_data", "node", "cache"), &ORC_ProxyFactory::free_data);
     
-    ClassDB::bind_static_method("Ref<ORC_ProxyData>", D_METHOD("create_and_register", "what", "cache"), &ORC_ProxyFactory::create_and_register_gd);
+    ClassDB::bind_static_method("ORC_ProxyFactory", D_METHOD("create_and_register", "what", "cache"), &ORC_ProxyFactory::create_and_register_gd);
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_2_ARGS(ORC_ProxyFactory, Ref<ORC_ProxyObject>, create_from, Node*, node, Ref<ORC_ProxyCache>, cache)
