@@ -28,9 +28,12 @@ protected:
 public:
     std::unordered_map<std::type_index, std::vector<Ref<ORC_ProxyData>>> cache;
 
-    void register_data(Ref<ORC_ProxyData> proxy_data);
-    void unregister_data(Ref<ORC_ProxyData> proxy_data);
+    void register_data(Ref<ORC_ProxyData> proxy_data, int64_t unique_id = -1);
+    void unregister_data(Ref<ORC_ProxyData> proxy_data, int64_t unique_id = -1);
     Ref<ORC_ProxyData> get_by_type(std::type_index type) const;
+    Ref<ORC_ProxyData> get_by_unique_id(int64_t unique_id) const;
+    bool increment_refcount(int64_t unique_id);
+    bool decrement_refcount(int64_t unique_id);
 };
 
 }

@@ -24,61 +24,61 @@ void ORCTEST_GDOverridableMacro_Mock::_bind_methods() {
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORCTEST_GDOverridableMacro_Mock, void, proc_0_args)
-void ORCTEST_GDOverridableMacro_Mock::proc_0_args() {
+void ORCTEST_GDOverridableMacro_Mock::proc_0_args_impl() {
 	internal_state = 1;
 	UtilityFunctions::print("ORCTEST_GDOverridableMacro_Mock.proc_0_args");
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_1_ARGS(ORCTEST_GDOverridableMacro_Mock, void, proc_1_args, int, arg1)
-void ORCTEST_GDOverridableMacro_Mock::proc_1_args(int arg1) {
+void ORCTEST_GDOverridableMacro_Mock::proc_1_args_impl(int arg1) {
 	internal_state = 1 + arg1;
 	UtilityFunctions::print("ORCTEST_GDOverridableMacro_Mock.proc_1_args ", arg1);
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_2_ARGS(ORCTEST_GDOverridableMacro_Mock, void, proc_2_args, int, arg1, int, arg2)
-void ORCTEST_GDOverridableMacro_Mock::proc_2_args(int arg1, int arg2) {
+void ORCTEST_GDOverridableMacro_Mock::proc_2_args_impl(int arg1, int arg2) {
 	internal_state = 1 + arg1 + arg2;
 	UtilityFunctions::print("ORCTEST_GDOverridableMacro_Mock.proc_1_args ", arg1, arg2);
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_3_ARGS(ORCTEST_GDOverridableMacro_Mock, void, proc_3_args, int, arg1, int, arg2, int, arg3)
-void ORCTEST_GDOverridableMacro_Mock::proc_3_args(int arg1, int arg2, int arg3) {
+void ORCTEST_GDOverridableMacro_Mock::proc_3_args_impl(int arg1, int arg2, int arg3) {
 	internal_state = 1 + arg1 + arg2 + arg3;
 	UtilityFunctions::print("ORCTEST_GDOverridableMacro_Mock.proc_1_args ", arg1, arg2, arg3);
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_4_ARGS(ORCTEST_GDOverridableMacro_Mock, void, proc_4_args, int, arg1, int, arg2, int, arg3, int, arg4)
-void ORCTEST_GDOverridableMacro_Mock::proc_4_args(int arg1, int arg2, int arg3, int arg4) {
+void ORCTEST_GDOverridableMacro_Mock::proc_4_args_impl(int arg1, int arg2, int arg3, int arg4) {
 	internal_state = 1 + arg1 + arg2 + arg3 + arg4;
 	UtilityFunctions::print("ORCTEST_GDOverridableMacro_Mock.proc_1_args ", arg1, arg2, arg3, arg4);
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORCTEST_GDOverridableMacro_Mock, int, func_0_args)
-int ORCTEST_GDOverridableMacro_Mock::func_0_args() {
+int ORCTEST_GDOverridableMacro_Mock::func_0_args_impl() {
 	UtilityFunctions::print("ORCTEST_GDOverridableMacro_Mock.func_0_args");
     return 1;
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_1_ARGS(ORCTEST_GDOverridableMacro_Mock, int, func_1_args, int, arg1)
-int ORCTEST_GDOverridableMacro_Mock::func_1_args(int arg1) {
+int ORCTEST_GDOverridableMacro_Mock::func_1_args_impl(int arg1) {
 	UtilityFunctions::print("ORCTEST_GDOverridableMacro_Mock.func_1_args ", arg1);
     return 1 + arg1;
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_2_ARGS(ORCTEST_GDOverridableMacro_Mock, int, func_2_args, int, arg1, int, arg2)
-int ORCTEST_GDOverridableMacro_Mock::func_2_args(int arg1, int arg2) {
+int ORCTEST_GDOverridableMacro_Mock::func_2_args_impl(int arg1, int arg2) {
 	UtilityFunctions::print("ORCTEST_GDOverridableMacro_Mock.func_1_args ", arg1, arg2);
     return 1 + arg1 + arg2;
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_3_ARGS(ORCTEST_GDOverridableMacro_Mock, int, func_3_args, int, arg1, int, arg2, int, arg3)
-int ORCTEST_GDOverridableMacro_Mock::func_3_args(int arg1, int arg2, int arg3) {
+int ORCTEST_GDOverridableMacro_Mock::func_3_args_impl(int arg1, int arg2, int arg3) {
 	UtilityFunctions::print("ORCTEST_GDOverridableMacro_Mock.func_1_args ", arg1, arg2, arg3);
     return 1 + arg1 + arg2 + arg3;
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_4_ARGS(ORCTEST_GDOverridableMacro_Mock, int, func_4_args, int, arg1, int, arg2, int, arg3, int, arg4)
-int ORCTEST_GDOverridableMacro_Mock::func_4_args(int arg1, int arg2, int arg3, int arg4) {
+int ORCTEST_GDOverridableMacro_Mock::func_4_args_impl(int arg1, int arg2, int arg3, int arg4) {
 	UtilityFunctions::print("ORCTEST_GDOverridableMacro_Mock.func_1_args ", arg1, arg2, arg3, arg4);
     return 1 + arg1 + arg2 + arg3 + arg4;
 }

@@ -31,17 +31,6 @@ public:
 	DECLARE_GD_OVERRIDABLE_METHOD(void, render)
 	DECLARE_GD_OVERRIDABLE_METHOD(RID, get_render_target)
 	DECLARE_GD_OVERRIDABLE_METHOD(void, cleanup)
-
-	DECLARE_GD_OVERRIDABLE_METHOD(void, proc_0_args)
-	DECLARE_GD_OVERRIDABLE_METHOD(void, proc_1_args, int)
-	DECLARE_GD_OVERRIDABLE_METHOD(void, proc_2_args, int, int)
-	DECLARE_GD_OVERRIDABLE_METHOD(void, proc_3_args, int, int, int)
-	DECLARE_GD_OVERRIDABLE_METHOD(void, proc_4_args, int, int, int, int)
-	DECLARE_GD_OVERRIDABLE_METHOD(int, func_0_args)
-	DECLARE_GD_OVERRIDABLE_METHOD(int, func_1_args, int)
-	DECLARE_GD_OVERRIDABLE_METHOD(int, func_2_args, int, int)
-	DECLARE_GD_OVERRIDABLE_METHOD(int, func_3_args, int, int, int)
-	DECLARE_GD_OVERRIDABLE_METHOD(int, func_4_args, int, int, int, int)
 };
 
 }

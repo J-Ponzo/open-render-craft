@@ -22,6 +22,6 @@ void ORC_ProxyObject::_bind_methods() {
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_ProxyObject, void, update_data)
-void ORC_ProxyObject::update_data() {
+void ORC_ProxyObject::update_data_impl() {
     UtilityFunctions::print("ORC_ProxyObject.update_data");
 }

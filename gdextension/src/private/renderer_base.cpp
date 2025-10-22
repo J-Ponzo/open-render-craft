@@ -20,36 +20,25 @@ void ORC_RendererBase::_bind_methods() {
     BIND_GD_OVERRIDABLE_METHOD(ORC_RendererBase, render)
     BIND_GD_OVERRIDABLE_METHOD(ORC_RendererBase, get_render_target)
     BIND_GD_OVERRIDABLE_METHOD(ORC_RendererBase, cleanup)
-
-    BIND_GD_OVERRIDABLE_METHOD(ORC_RendererBase, proc_0_args)
-	BIND_GD_OVERRIDABLE_METHOD(ORC_RendererBase, proc_1_args, "arg1")
-	BIND_GD_OVERRIDABLE_METHOD(ORC_RendererBase, proc_2_args, "arg1", "arg2")
-	BIND_GD_OVERRIDABLE_METHOD(ORC_RendererBase, proc_3_args, "arg1", "arg2", "arg3")
-	BIND_GD_OVERRIDABLE_METHOD(ORC_RendererBase, proc_4_args, "arg1", "arg2", "arg3", "arg4")
-	BIND_GD_OVERRIDABLE_METHOD(ORC_RendererBase, func_0_args)
-	BIND_GD_OVERRIDABLE_METHOD(ORC_RendererBase, func_1_args, "arg1")
-	BIND_GD_OVERRIDABLE_METHOD(ORC_RendererBase, func_2_args, "arg1", "arg2")
-	BIND_GD_OVERRIDABLE_METHOD(ORC_RendererBase, func_3_args, "arg1", "arg2", "arg3")
-	BIND_GD_OVERRIDABLE_METHOD(ORC_RendererBase, func_4_args, "arg1", "arg2", "arg3", "arg4")
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_RendererBase, void, setup)
-void ORC_RendererBase::setup() {
+void ORC_RendererBase::setup_impl() {
 	UtilityFunctions::print("ORC_RendererBase.setup");
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_RendererBase, void, pre_render)
-void ORC_RendererBase::pre_render(){
+void ORC_RendererBase::pre_render_impl(){
 	UtilityFunctions::print("ORC_RendererBase.pre_render");
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_RendererBase, void, render)
-void ORC_RendererBase::render() {
+void ORC_RendererBase::render_impl() {
 	UtilityFunctions::print("ORC_RendererBase.render");
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_RendererBase, RID, get_render_target)
-RID ORC_RendererBase::get_render_target() {
+RID ORC_RendererBase::get_render_target_impl() {
 	UtilityFunctions::print("ORC_RendererBase.get_render_target");
 
 	RenderingDevice *rd = RenderingServer::get_singleton()->get_rendering_device();
@@ -84,61 +73,6 @@ RID ORC_RendererBase::get_render_target() {
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_RendererBase, void, cleanup)
-void ORC_RendererBase::cleanup() {
+void ORC_RendererBase::cleanup_impl() {
 	UtilityFunctions::print("ORC_SceneProxyBase.cleanup");
-}
-
-DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_RendererBase, void, proc_0_args)
-void ORC_RendererBase::proc_0_args() {
-	UtilityFunctions::print("ORC_SceneProxyBase.proc_0_args");
-}
-
-DEFINE_GD_OVERRIDABLE_METHOD_1_ARGS(ORC_RendererBase, void, proc_1_args, int, arg1)
-void ORC_RendererBase::proc_1_args(int arg1) {
-	UtilityFunctions::print("ORC_SceneProxyBase.proc_1_args ", arg1);
-}
-
-DEFINE_GD_OVERRIDABLE_METHOD_2_ARGS(ORC_RendererBase, void, proc_2_args, int, arg1, int, arg2)
-void ORC_RendererBase::proc_2_args(int arg1, int arg2) {
-	UtilityFunctions::print("ORC_SceneProxyBase.proc_1_args ", arg1, arg2);
-}
-
-DEFINE_GD_OVERRIDABLE_METHOD_3_ARGS(ORC_RendererBase, void, proc_3_args, int, arg1, int, arg2, int, arg3)
-void ORC_RendererBase::proc_3_args(int arg1, int arg2, int arg3) {
-	UtilityFunctions::print("ORC_SceneProxyBase.proc_1_args ", arg1, arg2, arg3);
-}
-
-DEFINE_GD_OVERRIDABLE_METHOD_4_ARGS(ORC_RendererBase, void, proc_4_args, int, arg1, int, arg2, int, arg3, int, arg4)
-void ORC_RendererBase::proc_4_args(int arg1, int arg2, int arg3, int arg4) {
-	UtilityFunctions::print("ORC_SceneProxyBase.proc_1_args ", arg1, arg2, arg3, arg4);
-}
-
-DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_RendererBase, int, func_0_args)
-int ORC_RendererBase::func_0_args() {
-	UtilityFunctions::print("ORC_SceneProxyBase.func_0_args");
-    return 0;
-}
-
-DEFINE_GD_OVERRIDABLE_METHOD_1_ARGS(ORC_RendererBase, int, func_1_args, int, arg1)
-int ORC_RendererBase::func_1_args(int arg1) {
-	UtilityFunctions::print("ORC_SceneProxyBase.func_1_args ", arg1);
-    return arg1;
-}
-
-DEFINE_GD_OVERRIDABLE_METHOD_2_ARGS(ORC_RendererBase, int, func_2_args, int, arg1, int, arg2)
-int ORC_RendererBase::func_2_args(int arg1, int arg2) {
-	UtilityFunctions::print("ORC_SceneProxyBase.func_1_args ", arg1, arg2);
-    return arg1 + arg2;
-}
-
-DEFINE_GD_OVERRIDABLE_METHOD_3_ARGS(ORC_RendererBase, int, func_3_args, int, arg1, int, arg2, int, arg3)
-int ORC_RendererBase::func_3_args(int arg1, int arg2, int arg3) {
-	UtilityFunctions::print("ORC_SceneProxyBase.func_1_args ", arg1, arg2, arg3);
-    return arg1 + arg2 + arg3;
-}
-
-DEFINE_GD_OVERRIDABLE_METHOD_4_ARGS(ORC_RendererBase, int, func_4_args, int, arg1, int, arg2, int, arg3, int, arg4)
-int ORC_RendererBase::func_4_args(int arg1, int arg2, int arg3, int arg4) {
-	UtilityFunctions::print("ORC_SceneProxyBase.func_1_args ", arg1, arg2, arg3, arg4);
-    return arg1 + arg2 + arg3 + arg4;
 }

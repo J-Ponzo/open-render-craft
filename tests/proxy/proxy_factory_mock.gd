@@ -7,9 +7,6 @@ class MeshProxy extends ORC_ProxyObject:
 class MeshData extends ORC_PrimaryData:
 	pass
 	
-class SurfaceData extends ORC_SecondaryData:
-	pass
-	
 class TopologyData extends ORC_SecondaryData:
 	pass
 	
@@ -37,7 +34,7 @@ class DirectionalLightProxy extends ORC_ProxyObject:
 class DirectionalLightData extends ORC_PrimaryData:
 	pass
 
-func create_from_override(node : Node, cache : ORC_ProxyCache) -> ORC_ProxyObject:
+func create_proxy_from_override(node : Node) -> ORC_ProxyObject:
 	var proxy_object : ORC_ProxyObject = null
 	if node is Camera3D:
 		proxy_object = CameraProxy.new()
@@ -48,6 +45,21 @@ func create_from_override(node : Node, cache : ORC_ProxyCache) -> ORC_ProxyObjec
 	elif node is DirectionalLight3D:
 		proxy_object = DirectionalLightProxy.new()
 	elif node is MeshInstance3D:
-		proxy_object = MeshProxy.new()			
-	
+		proxy_object = MeshProxy.new()
 	return proxy_object
+	
+func create_data_from_override(node : Node, cache : ORC_ProxyCache) -> ORC_PrimaryData:
+	var primary_data : ORC_PrimaryData = null
+	if node is Camera3D:
+		primary_data = create_and_register(CameraData, cache)
+	elif node is OmniLight3D:
+		primary_data = create_and_register(OmniLightData, cache)
+	elif node is SpotLight3D:
+		primary_data = create_and_register(SpotLightData, cache)
+	elif node is DirectionalLight3D:
+		primary_data = create_and_register(DirectionalLightData, cache)
+	elif node is MeshInstance3D:
+		primary_data = create_and_register(MeshData, cache)
+		var mes
+		
+	return primary_data;

@@ -2,6 +2,7 @@
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/classes/scene_tree.hpp>
+#include <godot_cpp/classes/visual_instance3d.hpp>
 
 using namespace godot;
 
@@ -47,7 +48,7 @@ static void find_all_in_tree(Node* root, bool(*selector)(Node*), std::vector<Nod
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_1_ARGS(ORC_SceneProxyBase, void, setup, Node*, scene)
-void ORC_SceneProxyBase::setup(Node* scene) {
+void ORC_SceneProxyBase::setup_impl(Node* scene) {
 	this->scene_root = scene;
 	this->scene_root->get_tree()->connect("node_added", Callable(this, "on_node_enter_tree"));
 	this->scene_root->get_tree()->connect("node_removed", Callable(this, "on_node_exit_tree"));
@@ -61,18 +62,22 @@ void ORC_SceneProxyBase::setup(Node* scene) {
 void ORC_SceneProxyBase::on_node_enter_tree(Node* node) {
 	Ref<ORC_ProxyObject> proxy_object = proxy_factory->create_from(node, proxy_cache);
 
-	if (proxy_object == nullptr) return;
+	if (!proxy_object.is_valid()) return;
+
+	VisualInstance3D* vi = Object::cast_to<VisualInstance3D>(node);
+	if (vi == nullptr) proxy_object->is_active_ = true;
+	else proxy_object->is_active_ = vi->is_visible_in_tree();
 
 	proxy_objects_pool[node] = proxy_object;
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_SceneProxyBase, void, pre_render)
-void ORC_SceneProxyBase::pre_render(){
+void ORC_SceneProxyBase::pre_render_impl(){
 	UtilityFunctions::print("ORC_SceneProxyBase.pre_render");
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_SceneProxyBase, void, post_render)
-void ORC_SceneProxyBase::post_render() {
+void ORC_SceneProxyBase::post_render_impl() {
 	UtilityFunctions::print("ORC_SceneProxyBase.post_render");
 }
 
@@ -86,7 +91,7 @@ void ORC_SceneProxyBase::on_node_exit_tree(Node* node) {
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_SceneProxyBase, void, cleanup)
-void ORC_SceneProxyBase::cleanup() {
+void ORC_SceneProxyBase::cleanup_impl() {
 	this->scene_root->get_tree()->disconnect("node_added", Callable(this, "on_node_enter_tree"));
 	this->scene_root->get_tree()->disconnect("node_removed", Callable(this, "on_node_exit_tree"));
 
