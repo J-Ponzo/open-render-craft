@@ -22,9 +22,9 @@ protected:
     static void _bind_methods();
 
 public:
-    Ref<ORC_PrimaryData> primary_data;
-    Ref<ORC_PrimaryData> get_primary_data() { return primary_data; }
-    void set_primary_data(Ref<ORC_PrimaryData> primary_data) { this->primary_data = primary_data; }
+    TypedArray<ORC_PrimaryData> primary_data_array;
+    TypedArray<ORC_PrimaryData> get_primary_data_array() { return primary_data_array; }
+    void set_primary_data_array(TypedArray<ORC_PrimaryData> primary_data_array) { this->primary_data_array = primary_data_array; }
 };
 
 }

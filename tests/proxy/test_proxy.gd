@@ -30,7 +30,7 @@ func test_init_scene():
 	
 	var nb_proxy_objs = 7
 	var nb_primary_data = 7
-	var nb_secondary_data = 5	# 3 SurfaceData + 2 TopologyData (cube is shared)
+	var nb_secondary_data = 2	# 2 TopologyData (cube is shared)
 	var additional_expected = nb_proxy_objs + nb_primary_data + nb_secondary_data
 	var actual_total : int = Performance.get_monitor(Performance.OBJECT_COUNT)
 	assert_int(actual_total).is_equal(nb_obj_before + additional_expected)

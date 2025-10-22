@@ -5,7 +5,7 @@ class MeshProxy extends ORC_ProxyObject:
 	pass
 	
 class MeshData extends ORC_PrimaryData:
-	pass
+	var topologyData : TopologyData
 	
 class TopologyData extends ORC_SecondaryData:
 	pass
@@ -51,15 +51,16 @@ func create_proxy_from_override(node : Node) -> ORC_ProxyObject:
 func create_data_from_override(node : Node, cache : ORC_ProxyCache) -> ORC_PrimaryData:
 	var primary_data : ORC_PrimaryData = null
 	if node is Camera3D:
-		primary_data = create_and_register(CameraData, cache)
+		primary_data = create_and_register_primary(CameraData, cache)
 	elif node is OmniLight3D:
-		primary_data = create_and_register(OmniLightData, cache)
+		primary_data = create_and_register_primary(OmniLightData, cache)
 	elif node is SpotLight3D:
-		primary_data = create_and_register(SpotLightData, cache)
+		primary_data = create_and_register_primary(SpotLightData, cache)
 	elif node is DirectionalLight3D:
-		primary_data = create_and_register(DirectionalLightData, cache)
+		primary_data = create_and_register_primary(DirectionalLightData, cache)
 	elif node is MeshInstance3D:
-		primary_data = create_and_register(MeshData, cache)
-		var mes
+		primary_data = create_and_register_primary(MeshData, cache)
+		var topology_data = create_and_register_secondary(TopologyData, cache, primary_data, node.mesh.get_rid().get_id())
+		primary_data.topologyData = topology_data
 		
 	return primary_data;

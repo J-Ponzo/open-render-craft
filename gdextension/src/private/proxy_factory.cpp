@@ -12,7 +12,8 @@ void ORC_ProxyFactory::_bind_methods() {
     BIND_GD_OVERRIDABLE_METHOD(ORC_ProxyFactory, create_data_from, "node", "cache")
     ClassDB::bind_method(D_METHOD("free_data", "node", "cache"), &ORC_ProxyFactory::free_data);
     
-    ClassDB::bind_static_method("ORC_ProxyFactory", D_METHOD("create_and_register", "script", "cache", "unique_id"), &ORC_ProxyFactory::create_and_register_gd, DEFVAL(-1));
+    ClassDB::bind_static_method("ORC_ProxyFactory", D_METHOD("create_and_register_primary", "script", "cache", "unique_id"), &ORC_ProxyFactory::create_and_register_primary_gd, DEFVAL(-1));
+    ClassDB::bind_static_method("ORC_ProxyFactory", D_METHOD("create_and_register_secondary", "script", "cache", "primary_data", "unique_id"), &ORC_ProxyFactory::create_and_register_secondary_gd, DEFVAL(-1));
 }
 
 Ref<ORC_ProxyObject> ORC_ProxyFactory::create_from(Node* node, Ref<ORC_ProxyCache> cache) {
@@ -43,8 +44,9 @@ Ref<ORC_ProxyData> ORC_ProxyFactory::free_data(Node* node, Ref<ORC_ProxyCache> c
     return Ref<ORC_ProxyData>();
 }
 
-Ref<ORC_ProxyData> ORC_ProxyFactory::create_and_register_gd(const Ref<GDScript> script, Ref<ORC_ProxyCache> cache, int64_t unique_id) {
-    Ref<ORC_ProxyData> ref;
+Ref<ORC_PrimaryData> ORC_ProxyFactory::create_and_register_primary_gd(const Ref<GDScript> script, Ref<ORC_ProxyCache> cache, int64_t unique_id) {
+    Ref<ORC_PrimaryData> ref;
+
     if (unique_id != -1) ref = cache->get_by_unique_id(unique_id);
     if (ref.is_valid()) {
         cache->increment_refcount(unique_id);
@@ -53,24 +55,61 @@ Ref<ORC_ProxyData> ORC_ProxyFactory::create_and_register_gd(const Ref<GDScript> 
 
     if (!script.is_valid()) {
         UtilityFunctions::print("create_and_register_gd: script is not valid");
-        return Ref<ORC_ProxyData>();
+        return Ref<ORC_PrimaryData>();
     }
     Variant v = script->new_();
     Object *obj = Object::cast_to<Object>(v);
     if (!obj) {
         UtilityFunctions::print("create_and_register_gd: script instantiation failed");
-        return Ref<ORC_ProxyData>();
+        return Ref<ORC_PrimaryData>();
     }
-    ORC_ProxyData *pdata = Object::cast_to<ORC_ProxyData>(obj);
+    ORC_PrimaryData *pdata = Object::cast_to<ORC_PrimaryData>(obj);
     if (!pdata) {
-        UtilityFunctions::print("create_and_register_gd: instantiated object is not ORC_ProxyData");
-        return Ref<ORC_ProxyData>();
+        UtilityFunctions::print("create_and_register_gd: instantiated object is not ORC_PrimaryData");
+        return Ref<ORC_PrimaryData>();
     }
-    ref = Ref<ORC_ProxyData>(pdata);
+    ref = Ref<ORC_PrimaryData>(pdata);
     if (cache.is_valid()) {
-        cache->register_data(ref);
+        cache->register_data(ref, unique_id);
     }
+
     return ref;
 }
+
+Ref<ORC_SecondaryData> ORC_ProxyFactory::create_and_register_secondary_gd(const Ref<GDScript> script, Ref<ORC_ProxyCache> cache, Ref<ORC_PrimaryData> primary_data, int64_t unique_id) {
+    Ref<ORC_SecondaryData> ref;
+
+    if (unique_id != -1) ref = cache->get_by_unique_id(unique_id);
+    if (ref.is_valid()) {
+        cache->increment_refcount(unique_id);
+    }
+    else {  
+        if (!script.is_valid()) {
+            UtilityFunctions::print("create_and_register_gd: script is not valid");
+            return Ref<ORC_SecondaryData>();
+        }
+        Variant v = script->new_();
+        Object *obj = Object::cast_to<Object>(v);
+        if (!obj) {
+            UtilityFunctions::print("create_and_register_gd: script instantiation failed");
+            return Ref<ORC_SecondaryData>();
+        }
+        ORC_SecondaryData *sdata = Object::cast_to<ORC_SecondaryData>(obj);
+        if (!sdata) {
+            UtilityFunctions::print("create_and_register_gd: instantiated object is not ORC_SecondaryData");
+            return Ref<ORC_SecondaryData>();
+        }
+        ref = Ref<ORC_SecondaryData>(sdata);
+        if (cache.is_valid()) {
+            cache->register_data(ref, unique_id);
+        }
+    }
+
+    primary_data->secondary_data_array.append(ref);
+    ref->primary_data_array.append(primary_data);
+
+    return ref;
+}
+
 
 }

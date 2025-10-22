@@ -31,8 +31,8 @@ public:
     Ref<ORC_ProxyData> free_data(Node* node, Ref<ORC_ProxyCache> cache);
 
     template <class T>
-    static Ref<T> create_and_register(Ref<ORC_ProxyCache> cache, int64_t unique_id = -1) {
-        static_assert(std::is_base_of<ORC_ProxyData, T>::value, "T must inherit from ORC_ProxyData");
+    static Ref<T> create_and_register_primary(Ref<ORC_ProxyCache> cache, int64_t unique_id = -1) {
+        static_assert(std::is_base_of<ORC_PrimaryData, T>::value, "T must inherit from ORC_PrimaryData");
         
         Ref<T> ref;
         if (unique_id != -1) ref = cache->get_by_unique_id(unique_id);
@@ -42,12 +42,33 @@ public:
         }
 
         ref.instantiate();
-        cache->register_data(Ref<ORC_ProxyData>(ref), unique_id);
+        cache->register_data(ref, unique_id);
         
         return ref;
     }
 
-    static Ref<ORC_ProxyData> create_and_register_gd(const Ref<GDScript> script, Ref<ORC_ProxyCache> cache, int64_t unique_id = -1);
+    template <class T>
+    static Ref<T> create_and_register_secondary(Ref<ORC_ProxyCache> cache, Ref<ORC_PrimaryData> primary_data, int64_t unique_id = -1) {
+        static_assert(std::is_base_of<ORC_SecondaryData, T>::value, "T must inherit from ORC_SecondaryData");
+
+        Ref<T> ref;
+        if (unique_id != -1) ref = cache->get_by_unique_id(unique_id);
+        if (ref.is_valid()) {
+            cache->increment_refcount(unique_id);
+            return ref;
+        }
+        else {
+            ref.instantiate();
+            cache->register_data(ref, unique_id);
+        }
+        
+        primary_data->secondary_data_array.append(ref);
+        ref->primary_data_array.append(primary_data);
+        return ref;
+    }
+
+    static Ref<ORC_PrimaryData> create_and_register_primary_gd(const Ref<GDScript> script, Ref<ORC_ProxyCache> cache, int64_t unique_id = -1);
+    static Ref<ORC_SecondaryData> create_and_register_secondary_gd(const Ref<GDScript> script, Ref<ORC_ProxyCache> cache, Ref<ORC_PrimaryData> primary_data, int64_t unique_id = -1);
 };
 
 }
