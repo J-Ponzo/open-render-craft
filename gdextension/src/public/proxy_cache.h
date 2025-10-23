@@ -26,11 +26,12 @@ protected:
     static void _bind_methods();
 
 public:
-    std::unordered_map<std::type_index, std::vector<Ref<ORC_ProxyData>>> cache;
+    std::unordered_map<std::type_index, std::vector<Ref<ORC_ProxyData>>> type_cache;
+    std::unordered_map<int64_t, std::tuple<Ref<ORC_ProxyData>, int>> id_cache;
 
-    void register_data(Ref<ORC_ProxyData> proxy_data, int64_t unique_id = -1);
-    void unregister_data(Ref<ORC_ProxyData> proxy_data, int64_t unique_id = -1);
-    Ref<ORC_ProxyData> get_by_type(std::type_index type) const;
+    bool register_data(Ref<ORC_ProxyData> proxy_data, int64_t unique_id = -1);
+    bool unregister_data(Ref<ORC_ProxyData> proxy_data);
+    std::vector<Ref<ORC_ProxyData>> get_by_type(std::type_index type) const;
     Ref<ORC_ProxyData> get_by_unique_id(int64_t unique_id) const;
     bool increment_refcount(int64_t unique_id);
     bool decrement_refcount(int64_t unique_id);

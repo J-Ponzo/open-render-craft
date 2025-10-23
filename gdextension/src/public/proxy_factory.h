@@ -69,6 +69,7 @@ public:
 
     static Ref<ORC_PrimaryData> create_and_register_primary_gd(const Ref<GDScript> script, Ref<ORC_ProxyCache> cache, int64_t unique_id = -1);
     static Ref<ORC_SecondaryData> create_and_register_secondary_gd(const Ref<GDScript> script, Ref<ORC_ProxyCache> cache, Ref<ORC_PrimaryData> primary_data, int64_t unique_id = -1);
+    static bool destroy_and_unregister_data_gd(Ref<ORC_ProxyCache> cache, Ref<ORC_ProxyData> data, int64_t unique_id = -1);
 };
 
 }

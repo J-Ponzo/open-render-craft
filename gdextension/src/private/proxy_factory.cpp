@@ -14,6 +14,7 @@ void ORC_ProxyFactory::_bind_methods() {
     
     ClassDB::bind_static_method("ORC_ProxyFactory", D_METHOD("create_and_register_primary", "script", "cache", "unique_id"), &ORC_ProxyFactory::create_and_register_primary_gd, DEFVAL(-1));
     ClassDB::bind_static_method("ORC_ProxyFactory", D_METHOD("create_and_register_secondary", "script", "cache", "primary_data", "unique_id"), &ORC_ProxyFactory::create_and_register_secondary_gd, DEFVAL(-1));
+    ClassDB::bind_static_method("ORC_ProxyFactory", D_METHOD("destroy_and_unregister_data", "cache", "data", "unique_id"), &ORC_ProxyFactory::destroy_and_unregister_data_gd, DEFVAL(-1));
 }
 
 Ref<ORC_ProxyObject> ORC_ProxyFactory::create_from(Node* node, Ref<ORC_ProxyCache> cache) {
@@ -111,5 +112,17 @@ Ref<ORC_SecondaryData> ORC_ProxyFactory::create_and_register_secondary_gd(const 
     return ref;
 }
 
+bool ORC_ProxyFactory::destroy_and_unregister_data_gd(Ref<ORC_ProxyCache> cache, Ref<ORC_ProxyData> data, int64_t unique_id) {
+    if (!data.is_valid()) return false;
+
+    Ref<ORC_ProxyData> ref;
+    if (unique_id != -1) ref = cache->get_by_unique_id(unique_id);
+    if (ref.is_valid()) {
+        cache->decrement_refcount(unique_id);
+        return true;
+    }
+
+    return cache->unregister_data(data);
+}
 
 }
