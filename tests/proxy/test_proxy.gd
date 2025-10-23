@@ -34,3 +34,8 @@ func test_init_scene():
 	var additional_expected = nb_proxy_objs + nb_primary_data + nb_secondary_data
 	var actual_total : int = Performance.get_monitor(Performance.OBJECT_COUNT)
 	assert_int(actual_total).is_equal(nb_obj_before + additional_expected)
+	
+	#scn_proxy.cleanup()
+#
+	#actual_total = Performance.get_monitor(Performance.OBJECT_COUNT)
+	#assert_int(actual_total).is_equal(nb_obj_before)

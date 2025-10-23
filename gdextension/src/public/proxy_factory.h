@@ -28,7 +28,9 @@ public:
     DECLARE_GD_OVERRIDABLE_METHOD(Ref<ORC_ProxyObject>, create_proxy_from, Node*)
     DECLARE_GD_OVERRIDABLE_METHOD(Ref<ORC_PrimaryData>, create_data_from, Node*, Ref<ORC_ProxyCache>)
 
-    Ref<ORC_ProxyData> free_data(Node* node, Ref<ORC_ProxyCache> cache);
+    bool free(Ref<ORC_ProxyObject> proxy_object, Ref<ORC_ProxyCache> cache);
+    DECLARE_GD_OVERRIDABLE_METHOD(bool, free_proxy, Ref<ORC_ProxyObject>)
+    DECLARE_GD_OVERRIDABLE_METHOD(bool, free_data, Ref<ORC_ProxyData>, Ref<ORC_ProxyCache>)
 
     template <class T>
     static Ref<T> create_and_register_primary(Ref<ORC_ProxyCache> cache, int64_t unique_id = -1) {
@@ -69,7 +71,7 @@ public:
 
     static Ref<ORC_PrimaryData> create_and_register_primary_gd(const Ref<GDScript> script, Ref<ORC_ProxyCache> cache, int64_t unique_id = -1);
     static Ref<ORC_SecondaryData> create_and_register_secondary_gd(const Ref<GDScript> script, Ref<ORC_ProxyCache> cache, Ref<ORC_PrimaryData> primary_data, int64_t unique_id = -1);
-    static bool destroy_and_unregister_data_gd(Ref<ORC_ProxyCache> cache, Ref<ORC_ProxyData> data, int64_t unique_id = -1);
+    static bool destroy_and_unregister_data_gd(Ref<ORC_ProxyData> data, Ref<ORC_ProxyCache> cache, int64_t unique_id = -1);
 };
 
 }

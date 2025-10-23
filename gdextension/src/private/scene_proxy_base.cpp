@@ -86,7 +86,7 @@ void ORC_SceneProxyBase::on_node_exit_tree(Node* node) {
 	if (it == proxy_objects_pool.end()) return;
 	Ref<ORC_ProxyObject> proxy_object = it->second;
 	
-	proxy_factory->free_data(node, proxy_cache);
+	proxy_factory->free(proxy_object, proxy_cache);
 	proxy_objects_pool.erase(it);
 }
 
