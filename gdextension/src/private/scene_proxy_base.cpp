@@ -97,6 +97,7 @@ void ORC_SceneProxyBase::cleanup_impl() {
 
 	std::vector<Node*> all_nodes;
 	find_all_in_tree(this->scene_root, [](Node* node) { return true; }, all_nodes);
-	for (Node* node : all_nodes)
+	for (Node* node : all_nodes) {
 		on_node_exit_tree(node);
+	}
 }

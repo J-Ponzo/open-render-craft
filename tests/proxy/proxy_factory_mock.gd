@@ -67,14 +67,13 @@ func create_data_from_override(node : Node, cache : ORC_ProxyCache) -> ORC_Prima
 	return primary_data;
 
 func free_proxy_override(proxy_object : ORC_ProxyObject) -> bool:
-		proxy_object.unreference()
 		return true
 		
 func free_data_override(data : ORC_ProxyData, cache : ORC_ProxyCache) -> bool:
 	var success = true
 	if data is TopologyData:
 		var topology_data : TopologyData = data
-		success &= destroy_and_unregister_data(data, cache, topology_data.mesh.get_rid().get_id())
+		success = success && destroy_and_unregister_data(data, cache, topology_data.mesh.get_rid().get_id())
 	else:
-		success &= destroy_and_unregister_data(data, cache)
+		success = success && destroy_and_unregister_data(data, cache)
 	return success

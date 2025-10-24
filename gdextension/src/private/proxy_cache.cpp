@@ -12,6 +12,8 @@ void ORC_ProxyCache::_bind_methods() {
 }
 
 bool ORC_ProxyCache::register_data(Ref<ORC_ProxyData> proxy_data, int64_t unique_id) {
+    if (!proxy_data.is_valid()) return false;
+
     if (unique_id != -1) {
         auto it = id_cache.find(unique_id);
         if (it != id_cache.end()) return false;
@@ -24,14 +26,17 @@ bool ORC_ProxyCache::register_data(Ref<ORC_ProxyData> proxy_data, int64_t unique
     } 
     else {
         auto& vec = type_cache[type_id];
-        if (std::find(vec.begin(), vec.end(), proxy_data) != vec.end()) 
+        if (std::find(vec.begin(), vec.end(), proxy_data) != vec.end()) {
             return false;
+        }
     }
     type_cache[type_id].push_back(proxy_data);
     return true;
 }
 
 bool ORC_ProxyCache::unregister_data(Ref<ORC_ProxyData> proxy_data) {
+    if (!proxy_data.is_valid()) return false;
+
     std::type_index type_id = typeid(*proxy_data.ptr());
     auto type_it = type_cache.find(type_id);
     if (type_it == type_cache.end()) return false;
@@ -76,8 +81,8 @@ bool ORC_ProxyCache::decrement_refcount(int64_t unique_id) {
     if (it != id_cache.end()) {
         std::get<1>(it->second)--;
         if (std::get<1>(it->second) == 0) {
-            id_cache.erase(it);
             unregister_data(std::get<0>(it->second));
+            id_cache.erase(it);
         }
         return true;
     }

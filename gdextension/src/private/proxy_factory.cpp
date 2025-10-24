@@ -42,14 +42,23 @@ Ref<ORC_PrimaryData> ORC_ProxyFactory::create_data_from_impl(Node* node, Ref<ORC
 }
 
 bool ORC_ProxyFactory::free(Ref<ORC_ProxyObject> proxy_object, Ref<ORC_ProxyCache> cache) {
+    if (!proxy_object.is_valid()) return false;
+
     Ref<ORC_PrimaryData> primary = proxy_object->get_primary_data();
 
     bool success = true;
     for (Ref<ORC_SecondaryData> secondary : primary->secondary_data_array) {
         success &= free_data(secondary, cache);
-    }   
+    }
     success &= free_data(primary, cache);
     success &= free_proxy(proxy_object);
+
+    for (Ref<ORC_SecondaryData> secondary : primary->secondary_data_array) {
+        secondary->primary_data_array.erase(primary);
+    }
+    primary->secondary_data_array.clear();
+    primary->proxy_object = Ref<ORC_ProxyObject>();
+    proxy_object->set_primary_data(Ref<ORC_PrimaryData>());
 
     return success;
 }
@@ -92,7 +101,9 @@ Ref<ORC_PrimaryData> ORC_ProxyFactory::create_and_register_primary_gd(const Ref<
     }
     ref = Ref<ORC_PrimaryData>(pdata);
     if (cache.is_valid()) {
-        cache->register_data(ref, unique_id);
+        if (!cache->register_data(ref, unique_id)) {
+            UtilityFunctions::print("create_and_register_gd: failed to register data in cache");
+        }
     }
 
     return ref;
@@ -123,7 +134,9 @@ Ref<ORC_SecondaryData> ORC_ProxyFactory::create_and_register_secondary_gd(const 
         }
         ref = Ref<ORC_SecondaryData>(sdata);
         if (cache.is_valid()) {
-            cache->register_data(ref, unique_id);
+            if (!cache->register_data(ref, unique_id)) {
+                UtilityFunctions::print("create_and_register_gd: failed to register data in cache");
+            }
         }
     }
 
