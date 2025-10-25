@@ -1,4 +1,4 @@
-class_name Test_ScnProxyCommon
+class_name ORCTEST_ScnProxyTestsCommon
 
 static func load_mock_scene(scn_tree : SceneTree) -> Node:
 	var scene = load("res://addons/open-render-craft/tests/proxy/proxy_mock_scene.tscn") as PackedScene

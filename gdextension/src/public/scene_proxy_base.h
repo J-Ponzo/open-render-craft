@@ -18,14 +18,12 @@ namespace godot {
 
 class ORC_RendererBase;
 
-// TODO : could be better if not exposed to GDScript ? 
 class ORC_API ORC_SceneProxyBase : public RefCounted {
 	GDCLASS(ORC_SceneProxyBase, RefCounted)
 
 protected:
 	static void _bind_methods();
 
-	// TODO : expose or not expose ?
 	Node* scene_root;
 	Ref<ORC_ProxyCache> proxy_cache;
 	std::unordered_map<Node*, Ref<ORC_ProxyObject>> proxy_objects_pool;
@@ -41,7 +39,6 @@ public:
 	ORC_SceneProxyBase();
 	~ORC_SceneProxyBase();
 
-public:
 	Ref<ORC_RendererBase> renderer;
 	Ref<ORC_RendererBase> get_renderer() { return renderer; }
 	void set_renderer(Ref<ORC_RendererBase> renderer) { this->renderer = renderer; }

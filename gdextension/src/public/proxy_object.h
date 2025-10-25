@@ -35,7 +35,7 @@ public:
     bool is_active() const { return is_active_; }
     void set_active(bool active) { is_active_ = active; }
 
-    DECLARE_GD_OVERRIDABLE_METHOD(void, update_data)
+    DECLARE_GD_OVERRIDABLE_METHOD(void, update)
 };
 
 }

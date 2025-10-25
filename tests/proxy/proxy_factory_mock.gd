@@ -1,8 +1,17 @@
 extends ORC_ProxyFactory
 class_name ORCTEST_ProxyFactory_GDMock
 
-class MeshProxy extends ORC_ProxyObject:
-	pass
+class MockProxyObject extends ORC_ProxyObject:
+	static var all_update_count : int = 0
+	func update_override() -> void:
+		self.super_update()
+		MockProxyObject.all_update_count += 1
+
+class MeshProxy extends MockProxyObject:
+	static var mesh_update_count : int = 0
+	func update_override() -> void:
+		super()
+		MeshProxy.mesh_update_count += 1
 	
 class MeshData extends ORC_PrimaryData:
 	var topologyData : TopologyData
@@ -10,26 +19,38 @@ class MeshData extends ORC_PrimaryData:
 class TopologyData extends ORC_SecondaryData:
 	var mesh : Mesh
 	
-class CameraProxy extends ORC_ProxyObject:
-	pass
+class CameraProxy extends MockProxyObject:
+	static var cam_update_count : int = 0
+	func update_override() -> void:
+		super()
+		CameraProxy.cam_update_count += 1
 
 class CameraData extends ORC_PrimaryData:
 	pass
 
-class OmniLightProxy extends ORC_ProxyObject:
-	pass
+class OmniLightProxy extends MockProxyObject:
+	static var omni_update_count : int = 0
+	func update_override() -> void:
+		super()
+		OmniLightProxy.omni_update_count += 1
 
 class OmniLightData extends ORC_PrimaryData:
 	pass
 	
-class SpotLightProxy extends ORC_ProxyObject:
-	pass
+class SpotLightProxy extends MockProxyObject:
+	static var spot_update_count : int = 0
+	func update_override() -> void:
+		super()
+		SpotLightProxy.spot_update_count += 1
 
 class SpotLightData extends ORC_PrimaryData:
 	pass
 	
-class DirectionalLightProxy extends ORC_ProxyObject:
-	pass
+class DirectionalLightProxy extends MockProxyObject:
+	static var directional_update_count : int = 0
+	func update_override() -> void:
+		super()
+		DirectionalLightProxy.directional_update_count += 1
 
 class DirectionalLightData extends ORC_PrimaryData:
 	pass

@@ -6,7 +6,7 @@ var scn_instance : Node
 func before() -> void:
 	scn_proxy = ORC_SceneProxyBase.new()
 	scn_proxy.proxy_factory = ORCTEST_ProxyFactory_GDMock.new()
-	scn_instance = Test_ScnProxyCommon.load_mock_scene(get_tree())
+	scn_instance = ORCTEST_ScnProxyTestsCommon.load_mock_scene(get_tree())
 
 func after() -> void:
 	scn_proxy.proxy_factory = null
@@ -14,11 +14,11 @@ func after() -> void:
 	scn_instance.queue_free()
 
 func test_remove_unique():
-	await Test_ScnProxyCommon.wait_for_stabilisation(get_tree())
+	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
 	scn_proxy.setup(scn_instance)
 
-	var shared_mesh := Test_ScnProxyCommon.create_triangle_mesh()
+	var shared_mesh := ORCTEST_ScnProxyTestsCommon.create_triangle_mesh()
 
 	var mesh_instance1 := MeshInstance3D.new()
 	mesh_instance1.mesh = shared_mesh
@@ -28,12 +28,12 @@ func test_remove_unique():
 	mesh_instance2.mesh = shared_mesh.duplicate()
 	scn_instance.add_child(mesh_instance2)
 
-	await Test_ScnProxyCommon.wait_for_stabilisation(get_tree())
+	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 
 	var nb_obj_before : int = Performance.get_monitor(Performance.OBJECT_COUNT)
 	mesh_instance1.free()
 
-	await Test_ScnProxyCommon.wait_for_stabilisation(get_tree())
+	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 
 	var nb_mesh_inst_removed = 1
 	var nb_mesh_removed = 0			# The shared_mesh var still exists

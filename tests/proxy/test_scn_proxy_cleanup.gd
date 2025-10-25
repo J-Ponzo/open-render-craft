@@ -6,7 +6,7 @@ var scn_instance : Node
 func before() -> void:
 	scn_proxy = ORC_SceneProxyBase.new()
 	scn_proxy.proxy_factory = ORCTEST_ProxyFactory_GDMock.new()
-	scn_instance = Test_ScnProxyCommon.load_mock_scene(get_tree())
+	scn_instance = ORCTEST_ScnProxyTestsCommon.load_mock_scene(get_tree())
 
 func after() -> void:
 	scn_proxy.proxy_factory = null
@@ -14,16 +14,16 @@ func after() -> void:
 	scn_instance.queue_free()
 
 func test_cleanup_scene():
-	await Test_ScnProxyCommon.wait_for_stabilisation(get_tree())
+	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 
 	scn_proxy.setup(scn_instance)
 
-	await Test_ScnProxyCommon.wait_for_stabilisation(get_tree())
+	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 
 	var nb_obj_before : int = Performance.get_monitor(Performance.OBJECT_COUNT)
 	scn_proxy.cleanup()
 
-	await Test_ScnProxyCommon.wait_for_stabilisation(get_tree())
+	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 
 	var nb_proxy_objs = 7
 	var nb_primary_data = 7

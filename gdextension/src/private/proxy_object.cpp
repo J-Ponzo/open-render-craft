@@ -18,10 +18,10 @@ void ORC_ProxyObject::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_active", "active"), &ORC_ProxyObject::set_active);
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "is_active"), "set_active", "is_active");
 
-    BIND_GD_OVERRIDABLE_METHOD(ORC_ProxyObject, update_data)
+    BIND_GD_OVERRIDABLE_METHOD(ORC_ProxyObject, update)
 }
 
-DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_ProxyObject, void, update_data)
-void ORC_ProxyObject::update_data_impl() {
-    UtilityFunctions::print("ORC_ProxyObject.update_data");
+DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_ProxyObject, void, update)
+void ORC_ProxyObject::update_impl() {
+    UtilityFunctions::print("ORC_ProxyObject.update");
 }

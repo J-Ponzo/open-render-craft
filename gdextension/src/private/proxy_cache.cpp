@@ -6,9 +6,6 @@
 namespace godot {
 
 void ORC_ProxyCache::_bind_methods() {
-    // TODO : unbind if not needed
-    ClassDB::bind_method(D_METHOD("register_data", "proxy_data"), &ORC_ProxyCache::register_data);
-    ClassDB::bind_method(D_METHOD("unregister_data", "proxy_data"), &ORC_ProxyCache::unregister_data);
 }
 
 bool ORC_ProxyCache::register_data(Ref<ORC_ProxyData> proxy_data, int64_t unique_id) {
