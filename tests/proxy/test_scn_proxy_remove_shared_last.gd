@@ -13,7 +13,7 @@ func after() -> void:
 	scn_proxy = null
 	scn_instance.queue_free()
 
-func test_remove_shared():
+func test_remove_shared_last():
 	await Test_ScnProxyCommon.wait_for_stabilisation(get_tree())
 	
 	scn_proxy.setup(scn_instance)
