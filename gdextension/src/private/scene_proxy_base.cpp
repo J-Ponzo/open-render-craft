@@ -50,8 +50,8 @@ static void find_all_in_tree(Node* root, bool(*selector)(Node*), std::vector<Nod
 DEFINE_GD_OVERRIDABLE_METHOD_1_ARGS(ORC_SceneProxyBase, void, setup, Node*, scene)
 void ORC_SceneProxyBase::setup_impl(Node* scene) {
 	this->scene_root = scene;
-	this->scene_root->get_tree()->connect("node_added", Callable(this, "on_node_enter_tree"));
-	this->scene_root->get_tree()->connect("node_removed", Callable(this, "on_node_exit_tree"));
+	this->scene_root->get_tree()->connect("node_added", callable_mp(this, &ORC_SceneProxyBase::on_node_enter_tree));
+	this->scene_root->get_tree()->connect("node_removed", callable_mp(this, &ORC_SceneProxyBase::on_node_exit_tree));
 
 	std::vector<Node*> all_nodes;
 	find_all_in_tree(this->scene_root, [](Node* node) { return true; }, all_nodes);
@@ -60,6 +60,7 @@ void ORC_SceneProxyBase::setup_impl(Node* scene) {
 }
 
 void ORC_SceneProxyBase::on_node_enter_tree(Node* node) {
+	UtilityFunctions::print("ORC_SceneProxyBase.on_node_enter_tree(", node->get_name());
 	Ref<ORC_ProxyObject> proxy_object = proxy_factory->create_from(node, proxy_cache);
 
 	if (!proxy_object.is_valid()) return;
@@ -92,12 +93,11 @@ void ORC_SceneProxyBase::on_node_exit_tree(Node* node) {
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_SceneProxyBase, void, cleanup)
 void ORC_SceneProxyBase::cleanup_impl() {
-	this->scene_root->get_tree()->disconnect("node_added", Callable(this, "on_node_enter_tree"));
-	this->scene_root->get_tree()->disconnect("node_removed", Callable(this, "on_node_exit_tree"));
+	this->scene_root->get_tree()->disconnect("node_added", callable_mp(this, &ORC_SceneProxyBase::on_node_enter_tree));
+	this->scene_root->get_tree()->disconnect("node_removed", callable_mp(this, &ORC_SceneProxyBase::on_node_exit_tree));
 
 	std::vector<Node*> all_nodes;
 	find_all_in_tree(this->scene_root, [](Node* node) { return true; }, all_nodes);
-	for (Node* node : all_nodes) {
+	for (Node* node : all_nodes)
 		on_node_exit_tree(node);
-	}
 }
