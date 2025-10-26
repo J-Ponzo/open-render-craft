@@ -1,6 +1,7 @@
 #include "register_types.h"
 
 #include <renderer_base.h>
+#include <render_pass_base.h>
 #include <scene_proxy_base.h>
 #include <proxy_data.h>
 #include <primary_data.h>
@@ -25,6 +26,7 @@ void initialize_orc_module(ModuleInitializationLevel p_level) {
 	}
 
 	GDREGISTER_RUNTIME_CLASS(ORC_RendererBase);
+	GDREGISTER_RUNTIME_CLASS(ORC_RenderPassBase);
 	GDREGISTER_RUNTIME_CLASS(ORC_SceneProxyBase);
 	GDREGISTER_RUNTIME_CLASS(ORC_ProxyData);
 	GDREGISTER_RUNTIME_CLASS(ORC_PrimaryData);

@@ -15,6 +15,14 @@ void ORC_RendererBase::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_scene_proxy", "scene_proxy"), &ORC_RendererBase::set_scene_proxy);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "scene_proxy", PROPERTY_HINT_RESOURCE_TYPE, "ORC_SceneProxyBase"), "set_scene_proxy", "get_scene_proxy");
 
+	ClassDB::bind_method(D_METHOD("get_render_passes"), &ORC_RendererBase::get_render_passes);
+	ClassDB::bind_method(D_METHOD("set_render_passes", "render_passes"), &ORC_RendererBase::set_render_passes);
+	ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "render_passes"), "set_render_passes", "get_render_passes");
+
+	ClassDB::bind_method(D_METHOD("get_attachments"), &ORC_RendererBase::get_attachments);
+	ClassDB::bind_method(D_METHOD("set_attachments", "attachments"), &ORC_RendererBase::set_attachments);
+	ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "attachments"), "set_attachments", "get_attachments");
+
     BIND_GD_OVERRIDABLE_METHOD(ORC_RendererBase, setup)
     BIND_GD_OVERRIDABLE_METHOD(ORC_RendererBase, pre_render)
     BIND_GD_OVERRIDABLE_METHOD(ORC_RendererBase, render)

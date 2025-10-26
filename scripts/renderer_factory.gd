@@ -6,4 +6,7 @@ static func create_renderer(renderer_def : ORC_Renderer_Def) -> ORC_RendererBase
 	renderer_inst.scene_proxy = scn_proxy_inst
 	scn_proxy_inst.renderer = renderer_inst
 	scn_proxy_inst.proxy_factory = ORC_ProxyFactory.new()
+	
+	var test : Dictionary[StringName, ORC_RenderPassBase]
+	ORC_RendererBase.new().attachments[3] = 1
 	return renderer_inst
