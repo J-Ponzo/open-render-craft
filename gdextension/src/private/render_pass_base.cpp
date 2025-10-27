@@ -10,6 +10,18 @@ void ORC_RenderPassBase::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_renderer", "renderer"), &ORC_RenderPassBase::set_renderer);
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "renderer", PROPERTY_HINT_RESOURCE_TYPE, "ORC_RendererBase"), "set_renderer", "get_renderer");
 
+    ClassDB::bind_method(D_METHOD("get_explicits_pso"), &ORC_RenderPassBase::get_explicits_pso);
+    ClassDB::bind_method(D_METHOD("set_explicits_pso", "explicits_pso"), &ORC_RenderPassBase::set_explicits_pso);
+    ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "explicits_pso"), "set_explicits_pso", "get_explicits_pso");
+
+    ClassDB::bind_method(D_METHOD("get_framebuffer_format"), &ORC_RenderPassBase::get_framebuffer_format);
+    ClassDB::bind_method(D_METHOD("set_framebuffer_format", "framebuffer_format"), &ORC_RenderPassBase::set_framebuffer_format);
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "framebuffer_format"), "set_framebuffer_format", "get_framebuffer_format");
+
+    ClassDB::bind_method(D_METHOD("get_framebuffer"), &ORC_RenderPassBase::get_framebuffer);
+    ClassDB::bind_method(D_METHOD("set_framebuffer", "framebuffer"), &ORC_RenderPassBase::set_framebuffer);
+    ADD_PROPERTY(PropertyInfo(Variant::RID, "framebuffer"), "set_framebuffer", "get_framebuffer");
+
     BIND_GD_OVERRIDABLE_METHOD(ORC_RenderPassBase, setup)
     BIND_GD_OVERRIDABLE_METHOD(ORC_RenderPassBase, render)
     BIND_GD_OVERRIDABLE_METHOD(ORC_RenderPassBase, cleanup)

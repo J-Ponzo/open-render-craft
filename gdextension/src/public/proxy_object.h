@@ -28,8 +28,8 @@ public:
     void set_node(Node* node) { this->node = node; }
 
     Ref<ORC_PrimaryData> primary_data;
-    Ref<ORC_PrimaryData> get_primary_data() { return primary_data; }
-    void set_primary_data(Ref<ORC_PrimaryData> primary_data) { this->primary_data = primary_data; }
+    Ref<ORC_PrimaryData> get_primary_data() const { return primary_data; }
+    void set_primary_data(const Ref<ORC_PrimaryData> &primary_data) { this->primary_data = primary_data; }
     
     bool is_active_ = true;
     bool is_active() const { return is_active_; }

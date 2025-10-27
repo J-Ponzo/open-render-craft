@@ -12,5 +12,5 @@ enum ERenderMode {
 	AlphaHash
 }
 
-@export var vertex_shader : String
-@export var fragment_shader : String
+@export var vertex_shader_path : String
+@export var fragment_shader_path : String

@@ -29,8 +29,8 @@ protected:
 	std::unordered_map<Node*, Ref<ORC_ProxyObject>> proxy_objects_pool;
 
 	Ref<ORC_ProxyFactory> proxy_factory;
-	Ref<ORC_ProxyFactory> get_proxy_factory() { return proxy_factory; }
-	void set_proxy_factory(Ref<ORC_ProxyFactory> proxy_factory) { this->proxy_factory = proxy_factory; }
+	Ref<ORC_ProxyFactory> get_proxy_factory() const { return proxy_factory; }
+	void set_proxy_factory(const Ref<ORC_ProxyFactory> &proxy_factory) { this->proxy_factory = proxy_factory; }
 
 	void on_node_enter_tree(Node* node);
 	void on_node_exit_tree(Node* node);
@@ -40,8 +40,8 @@ public:
 	~ORC_SceneProxyBase();
 
 	Ref<ORC_RendererBase> renderer;
-	Ref<ORC_RendererBase> get_renderer() { return renderer; }
-	void set_renderer(Ref<ORC_RendererBase> renderer) { this->renderer = renderer; }
+	Ref<ORC_RendererBase> get_renderer() const { return renderer; }
+	void set_renderer(const Ref<ORC_RendererBase> &renderer) { this->renderer = renderer; }
 
 	DECLARE_GD_OVERRIDABLE_METHOD(void, setup, Node*)
 	DECLARE_GD_OVERRIDABLE_METHOD(void, pre_render)

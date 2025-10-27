@@ -50,4 +50,241 @@ static func create_render_pass(renderer_inst : ORC_RendererBase, render_pass_key
 	render_pass_inst.renderer = renderer_inst
 	renderer_inst.render_passes[render_pass_key] = render_pass_inst
 
+	render_pass_inst.framebuffer_format = create_framebuffer_format_from_def(render_pass_def.framebuffer_format_def, render_pass_def.attachment_format_def)	
+
+	var named_attachments : Array[RID]
+	for name in render_pass_def.framebuffer_format_def.get_all_attachment_keys():
+		named_attachments.append(renderer_inst.render_attachments[name])
+	render_pass_inst.framebuffer = rd.framebuffer_create(named_attachments, render_pass_inst.framebuffer_format)
+
+	# TODO : explicits_pso = create_explicits_pso_from_defs(render_pass_def.explicite_pso_defs)
+
 	return render_pass_inst
+
+static func create_framebuffer_format_from_def(fb_format_def : ORC_FramebufferFormat_Def, attachment_format_def : ORC_AttachmentFormat_Def) -> int:
+	var attachment_formats : Array[RDAttachmentFormat]
+
+	for attach_key : StringName in fb_format_def.get_all_attachment_keys():
+		var attachment_format : RDAttachmentFormat = RDAttachmentFormat.new()
+		attachment_format.format = attachment_format_def.format
+		attachment_format.usage_flags = 0
+		for bit in attachment_format_def.usage_flags:
+			attachment_format.usage_flags |= bit
+		attachment_formats.append(attachment_format)
+
+	return rd.framebuffer_format_create(attachment_formats)
+
+static func create_pso(pso_def : ORC_ExpicitPSODef, framebuffer_format : int) -> ORC_PSO:
+	var instance = ORC_PSO.new()
+
+	var path : String = pso_def.vertex_shader_path
+	var file_path = path
+	var file = FileAccess.open(file_path, FileAccess.READ)
+	if file == null:
+		push_error("Failed to open vertex shader file: %s" % file_path)
+		return null
+
+	var raw_source : String = file.get_as_text()
+	var preprocessed_source : String = ORC_ShaderPreprocessor.preprocess(path, raw_source, pso_def.defines)
+	var vertex_shader_src : String = preprocessed_source
+
+	path = pso_def.fragment_shader_path
+	file_path = path
+	file = FileAccess.open(file_path, FileAccess.READ)
+	if file == null:
+		push_error("Failed to open fragment shader file: %s" % file_path)
+		return null
+
+	raw_source = file.get_as_text()
+	preprocessed_source = ORC_ShaderPreprocessor.preprocess(path, raw_source, pso_def.defines)
+	var fragment_shader_src : String = preprocessed_source
+
+	instance.shader_program = compile_shader(vertex_shader_src, fragment_shader_src)
+
+	var vf_def : ORC_VertexFormatDef = pso_def.vertex_format_def
+	instance.vertex_format = get_or_create_vertex_format(vf_def)
+
+	var rasterizationState = RDPipelineRasterizationState.new()
+	rasterizationState.cull_mode = pso_def.rasterization_state.cull_mode
+	rasterizationState.depth_bias_clamp = pso_def.rasterization_state.depth_bias_clamp
+	rasterizationState.depth_bias_constant_factor = pso_def.rasterization_state.depth_bias_constant_factor
+	rasterizationState.depth_bias_enabled = pso_def.rasterization_state.depth_bias_enabled
+	rasterizationState.depth_bias_slope_factor = pso_def.rasterization_state.depth_bias_slope_factor
+	rasterizationState.discard_primitives = pso_def.rasterization_state.discard_primitives
+	rasterizationState.enable_depth_clamp = pso_def.rasterization_state.enable_depth_clamp
+	rasterizationState.front_face = pso_def.rasterization_state.front_face
+	rasterizationState.line_width = pso_def.rasterization_state.line_width
+	rasterizationState.patch_control_points = pso_def.rasterization_state.patch_control_points
+	rasterizationState.wireframe = pso_def.rasterization_state.wireframe
+
+	var multisampleState = RDPipelineMultisampleState.new()
+	multisampleState.enable_alpha_to_coverage = pso_def.multisample_state.enable_alpha_to_coverage
+	multisampleState.enable_alpha_to_one = pso_def.multisample_state.enable_alpha_to_one
+	multisampleState.enable_sample_shading = pso_def.multisample_state.enable_sample_shading
+	multisampleState.min_sample_shading = pso_def.multisample_state.min_sample_shading
+	multisampleState.sample_count = pso_def.multisample_state.sample_count
+	multisampleState.sample_masks = pso_def.multisample_state.sample_masks
+
+	var depthStencilState = RDPipelineDepthStencilState.new()
+	depthStencilState.back_op_compare = pso_def.depth_stencil_state.back_op_compare
+	depthStencilState.back_op_compare_mask = pso_def.depth_stencil_state.back_op_compare_mask
+	depthStencilState.back_op_depth_fail = pso_def.depth_stencil_state.back_op_depth_fail
+	depthStencilState.back_op_fail = pso_def.depth_stencil_state.back_op_fail
+	depthStencilState.back_op_pass = pso_def.depth_stencil_state.back_op_pass
+	depthStencilState.back_op_reference = pso_def.depth_stencil_state.back_op_reference
+	depthStencilState.back_op_write_mask = pso_def.depth_stencil_state.back_op_write_mask
+	depthStencilState.depth_compare_operator = pso_def.depth_stencil_state.depth_compare_operator
+	depthStencilState.depth_range_max = pso_def.depth_stencil_state.depth_range_max
+	depthStencilState.depth_range_min = pso_def.depth_stencil_state.depth_range_min
+	depthStencilState.enable_depth_range = pso_def.depth_stencil_state.enable_depth_range
+	depthStencilState.enable_depth_test = pso_def.depth_stencil_state.enable_depth_test
+	depthStencilState.enable_depth_write = pso_def.depth_stencil_state.enable_depth_write
+	depthStencilState.enable_stencil = pso_def.depth_stencil_state.enable_stencil
+	depthStencilState.front_op_compare = pso_def.depth_stencil_state.front_op_compare
+	depthStencilState.front_op_compare_mask = pso_def.depth_stencil_state.front_op_compare_mask
+	depthStencilState.front_op_depth_fail = pso_def.depth_stencil_state.front_op_depth_fail
+	depthStencilState.front_op_fail = pso_def.depth_stencil_state.front_op_fail
+	depthStencilState.front_op_pass = pso_def.depth_stencil_state.front_op_pass
+	depthStencilState.front_op_reference = pso_def.depth_stencil_state.front_op_reference
+	depthStencilState.front_op_write_mask = pso_def.depth_stencil_state.front_op_write_mask
+
+	var colorBlendState = RDPipelineColorBlendState.new()
+	for color_blend_attachment_def : ORC_PSOColorBlendAttachmentDef in pso_def.blend_attachments:
+		var colorBlendStateAttachment : RDPipelineColorBlendStateAttachment = RDPipelineColorBlendStateAttachment.new()
+		colorBlendStateAttachment.alpha_blend_op = color_blend_attachment_def.alpha_blend_op
+		colorBlendStateAttachment.color_blend_op = color_blend_attachment_def.color_blend_op
+		colorBlendStateAttachment.dst_alpha_blend_factor = color_blend_attachment_def.dst_alpha_blend_factor
+		colorBlendStateAttachment.dst_color_blend_factor = color_blend_attachment_def.dst_color_blend_factor
+		colorBlendStateAttachment.enable_blend = color_blend_attachment_def.enable_blend
+		colorBlendStateAttachment.src_alpha_blend_factor = color_blend_attachment_def.src_alpha_blend_factor
+		colorBlendStateAttachment.src_color_blend_factor = color_blend_attachment_def.src_color_blend_factor
+		colorBlendStateAttachment.write_a = color_blend_attachment_def.write_a
+		colorBlendStateAttachment.write_b = color_blend_attachment_def.write_b
+		colorBlendStateAttachment.write_g = color_blend_attachment_def.write_g
+		colorBlendStateAttachment.write_r = color_blend_attachment_def.write_r
+		colorBlendState.attachments.append(colorBlendStateAttachment)
+
+	colorBlendState.blend_constant = pso_def.blend_constant
+	colorBlendState.enable_logic_op = pso_def.enable_logic_op
+	colorBlendState.logic_op = pso_def.logic_op
+
+	instance.pipeline = rd.render_pipeline_create(instance.shader_program, framebuffer_format, instance.vertex_format, RenderingDevice.RENDER_PRIMITIVE_TRIANGLES, rasterizationState, multisampleState, depthStencilState, colorBlendState)
+
+	return instance
+
+static func compile_shader(vertex_src : String, fragment_src : String) -> RID:
+	var shader_source = RDShaderSource.new()
+	shader_source.language = RenderingDevice.SHADER_LANGUAGE_GLSL;
+	shader_source.source_vertex = vertex_src;
+	shader_source.source_fragment = fragment_src;
+	
+	return rd.shader_create_from_spirv(rd.shader_compile_spirv_from_source(shader_source))
+
+# TODO : refacto from here. Factory should be stateless
+
+const SIZEOF_FLOAT = 4
+const SIZEOF_INT = 4
+const POSITION_2D_NB_FLOATS = 2
+const POSITION_3D_NB_FLOATS = 3
+const NORMAL_NB_FLOATS = 3
+const TAGENT_NB_FLOATS = 4
+const COLOR_NB_FLOATS = 4
+const UV_NB_FLOATS = 2
+const UV2_NB_FLOATS = 2
+const BONES_NB_INTS = 4
+const WEIGHT_NB_FLOATS = 4
+
+static var vertex_formats_cache : Dictionary[int, int]
+
+static func get_or_create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int:
+	var mask : int = get_mask_from_vertex_format_def(vertex_format_def) 
+	if !vertex_formats_cache.has(mask):
+		vertex_formats_cache[mask] = create_vertex_format(vertex_format_def)
+	return vertex_formats_cache[mask]
+
+static func get_mask_from_vertex_format_def(vf_def : ORC_VertexFormatDef) -> int:
+	return get_mask_from_bool_array([vf_def.is_2d, vf_def.has_normal, vf_def.has_tangent, vf_def.has_color, vf_def.has_uv, vf_def.has_uv2, vf_def.has_bones, vf_def.has_weights])
+
+static func get_mask_from_bool_array(bools : Array[bool]) -> int:
+	if bools.size() > 32:
+		return -1
+	var mask : int = 0
+	for i in bools.size():
+		mask |= 1 << i if bools[i] else 0
+	return mask
+
+static func create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int:
+	var attrs : Array[RDVertexAttribute]
+	
+	if vertex_format_def.is_2d:
+		var positionAttr = RDVertexAttribute.new()
+		positionAttr.format = RenderingDevice.DATA_FORMAT_R32G32_SFLOAT;
+		positionAttr.stride = POSITION_2D_NB_FLOATS * SIZEOF_FLOAT
+		positionAttr.offset = 0
+		positionAttr.location = 0
+		attrs.append(positionAttr)
+	else:
+		var positionAttr = RDVertexAttribute.new()
+		positionAttr.format = RenderingDevice.DATA_FORMAT_R32G32B32_SFLOAT;
+		positionAttr.stride = POSITION_3D_NB_FLOATS * SIZEOF_FLOAT
+		positionAttr.offset = 0
+		positionAttr.location = 0
+		attrs.append(positionAttr)
+
+	if vertex_format_def.has_normal:
+		var normalAttr = RDVertexAttribute.new()
+		normalAttr.format = RenderingDevice.DATA_FORMAT_R32G32B32_SFLOAT;
+		normalAttr.stride = NORMAL_NB_FLOATS * SIZEOF_FLOAT
+		normalAttr.offset = 0
+		normalAttr.location = 1
+		attrs.append(normalAttr)
+
+	if vertex_format_def.has_tangent:
+		var tangentAttr = RDVertexAttribute.new()
+		tangentAttr.format = RenderingDevice.DATA_FORMAT_R32G32B32A32_SFLOAT ;
+		tangentAttr.stride = TAGENT_NB_FLOATS * SIZEOF_FLOAT
+		tangentAttr.offset = 0
+		tangentAttr.location = 2
+		attrs.append(tangentAttr)
+
+	if vertex_format_def.has_color:
+		var colorAttr = RDVertexAttribute.new()
+		colorAttr.format = RenderingDevice.DATA_FORMAT_R32G32B32A32_SFLOAT ;
+		colorAttr.stride = COLOR_NB_FLOATS * SIZEOF_FLOAT
+		colorAttr.offset = 0
+		colorAttr.location = 3
+		attrs.append(colorAttr)
+
+	if vertex_format_def.has_uv:
+		var uvAttr = RDVertexAttribute.new()
+		uvAttr.format = RenderingDevice.DATA_FORMAT_R32G32_SFLOAT;
+		uvAttr.stride = UV_NB_FLOATS * SIZEOF_FLOAT
+		uvAttr.offset = 0
+		uvAttr.location = 4
+		attrs.append(uvAttr)
+
+	if vertex_format_def.has_uv2:
+		var uv2Attr = RDVertexAttribute.new()
+		uv2Attr.format = RenderingDevice.DATA_FORMAT_R32G32_SFLOAT;
+		uv2Attr.stride = UV_NB_FLOATS * SIZEOF_FLOAT
+		uv2Attr.offset = 0
+		uv2Attr.location = 5
+		attrs.append(uv2Attr)
+
+	if vertex_format_def.has_bones:
+		var bonesAttr = RDVertexAttribute.new()
+		bonesAttr.format = RenderingDevice.DATA_FORMAT_R32G32B32A32_SINT;
+		bonesAttr.stride = BONES_NB_INTS * SIZEOF_INT
+		bonesAttr.offset = 0
+		bonesAttr.location = 6
+		attrs.append(bonesAttr)
+
+	if vertex_format_def.has_weights:
+		var weightsAttr = RDVertexAttribute.new()
+		weightsAttr.format = RenderingDevice.DATA_FORMAT_R32G32B32A32_SFLOAT;
+		weightsAttr.stride = WEIGHT_NB_FLOATS * SIZEOF_FLOAT
+		weightsAttr.offset = 0
+		weightsAttr.location = 7
+		attrs.append(weightsAttr)
+
+	return rd.vertex_format_create(attrs)

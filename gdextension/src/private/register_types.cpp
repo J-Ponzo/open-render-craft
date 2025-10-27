@@ -9,6 +9,7 @@
 #include <proxy_object.h>
 #include <proxy_factory.h>
 #include <proxy_cache.h>
+#include <pso.h>
 
 #include <gdextension_interface.h>
 #include <godot_cpp/core/defs.hpp>
@@ -34,6 +35,7 @@ void initialize_orc_module(ModuleInitializationLevel p_level) {
 	GDREGISTER_RUNTIME_CLASS(ORC_ProxyObject);
 	GDREGISTER_RUNTIME_CLASS(ORC_ProxyFactory);
 	GDREGISTER_RUNTIME_CLASS(ORC_ProxyCache);
+	GDREGISTER_RUNTIME_CLASS(ORC_PSO);
 
 #ifdef DEBUG_ENABLED
     UtilityFunctions::print("Registering test classes (DEBUG build)");
