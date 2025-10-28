@@ -20,12 +20,16 @@ void ORC_ProxyFactory::_bind_methods() {
 
 Ref<ORC_ProxyObject> ORC_ProxyFactory::create_from(Node* node, Ref<ORC_ProxyCache> cache) {
     Ref<ORC_ProxyObject> proxy_object = create_proxy_from(node);
+    if (!proxy_object.is_valid()) return Ref<ORC_ProxyObject>();
+
+    proxy_object->set_node(node);
+
     Ref<ORC_PrimaryData> primary_data = create_data_from(node, cache);
-    if (proxy_object.is_valid() && primary_data.is_valid()) {
-        proxy_object->set_node(node);
-        proxy_object->set_primary_data(primary_data);
-        primary_data->set_proxy_object(proxy_object);
-    }
+    if (!primary_data.is_valid()) return Ref<ORC_ProxyObject>();
+
+    proxy_object->set_primary_data(primary_data);
+    primary_data->set_proxy_object(proxy_object);
+
     return proxy_object;
 }
 

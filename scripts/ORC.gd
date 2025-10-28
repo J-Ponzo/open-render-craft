@@ -5,6 +5,8 @@ const ERR_RENDERER_IDX_UNDEFINED = "Cannot switch the active renderer to %d. No 
 const NATIVE_RENDERER_IDX = -1
 const INVALID_RENDERER_IDX = -2
 
+static var rd = RenderingServer.get_rendering_device()
+
 # TODO put this in project settings
 var registry : ORC_RenderersRegistry_Def = preload("res://renderers_registry.tres")
 

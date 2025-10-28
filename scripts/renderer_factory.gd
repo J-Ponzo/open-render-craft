@@ -1,7 +1,5 @@
 class_name ORC_RendererFactory
 
-static var rd = RenderingServer.get_rendering_device()
-
 static func create_renderer(renderer_def : ORC_Renderer_Def) -> ORC_RendererBase:
 	var renderer_inst : ORC_RendererBase = ORC_ImplFactory.create_impl(renderer_def.renderer_impl) as ORC_RendererBase
 	var scn_proxy_inst : ORC_SceneProxyBase = ORC_ImplFactory.create_impl(renderer_def.scene_proxy_impl) as ORC_SceneProxyBase
@@ -40,7 +38,7 @@ static func create_texture_attachment(attach_format_def : ORC_AttachmentFormat_D
 	tf.format = attach_format_def.format
 	var view = RDTextureView.new();
 
-	return rd.texture_create(tf, view)
+	return ORC.rd.texture_create(tf, view)
 
 static func create_render_pass(renderer_inst : ORC_RendererBase, render_pass_key : StringName, render_pass_def : ORC_RenderPassDef) -> ORC_RenderPassBase:
 	var render_pass_inst = ORC_ImplFactory.create_impl(render_pass_def.pass_impl) as ORC_RenderPassBase
@@ -55,9 +53,10 @@ static func create_render_pass(renderer_inst : ORC_RendererBase, render_pass_key
 	var named_attachments : Array[RID]
 	for name in render_pass_def.framebuffer_format_def.get_all_attachment_keys():
 		named_attachments.append(renderer_inst.render_attachments[name])
-	render_pass_inst.framebuffer = rd.framebuffer_create(named_attachments, render_pass_inst.framebuffer_format)
+	render_pass_inst.framebuffer = ORC.rd.framebuffer_create(named_attachments, render_pass_inst.framebuffer_format)
 
-	# TODO : explicits_pso = create_explicits_pso_from_defs(render_pass_def.explicite_pso_defs)
+	for key : StringName in render_pass_def.explicite_pso_defs.keys():
+		render_pass_inst.explicits_pso[key] = create_pso(render_pass_def.explicite_pso_defs[key], render_pass_inst.framebuffer_format)
 
 	return render_pass_inst
 
@@ -72,7 +71,7 @@ static func create_framebuffer_format_from_def(fb_format_def : ORC_FramebufferFo
 			attachment_format.usage_flags |= bit
 		attachment_formats.append(attachment_format)
 
-	return rd.framebuffer_format_create(attachment_formats)
+	return ORC.rd.framebuffer_format_create(attachment_formats)
 
 static func create_pso(pso_def : ORC_ExpicitPSODef, framebuffer_format : int) -> ORC_PSO:
 	var instance = ORC_PSO.new()
@@ -168,7 +167,7 @@ static func create_pso(pso_def : ORC_ExpicitPSODef, framebuffer_format : int) ->
 	colorBlendState.enable_logic_op = pso_def.enable_logic_op
 	colorBlendState.logic_op = pso_def.logic_op
 
-	instance.pipeline = rd.render_pipeline_create(instance.shader_program, framebuffer_format, instance.vertex_format, RenderingDevice.RENDER_PRIMITIVE_TRIANGLES, rasterizationState, multisampleState, depthStencilState, colorBlendState)
+	instance.pipeline = ORC.rd.render_pipeline_create(instance.shader_program, framebuffer_format, instance.vertex_format, RenderingDevice.RENDER_PRIMITIVE_TRIANGLES, rasterizationState, multisampleState, depthStencilState, colorBlendState)
 
 	return instance
 
@@ -178,7 +177,7 @@ static func compile_shader(vertex_src : String, fragment_src : String) -> RID:
 	shader_source.source_vertex = vertex_src;
 	shader_source.source_fragment = fragment_src;
 	
-	return rd.shader_create_from_spirv(rd.shader_compile_spirv_from_source(shader_source))
+	return ORC.rd.shader_create_from_spirv(ORC.rd.shader_compile_spirv_from_source(shader_source))
 
 # TODO : refacto from here. Factory should be stateless
 
@@ -287,4 +286,4 @@ static func create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int
 		weightsAttr.location = 7
 		attrs.append(weightsAttr)
 
-	return rd.vertex_format_create(attrs)
+	return ORC.rd.vertex_format_create(attrs)
