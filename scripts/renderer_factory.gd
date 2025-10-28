@@ -8,11 +8,11 @@ static func create_renderer(renderer_def : ORC_Renderer_Def) -> ORC_RendererBase
 	scn_proxy_inst.renderer = renderer_inst
 	scn_proxy_inst.proxy_factory = proxy_factory_inst
 	
-	for key : StringName in renderer_def.renderer_pass_defs.keys():
-		create_render_pass(renderer_inst, key, renderer_def.renderer_pass_defs[key])
-	
-	for key : StringName in renderer_def.renderer_pass_defs.keys():
+	for key : StringName in renderer_def.attachment_format_defs.keys():
 		create_attachment(renderer_inst, key, renderer_def.attachment_format_defs[key])
+
+	for key : StringName in renderer_def.renderer_pass_defs.keys():
+		create_render_pass(renderer_inst, key, renderer_def)
 	
 	return renderer_inst
 
@@ -40,7 +40,8 @@ static func create_texture_attachment(attach_format_def : ORC_AttachmentFormat_D
 
 	return ORC.rd.texture_create(tf, view)
 
-static func create_render_pass(renderer_inst : ORC_RendererBase, render_pass_key : StringName, render_pass_def : ORC_RenderPassDef) -> ORC_RenderPassBase:
+static func create_render_pass(renderer_inst : ORC_RendererBase, render_pass_key : StringName, renderer_def : ORC_Renderer_Def) -> ORC_RenderPassBase:
+	var render_pass_def = renderer_def.renderer_pass_defs[render_pass_key]
 	var render_pass_inst = ORC_ImplFactory.create_impl(render_pass_def.pass_impl) as ORC_RenderPassBase
 	if render_pass_inst == null:
 		return null
@@ -48,11 +49,11 @@ static func create_render_pass(renderer_inst : ORC_RendererBase, render_pass_key
 	render_pass_inst.renderer = renderer_inst
 	renderer_inst.render_passes[render_pass_key] = render_pass_inst
 
-	render_pass_inst.framebuffer_format = create_framebuffer_format_from_def(render_pass_def.framebuffer_format_def, render_pass_def.attachment_format_def)	
+	render_pass_inst.framebuffer_format = create_framebuffer_format_from_def(render_pass_def.fb_format_def, renderer_def.attachment_format_defs)
 
 	var named_attachments : Array[RID]
-	for name in render_pass_def.framebuffer_format_def.get_all_attachment_keys():
-		named_attachments.append(renderer_inst.render_attachments[name])
+	for name in render_pass_def.fb_format_def.get_all_attachment_keys():
+		named_attachments.append(renderer_inst.attachments[name])
 	render_pass_inst.framebuffer = ORC.rd.framebuffer_create(named_attachments, render_pass_inst.framebuffer_format)
 
 	for key : StringName in render_pass_def.explicite_pso_defs.keys():
@@ -60,14 +61,14 @@ static func create_render_pass(renderer_inst : ORC_RendererBase, render_pass_key
 
 	return render_pass_inst
 
-static func create_framebuffer_format_from_def(fb_format_def : ORC_FramebufferFormat_Def, attachment_format_def : ORC_AttachmentFormat_Def) -> int:
+static func create_framebuffer_format_from_def(fb_format_def : ORC_FramebufferFormat_Def, attachment_format_defs : Dictionary[StringName, ORC_AttachmentFormat_Def]) -> int:
 	var attachment_formats : Array[RDAttachmentFormat]
 
 	for attach_key : StringName in fb_format_def.get_all_attachment_keys():
 		var attachment_format : RDAttachmentFormat = RDAttachmentFormat.new()
-		attachment_format.format = attachment_format_def.format
+		attachment_format.format = attachment_format_defs[attach_key].format
 		attachment_format.usage_flags = 0
-		for bit in attachment_format_def.usage_flags:
+		for bit in attachment_format_defs[attach_key].usage_flags:
 			attachment_format.usage_flags |= bit
 		attachment_formats.append(attachment_format)
 
