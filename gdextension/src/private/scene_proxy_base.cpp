@@ -15,6 +15,8 @@ void ORC_SceneProxyBase::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_proxy_factory", "proxy_factory"), &ORC_SceneProxyBase::set_proxy_factory);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "proxy_factory", PROPERTY_HINT_RESOURCE_TYPE, "ORC_ProxyFactory"), "set_proxy_factory", "get_proxy_factory");
 
+	ClassDB::bind_method(D_METHOD("get_by_type", "script"), &ORC_SceneProxyBase::get_by_type_gd);
+
 	BIND_GD_OVERRIDABLE_METHOD(ORC_SceneProxyBase, setup, "scene")
 	BIND_GD_OVERRIDABLE_METHOD(ORC_SceneProxyBase, pre_render)
 	BIND_GD_OVERRIDABLE_METHOD(ORC_SceneProxyBase, post_render)
@@ -101,4 +103,15 @@ void ORC_SceneProxyBase::cleanup_impl() {
 	find_all_in_tree(this->scene_root, [](Node* node) { return true; }, all_nodes);
 	for (Node* node : all_nodes)
 		on_node_exit_tree(node);
+}
+
+TypedArray<ORC_ProxyData> ORC_SceneProxyBase::get_by_type_gd(const Ref<GDScript>& script) const {
+	TypedArray<ORC_ProxyData> result;
+	if (!proxy_cache.is_valid() || !script.is_valid()) return result;
+	
+	std::vector<Ref<ORC_ProxyData>> raw = proxy_cache->get_by_type(TypeKey(script));
+	for (const auto& data : raw) {
+		result.append(data);
+	}
+	return result;
 }

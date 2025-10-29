@@ -49,31 +49,31 @@ func test_post_render():
 
 func test_update_all_proxy():	
 	var nb_all_proxy = nb_mesh_proxy + nb_cam_proxy + nb_omni_proxy + nb_spot_proxy + nb_directional_proxy
-	var actual_all_update_count = ORCTEST_ProxyFactory_GDMock.MockProxyObject.all_update_count
+	var actual_all_update_count = ORCTEST_MockProxyObject.all_update_count
 	var expected_all_update_count = nb_updates * nb_all_proxy
 	assert_int(actual_all_update_count).is_equal(expected_all_update_count)
 
 func test_update_mesh():	
-	var actual_mesh_update_count = ORCTEST_ProxyFactory_GDMock.MeshProxy.mesh_update_count
+	var actual_mesh_update_count = ORCTEST_MeshProxy.mesh_update_count
 	var expected_mesh_update_count = nb_updates * nb_mesh_proxy
 	assert_int(actual_mesh_update_count).is_equal(expected_mesh_update_count)
 
 func test_update_cam():
-	var actual_cam_update_count = ORCTEST_ProxyFactory_GDMock.CameraProxy.cam_update_count
+	var actual_cam_update_count = ORCTEST_CameraProxy.cam_update_count
 	var expected_cam_update_count = nb_updates * nb_cam_proxy
 	assert_int(actual_cam_update_count).is_equal(expected_cam_update_count)
 
 func test_update_omni():	
-	var actual_omni_update_count = ORCTEST_ProxyFactory_GDMock.OmniLightProxy.omni_update_count
+	var actual_omni_update_count = ORCTEST_ProxyFactory_GDMock.ORCTEST_OmniLightProxy.omni_update_count
 	var expected_omni_update_count = nb_updates * nb_omni_proxy
 	assert_int(actual_omni_update_count).is_equal(expected_omni_update_count)
 
 func test_update_spot():
-	var actual_spot_update_count = ORCTEST_ProxyFactory_GDMock.SpotLightProxy.spot_update_count
+	var actual_spot_update_count = ORCTEST_ProxyFactory_GDMock.ORCTEST_SpotLightProxy.spot_update_count
 	var expected_spot_update_count = nb_updates * nb_spot_proxy
 	assert_int(actual_spot_update_count).is_equal(expected_spot_update_count)
 
 func test_update_directional():
-	var actual_directional_update_count = ORCTEST_ProxyFactory_GDMock.DirectionalLightProxy.directional_update_count
+	var actual_directional_update_count = ORCTEST_ProxyFactory_GDMock.ORCTEST_DirectionalLightProxy.directional_update_count
 	var expected_directional_update_count = nb_updates * nb_directional_proxy
 	assert_int(actual_directional_update_count).is_equal(expected_directional_update_count)

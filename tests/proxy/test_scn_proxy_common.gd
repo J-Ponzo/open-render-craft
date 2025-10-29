@@ -1,7 +1,7 @@
 class_name ORCTEST_ScnProxyTestsCommon
 
 static func load_mock_scene(scn_tree : SceneTree) -> Node:
-	var scene = load("res://addons/open-render-craft/tests/proxy/proxy_mock_scene.tscn") as PackedScene
+	var scene = load("res://addons/open-render-craft/tests/proxy/mocks/proxy_mock_scene.tscn") as PackedScene
 	assert(scene != null, "load_mock_scene() : cannot load mock scene")
 	var instance = scene.instantiate()
 	assert(instance != null, "load_mock_scene() : cannot instantiate mock scene")

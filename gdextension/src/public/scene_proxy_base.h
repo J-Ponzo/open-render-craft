@@ -3,6 +3,8 @@
 
 #include <godot_cpp/classes/ref_counted.hpp>
 #include <godot_cpp/classes/node.hpp>
+#include <godot_cpp/classes/gd_script.hpp>
+#include <godot_cpp/variant/typed_array.hpp>
 #include <renderer_base.h>
 #include <proxy_cache.h>
 #include <proxy_factory.h>
@@ -42,6 +44,19 @@ public:
 	Ref<ORC_RendererBase> renderer;
 	Ref<ORC_RendererBase> get_renderer() const { return renderer; }
 	void set_renderer(const Ref<ORC_RendererBase> &renderer) { this->renderer = renderer; }
+
+	template <class T>
+	std::vector<Ref<T>> get_by_type() const {
+		std::vector<Ref<ORC_ProxyData>> raw = proxy_cache->get_by_type(TypeKey(typeid(T)));
+		std::vector<Ref<T>> result;
+		result.reserve(raw.size());
+		for (const auto& data : raw) {
+			result.push_back(Ref<T>(Object::cast_to<T>(data.ptr())));
+		}
+		return result;
+	}
+
+	TypedArray<ORC_ProxyData> get_by_type_gd(const Ref<GDScript>& script) const;
 
 	DECLARE_GD_OVERRIDABLE_METHOD(void, setup, Node*)
 	DECLARE_GD_OVERRIDABLE_METHOD(void, pre_render)
