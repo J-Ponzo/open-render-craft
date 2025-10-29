@@ -30,9 +30,9 @@ public:
     RID get_pipeline() const { return pipeline; }
     void set_pipeline(const RID &pipeline) { this->pipeline = pipeline; }
 
-    int vertex_format = -1;
-    int get_vertex_format() const { return vertex_format; }
-    void set_vertex_format(int vertex_format) { this->vertex_format = vertex_format; }
+    int64_t vertex_format = -1;
+    int64_t get_vertex_format() const { return vertex_format; }
+    void set_vertex_format(int64_t vertex_format) { this->vertex_format = vertex_format; }
 };
 
 }

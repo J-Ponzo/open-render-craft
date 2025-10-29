@@ -32,9 +32,9 @@ public:
     Dictionary get_explicits_pso() const { return explicits_pso; }
     void set_explicits_pso(const Dictionary &explicits_pso) { this->explicits_pso = explicits_pso; }
 
-    int framebuffer_format = -1;
-    int get_framebuffer_format() const { return framebuffer_format; }
-    void set_framebuffer_format(int framebuffer_format) { this->framebuffer_format = framebuffer_format; }
+    int64_t framebuffer_format = -1;
+    int64_t get_framebuffer_format() const { return framebuffer_format; }
+    void set_framebuffer_format(int64_t framebuffer_format) { this->framebuffer_format = framebuffer_format; }
 
     RID framebuffer;
     RID get_framebuffer() const { return framebuffer; }

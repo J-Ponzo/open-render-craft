@@ -102,7 +102,9 @@ static func create_pso(pso_def : ORC_ExpicitPSODef, framebuffer_format : int) ->
 	instance.shader_program = compile_shader(vertex_shader_src, fragment_shader_src)
 
 	var vf_def : ORC_VertexFormatDef = pso_def.vertex_format_def
-	instance.vertex_format = get_or_create_vertex_format(vf_def)
+	var vf : int = create_vertex_format(vf_def)
+	instance.vertex_format = vf
+	print("Using vertex format id:", vf)
 
 	var rasterizationState = RDPipelineRasterizationState.new()
 	rasterizationState.cull_mode = pso_def.rasterization_state.cull_mode
@@ -214,7 +216,7 @@ static func get_mask_from_bool_array(bools : Array[bool]) -> int:
 	return mask
 
 static func create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int:
-	var attrs : Array[RDVertexAttribute]
+	var attrs : Array[RDVertexAttribute] = []
 	
 	if vertex_format_def.is_2d:
 		var positionAttr = RDVertexAttribute.new()
@@ -222,6 +224,7 @@ static func create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int
 		positionAttr.stride = POSITION_2D_NB_FLOATS * SIZEOF_FLOAT
 		positionAttr.offset = 0
 		positionAttr.location = 0
+		positionAttr.frequency = RenderingDevice.VERTEX_FREQUENCY_VERTEX
 		attrs.append(positionAttr)
 	else:
 		var positionAttr = RDVertexAttribute.new()
@@ -229,6 +232,7 @@ static func create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int
 		positionAttr.stride = POSITION_3D_NB_FLOATS * SIZEOF_FLOAT
 		positionAttr.offset = 0
 		positionAttr.location = 0
+		positionAttr.frequency = RenderingDevice.VERTEX_FREQUENCY_VERTEX
 		attrs.append(positionAttr)
 
 	if vertex_format_def.has_normal:
@@ -237,6 +241,7 @@ static func create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int
 		normalAttr.stride = NORMAL_NB_FLOATS * SIZEOF_FLOAT
 		normalAttr.offset = 0
 		normalAttr.location = 1
+		normalAttr.frequency = RenderingDevice.VERTEX_FREQUENCY_VERTEX
 		attrs.append(normalAttr)
 
 	if vertex_format_def.has_tangent:
@@ -245,6 +250,7 @@ static func create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int
 		tangentAttr.stride = TAGENT_NB_FLOATS * SIZEOF_FLOAT
 		tangentAttr.offset = 0
 		tangentAttr.location = 2
+		tangentAttr.frequency = RenderingDevice.VERTEX_FREQUENCY_VERTEX
 		attrs.append(tangentAttr)
 
 	if vertex_format_def.has_color:
@@ -253,6 +259,7 @@ static func create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int
 		colorAttr.stride = COLOR_NB_FLOATS * SIZEOF_FLOAT
 		colorAttr.offset = 0
 		colorAttr.location = 3
+		colorAttr.frequency = RenderingDevice.VERTEX_FREQUENCY_VERTEX
 		attrs.append(colorAttr)
 
 	if vertex_format_def.has_uv:
@@ -261,6 +268,7 @@ static func create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int
 		uvAttr.stride = UV_NB_FLOATS * SIZEOF_FLOAT
 		uvAttr.offset = 0
 		uvAttr.location = 4
+		uvAttr.frequency = RenderingDevice.VERTEX_FREQUENCY_VERTEX
 		attrs.append(uvAttr)
 
 	if vertex_format_def.has_uv2:
@@ -269,6 +277,7 @@ static func create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int
 		uv2Attr.stride = UV_NB_FLOATS * SIZEOF_FLOAT
 		uv2Attr.offset = 0
 		uv2Attr.location = 5
+		uv2Attr.frequency = RenderingDevice.VERTEX_FREQUENCY_VERTEX
 		attrs.append(uv2Attr)
 
 	if vertex_format_def.has_bones:
@@ -277,6 +286,7 @@ static func create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int
 		bonesAttr.stride = BONES_NB_INTS * SIZEOF_INT
 		bonesAttr.offset = 0
 		bonesAttr.location = 6
+		bonesAttr.frequency = RenderingDevice.VERTEX_FREQUENCY_VERTEX
 		attrs.append(bonesAttr)
 
 	if vertex_format_def.has_weights:
@@ -285,6 +295,9 @@ static func create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int
 		weightsAttr.stride = WEIGHT_NB_FLOATS * SIZEOF_FLOAT
 		weightsAttr.offset = 0
 		weightsAttr.location = 7
+		weightsAttr.frequency = RenderingDevice.VERTEX_FREQUENCY_VERTEX
 		attrs.append(weightsAttr)
 
-	return ORC.rd.vertex_format_create(attrs)
+	var vf = ORC.rd.vertex_format_create(attrs)
+	print("Created vertex format id: ", vf)
+	return vf
