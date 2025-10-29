@@ -182,7 +182,7 @@ static func compile_shader(vertex_src : String, fragment_src : String) -> RID:
 	
 	return ORC.rd.shader_create_from_spirv(ORC.rd.shader_compile_spirv_from_source(shader_source))
 
-# TODO : refacto from here. Factory should be stateless
+# TODO : check is caching is needed. If not, consts still should be moved elsewhere
 
 const SIZEOF_FLOAT = 4
 const SIZEOF_INT = 4
@@ -196,27 +196,27 @@ const UV2_NB_FLOATS = 2
 const BONES_NB_INTS = 4
 const WEIGHT_NB_FLOATS = 4
 
-static var vertex_formats_cache : Dictionary[int, int]
+# static var vertex_formats_cache : Dictionary[int, int]
 
-static func get_or_create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int:
-	var mask : int = get_mask_from_vertex_format_def(vertex_format_def) 
-	if !vertex_formats_cache.has(mask):
-		vertex_formats_cache[mask] = create_vertex_format(vertex_format_def)
-	return vertex_formats_cache[mask]
+# static func get_or_create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int:
+# 	var mask : int = get_mask_from_vertex_format_def(vertex_format_def) 
+# 	if !vertex_formats_cache.has(mask):
+# 		vertex_formats_cache[mask] = create_vertex_format(vertex_format_def)
+# 	return vertex_formats_cache[mask]
 
-static func get_mask_from_vertex_format_def(vf_def : ORC_VertexFormatDef) -> int:
-	return get_mask_from_bool_array([vf_def.is_2d, vf_def.has_normal, vf_def.has_tangent, vf_def.has_color, vf_def.has_uv, vf_def.has_uv2, vf_def.has_bones, vf_def.has_weights])
+# static func get_mask_from_vertex_format_def(vf_def : ORC_VertexFormatDef) -> int:
+# 	return get_mask_from_bool_array([vf_def.is_2d, vf_def.has_normal, vf_def.has_tangent, vf_def.has_color, vf_def.has_uv, vf_def.has_uv2, vf_def.has_bones, vf_def.has_weights])
 
-static func get_mask_from_bool_array(bools : Array[bool]) -> int:
-	if bools.size() > 32:
-		return -1
-	var mask : int = 0
-	for i in bools.size():
-		mask |= 1 << i if bools[i] else 0
-	return mask
+# static func get_mask_from_bool_array(bools : Array[bool]) -> int:
+# 	if bools.size() > 32:
+# 		return -1
+# 	var mask : int = 0
+# 	for i in bools.size():
+# 		mask |= 1 << i if bools[i] else 0
+# 	return mask
 
 static func create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int:
-	var attrs : Array[RDVertexAttribute] = []
+	var attrs : Array[RDVertexAttribute]
 	
 	if vertex_format_def.is_2d:
 		var positionAttr = RDVertexAttribute.new()
