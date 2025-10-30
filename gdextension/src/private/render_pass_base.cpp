@@ -29,15 +29,12 @@ void ORC_RenderPassBase::_bind_methods() {
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_RenderPassBase, void, setup)
 void ORC_RenderPassBase::setup_impl() {
-    UtilityFunctions::print("ORC_RenderPassBase.setup");
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_RenderPassBase, void, render)
 void ORC_RenderPassBase::render_impl() {
-    UtilityFunctions::print("ORC_RenderPassBase.render");
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_RenderPassBase, void, cleanup)
 void ORC_RenderPassBase::cleanup_impl() {
-    UtilityFunctions::print("ORC_RenderPassBase.cleanup");
 }

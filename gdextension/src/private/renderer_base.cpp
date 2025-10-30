@@ -32,55 +32,21 @@ void ORC_RendererBase::_bind_methods() {
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_RendererBase, void, setup)
 void ORC_RendererBase::setup_impl() {
-	UtilityFunctions::print("ORC_RendererBase.setup");
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_RendererBase, void, pre_render)
 void ORC_RendererBase::pre_render_impl(){
-	UtilityFunctions::print("ORC_RendererBase.pre_render");
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_RendererBase, void, render)
 void ORC_RendererBase::render_impl() {
-	UtilityFunctions::print("ORC_RendererBase.render");
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_RendererBase, RID, get_render_target)
 RID ORC_RendererBase::get_render_target_impl() {
-	UtilityFunctions::print("ORC_RendererBase.get_render_target");
-
-	RenderingDevice *rd = RenderingServer::get_singleton()->get_rendering_device();
-
-    const int width = 512;
-    const int height = 512;
-
-	Ref<RDTextureFormat> tex_format;
-    tex_format.instantiate();
-    tex_format->set_format(RenderingDevice::DATA_FORMAT_R8G8B8A8_UNORM);
-    tex_format->set_width(width);
-    tex_format->set_height(height);
-    tex_format->set_usage_bits(RenderingDevice::TEXTURE_USAGE_SAMPLING_BIT | RenderingDevice::TEXTURE_USAGE_COLOR_ATTACHMENT_BIT | RenderingDevice::TEXTURE_USAGE_CAN_UPDATE_BIT);
-
-    Ref<RDTextureView> tex_view;
-    tex_view.instantiate();
-
-    RID rid = rd->texture_create(tex_format, tex_view, TypedArray<PackedByteArray>());
-
-    PackedByteArray data;
-    data.resize(width * height * 4);
-    uint8_t *ptr = data.ptrw();
-    for (int i = 0; i < width * height; i++) {
-        ptr[i * 4 + 0] = 255; // R
-        ptr[i * 4 + 1] = 0;   // G
-        ptr[i * 4 + 2] = 255; // B
-        ptr[i * 4 + 3] = 255; // A
-    }
-
-    rd->texture_update(rid, 0, data);
-    return rid;
+    return RID();
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_RendererBase, void, cleanup)
 void ORC_RendererBase::cleanup_impl() {
-	UtilityFunctions::print("ORC_SceneProxyBase.cleanup");
 }

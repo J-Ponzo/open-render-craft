@@ -106,7 +106,6 @@ func _process(delta: float) -> void:
 				renderers[active_renderer_idx].scene_proxy.pre_render()
 				renderers[active_renderer_idx].pre_render()
 				renderers[active_renderer_idx].render()
-				renderers[active_renderer_idx].scene_proxy.post_render()
 			
 func _unhandled_input(event):
 	if event is InputEventKey:

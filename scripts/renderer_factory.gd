@@ -2,7 +2,7 @@ class_name ORC_RendererFactory
 
 static func create_renderer(renderer_def : ORC_Renderer_Def) -> ORC_RendererBase:
 	var renderer_inst : ORC_RendererBase = ORC_ImplFactory.create_impl(renderer_def.renderer_impl) as ORC_RendererBase
-	var scn_proxy_inst : ORC_SceneProxyBase = ORC_ImplFactory.create_impl(renderer_def.scene_proxy_impl) as ORC_SceneProxyBase
+	var scn_proxy_inst : ORC_SceneProxyBase = ORC_SceneProxyBase.new()
 	var proxy_factory_inst : ORC_ProxyFactory = ORC_ImplFactory.create_impl(renderer_def.proxy_factory_impl) as ORC_ProxyFactory
 	renderer_inst.scene_proxy = scn_proxy_inst
 	scn_proxy_inst.renderer = renderer_inst
@@ -102,9 +102,7 @@ static func create_pso(pso_def : ORC_ExpicitPSODef, framebuffer_format : int) ->
 	instance.shader_program = compile_shader(vertex_shader_src, fragment_shader_src)
 
 	var vf_def : ORC_VertexFormatDef = pso_def.vertex_format_def
-	var vf : int = create_vertex_format(vf_def)
-	instance.vertex_format = vf
-	print("Using vertex format id:", vf)
+	instance.vertex_format = create_vertex_format(vf_def)
 
 	var rasterizationState = RDPipelineRasterizationState.new()
 	rasterizationState.cull_mode = pso_def.rasterization_state.cull_mode
@@ -298,6 +296,4 @@ static func create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int
 		weightsAttr.frequency = RenderingDevice.VERTEX_FREQUENCY_VERTEX
 		attrs.append(weightsAttr)
 
-	var vf = ORC.rd.vertex_format_create(attrs)
-	print("Created vertex format id: ", vf)
-	return vf
+	return ORC.rd.vertex_format_create(attrs)

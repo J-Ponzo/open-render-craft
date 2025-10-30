@@ -23,7 +23,7 @@ class ORC_RendererBase;
 class ORC_API ORC_SceneProxyBase : public RefCounted {
 	GDCLASS(ORC_SceneProxyBase, RefCounted)
 
-protected:
+private:
 	static void _bind_methods();
 
 	Node* scene_root;
@@ -34,6 +34,10 @@ protected:
 	Ref<ORC_ProxyFactory> get_proxy_factory() const { return proxy_factory; }
 	void set_proxy_factory(const Ref<ORC_ProxyFactory> &proxy_factory) { this->proxy_factory = proxy_factory; }
 
+	void setup(Node* scene);
+	void pre_render();
+	void cleanup();
+
 	void on_node_enter_tree(Node* node);
 	void on_node_exit_tree(Node* node);
 
@@ -41,6 +45,7 @@ public:
 	ORC_SceneProxyBase();
 	~ORC_SceneProxyBase();
 
+	// TODO maybe useless
 	Ref<ORC_RendererBase> renderer;
 	Ref<ORC_RendererBase> get_renderer() const { return renderer; }
 	void set_renderer(const Ref<ORC_RendererBase> &renderer) { this->renderer = renderer; }
@@ -58,11 +63,6 @@ public:
 
 	TypedArray<ORC_ProxyData> get_by_type_gd(const Ref<GDScript>& script) const;
 	String dump_cache() const;
-
-	DECLARE_GD_OVERRIDABLE_METHOD(void, setup, Node*)
-	DECLARE_GD_OVERRIDABLE_METHOD(void, pre_render)
-	DECLARE_GD_OVERRIDABLE_METHOD(void, post_render)
-	DECLARE_GD_OVERRIDABLE_METHOD(void, cleanup)
 };
 
 }

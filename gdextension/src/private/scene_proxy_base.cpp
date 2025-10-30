@@ -18,10 +18,9 @@ void ORC_SceneProxyBase::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_by_type", "script"), &ORC_SceneProxyBase::get_by_type_gd);
 	ClassDB::bind_method(D_METHOD("dump_cache"), &ORC_SceneProxyBase::dump_cache);
 
-	BIND_GD_OVERRIDABLE_METHOD(ORC_SceneProxyBase, setup, "scene")
-	BIND_GD_OVERRIDABLE_METHOD(ORC_SceneProxyBase, pre_render)
-	BIND_GD_OVERRIDABLE_METHOD(ORC_SceneProxyBase, post_render)
-	BIND_GD_OVERRIDABLE_METHOD(ORC_SceneProxyBase, cleanup)
+	ClassDB::bind_method(D_METHOD("setup", "scene"), &ORC_SceneProxyBase::setup);
+	ClassDB::bind_method(D_METHOD("pre_render"), &ORC_SceneProxyBase::pre_render);
+	ClassDB::bind_method(D_METHOD("cleanup"), &ORC_SceneProxyBase::cleanup);
 }
 
 ORC_SceneProxyBase::ORC_SceneProxyBase() {
@@ -50,8 +49,7 @@ static void find_all_in_tree(Node* root, bool(*selector)(Node*), std::vector<Nod
     }
 }
 
-DEFINE_GD_OVERRIDABLE_METHOD_1_ARGS(ORC_SceneProxyBase, void, setup, Node*, scene)
-void ORC_SceneProxyBase::setup_impl(Node* scene) {
+void ORC_SceneProxyBase::setup(Node* scene) {
 	this->scene_root = scene;
 	this->scene_root->get_tree()->connect("node_added", callable_mp(this, &ORC_SceneProxyBase::on_node_enter_tree));
 	this->scene_root->get_tree()->connect("node_removed", callable_mp(this, &ORC_SceneProxyBase::on_node_exit_tree));
@@ -74,16 +72,11 @@ void ORC_SceneProxyBase::on_node_enter_tree(Node* node) {
 	proxy_objects_pool[node] = proxy_object;
 }
 
-DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_SceneProxyBase, void, pre_render)
-void ORC_SceneProxyBase::pre_render_impl(){
+void ORC_SceneProxyBase::pre_render(){
 	for (auto& [node, proxy_object] : proxy_objects_pool) {
 		if (proxy_object->is_active_)
 			proxy_object->update();
 	}
-}
-
-DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_SceneProxyBase, void, post_render)
-void ORC_SceneProxyBase::post_render_impl() {
 }
 
 void ORC_SceneProxyBase::on_node_exit_tree(Node* node) {
@@ -95,8 +88,7 @@ void ORC_SceneProxyBase::on_node_exit_tree(Node* node) {
 	proxy_objects_pool.erase(it);
 }
 
-DEFINE_GD_OVERRIDABLE_METHOD_0_ARGS(ORC_SceneProxyBase, void, cleanup)
-void ORC_SceneProxyBase::cleanup_impl() {
+void ORC_SceneProxyBase::cleanup() {
 	this->scene_root->get_tree()->disconnect("node_added", callable_mp(this, &ORC_SceneProxyBase::on_node_enter_tree));
 	this->scene_root->get_tree()->disconnect("node_removed", callable_mp(this, &ORC_SceneProxyBase::on_node_exit_tree));
 
