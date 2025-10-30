@@ -142,6 +142,23 @@ static String get_type_and_address(const Object* obj) {
     return result;
 }
 
+// TODO : put in helper file
+static String get_primary_node_info(ORC_PrimaryData* primary) {
+    if (!primary) return "";
+    
+    Ref<ORC_ProxyObject> proxy_obj = primary->get_proxy_object();
+    if (proxy_obj.is_valid()) {
+        Node* node = proxy_obj->get_node();
+        if (node) {
+            return " (" + get_type_and_address(node) + ")";
+        } else {
+            return " (node: <null>)";
+        }
+    } else {
+        return " (proxy_object: <invalid>)";
+    }
+}
+
 String ORC_ProxyCache::dump_cache() const {
     String output = "=== ORC_ProxyCache Dump ===\n";
     
@@ -174,17 +191,7 @@ String ORC_ProxyCache::dump_cache() const {
                 
                 ORC_PrimaryData* primary = Object::cast_to<ORC_PrimaryData>(data.ptr());
                 if (primary) {
-                    Ref<ORC_ProxyObject> proxy_obj = primary->get_proxy_object();
-                    if (proxy_obj.is_valid()) {
-                        Node* node = proxy_obj->get_node();
-                        if (node) {
-                            output += " (" + get_type_and_address(node) + ")";
-                        } else {
-                            output += " (node: <null>)";
-                        }
-                    } else {
-                        output += " (proxy_object: <invalid>)";
-                    }
+                    output += get_primary_node_info(primary);
                 }
                 
                 ORC_SecondaryData* secondary = Object::cast_to<ORC_SecondaryData>(data.ptr());
@@ -196,6 +203,7 @@ String ORC_ProxyCache::dump_cache() const {
                         output += "        - ";
                         if (prim.is_valid()) {
                             output += get_type_and_address(prim);
+                            output += get_primary_node_info(prim.ptr());
                         } else {
                             output += "<invalid>";
                         }
