@@ -16,6 +16,7 @@ void ORC_SceneProxyBase::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "proxy_factory", PROPERTY_HINT_RESOURCE_TYPE, "ORC_ProxyFactory"), "set_proxy_factory", "get_proxy_factory");
 
 	ClassDB::bind_method(D_METHOD("get_by_type", "script"), &ORC_SceneProxyBase::get_by_type_gd);
+	ClassDB::bind_method(D_METHOD("dump_cache"), &ORC_SceneProxyBase::dump_cache);
 
 	BIND_GD_OVERRIDABLE_METHOD(ORC_SceneProxyBase, setup, "scene")
 	BIND_GD_OVERRIDABLE_METHOD(ORC_SceneProxyBase, pre_render)
@@ -114,4 +115,11 @@ TypedArray<ORC_ProxyData> ORC_SceneProxyBase::get_by_type_gd(const Ref<GDScript>
 		result.append(data);
 	}
 	return result;
+}
+
+String ORC_SceneProxyBase::dump_cache() const {
+	if (!proxy_cache.is_valid()) {
+		return "Proxy cache is not valid.";
+	}
+	return proxy_cache->dump_cache();
 }

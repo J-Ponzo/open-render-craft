@@ -70,6 +70,7 @@ public:
     Ref<ORC_ProxyData> get_by_unique_id(int64_t unique_id) const;
     bool increment_refcount(int64_t unique_id);
     bool decrement_refcount(int64_t unique_id);
+    String dump_cache() const;
 };
 
 }

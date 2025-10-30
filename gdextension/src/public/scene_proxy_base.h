@@ -57,6 +57,7 @@ public:
 	}
 
 	TypedArray<ORC_ProxyData> get_by_type_gd(const Ref<GDScript>& script) const;
+	String dump_cache() const;
 
 	DECLARE_GD_OVERRIDABLE_METHOD(void, setup, Node*)
 	DECLARE_GD_OVERRIDABLE_METHOD(void, pre_render)
