@@ -30,10 +30,12 @@ if os.path.exists(impl_dir):
             impl_define = "ORC_IMPL_" + impl_name.upper().replace("-", "_")
             env.Append(CPPDEFINES=[impl_define])
             
-            # Compile implementation .cpp files
-            impl_obj_dir = os.path.join(obj_dir, "impl", impl_name)
-            VariantDir(impl_obj_dir, impl_path, duplicate=0)
-            sources += Glob(os.path.join(impl_obj_dir, "*.cpp"))
+            # Compile implementation .cpp files from private/
+            impl_private = os.path.join(impl_path, "private")
+            if os.path.exists(impl_private):
+                impl_obj_dir = os.path.join(obj_dir, "impl", impl_name)
+                VariantDir(impl_obj_dir, impl_private, duplicate=0)
+                sources += Glob(os.path.join(impl_obj_dir, "*.cpp"))
             
             print(f"Adding C++ implementation: {impl_name} (define: {impl_define})")
 
