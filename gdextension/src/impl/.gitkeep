@@ -1,0 +1,4 @@
+# This directory is for C++ renderer implementations
+# Users should create symlinks here pointing to their implementation sources
+# Example:
+#   mklink /J potato-cpp ..\..\..\..\orc-renderers-impl\orc-potato-cpp-impl\src

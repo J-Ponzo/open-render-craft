@@ -10,6 +10,7 @@
 #include <proxy_factory.h>
 #include <proxy_cache.h>
 #include <pso.h>
+#include <impl_registry.h>
 
 #include <gdextension_interface.h>
 #include <godot_cpp/core/defs.hpp>
@@ -41,12 +42,16 @@ void initialize_orc_module(ModuleInitializationLevel p_level) {
     UtilityFunctions::print("Registering test classes (DEBUG build)");
 	GDREGISTER_RUNTIME_CLASS(ORCTEST_GDOverridableMacro_Mock);
 #endif
+
+	ORC_ImplRegistry::get_singleton().initialize_all(p_level);
 }
 
 void uninitialize_orc_module(ModuleInitializationLevel p_level) {
 	if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
 		return;
 	}
+
+	ORC_ImplRegistry::get_singleton().uninitialize_all(p_level);
 }
 
 extern "C" {

@@ -1,0 +1,6 @@
+# Ignore all symlinked implementations
+*
+
+# Keep this file and the README
+!.gitignore
+!.gitkeep
