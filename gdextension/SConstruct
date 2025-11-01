@@ -21,21 +21,23 @@ if os.path.exists(impl_dir):
     for impl_name in os.listdir(impl_dir):
         impl_path = os.path.join(impl_dir, impl_name)
         if os.path.isdir(impl_path) and impl_name != ".gitkeep":
-            # Add public headers to include path
-            impl_public = os.path.join(impl_path, "public")
-            if os.path.exists(impl_public):
-                env.Append(CPPPATH=[impl_public])
+            # Add all subdirectories recursively to include path for maximum flexibility
+            for root, dirs, files in os.walk(impl_path):
+                env.Append(CPPPATH=[root])
             
             # Define macro for this implementation
             impl_define = "ORC_IMPL_" + impl_name.upper().replace("-", "_")
             env.Append(CPPDEFINES=[impl_define])
             
-            # Compile implementation .cpp files from private/
-            impl_private = os.path.join(impl_path, "private")
-            if os.path.exists(impl_private):
-                impl_obj_dir = os.path.join(obj_dir, "impl", impl_name)
-                VariantDir(impl_obj_dir, impl_private, duplicate=0)
-                sources += Glob(os.path.join(impl_obj_dir, "*.cpp"))
+            # Compile all .cpp files recursively from the implementation directory
+            impl_obj_dir = os.path.join(obj_dir, "impl", impl_name)
+            for root, dirs, files in os.walk(impl_path):
+                cpp_files = [f for f in files if f.endswith('.cpp')]
+                if cpp_files:
+                    rel_path = os.path.relpath(root, impl_path)
+                    obj_subdir = os.path.join(impl_obj_dir, rel_path) if rel_path != '.' else impl_obj_dir
+                    VariantDir(obj_subdir, root, duplicate=0)
+                    sources += Glob(os.path.join(obj_subdir, "*.cpp"))
             
             print(f"Adding C++ implementation: {impl_name} (define: {impl_define})")
 
