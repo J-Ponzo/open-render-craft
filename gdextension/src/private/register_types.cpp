@@ -10,6 +10,7 @@
 #include <proxy_factory.h>
 #include <proxy_cache.h>
 #include <pso.h>
+#include <rd_helper.h>
 #include <impl_registry.h>
 
 #include <gdextension_interface.h>
@@ -37,6 +38,7 @@ void initialize_orc_module(ModuleInitializationLevel p_level) {
 	GDREGISTER_RUNTIME_CLASS(ORC_ProxyFactory);
 	GDREGISTER_RUNTIME_CLASS(ORC_ProxyCache);
 	GDREGISTER_RUNTIME_CLASS(ORC_PSO);
+	GDREGISTER_RUNTIME_CLASS(ORC_RDHelper);
 
 #ifdef DEBUG_ENABLED
     UtilityFunctions::print("Registering test classes (DEBUG build)");

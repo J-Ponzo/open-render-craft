@@ -102,7 +102,8 @@ static func create_pso(pso_def : ORC_ExpicitPSODef, framebuffer_format : int) ->
 	instance.shader_program = compile_shader(vertex_shader_src, fragment_shader_src)
 
 	var vf_def : ORC_VertexFormatDef = pso_def.vertex_format_def
-	instance.vertex_format = create_vertex_format(vf_def)
+	# instance.vertex_format = create_vertex_format(vf_def)
+	instance.vertex_format = ORC_RDHelper.create_vertex_format(vf_def)
 
 	var rasterizationState = RDPipelineRasterizationState.new()
 	rasterizationState.cull_mode = pso_def.rasterization_state.cull_mode
