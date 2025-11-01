@@ -2,43 +2,111 @@
 #include <godot_cpp/classes/rd_vertex_attribute.hpp>
 #include <godot_cpp/variant/typed_array.hpp>
 
+#define SIZEOF_FLOAT 4
+#define SIZEOF_INT 4
+#define POSITION_2D_NB_FLOATS 2
+#define POSITION_3D_NB_FLOATS 3
+#define NORMAL_NB_FLOATS 3
+#define TANGENT_NB_FLOATS 4
+#define COLOR_NB_FLOATS 4
+#define UV_NB_FLOATS 2
+#define UV2_NB_FLOATS 2
+#define BONES_NB_INTS 4
+#define WEIGHT_NB_FLOATS 4
+
 using namespace godot;
 
+// ORC_VertexFormatInfo implementation
+void ORC_VertexFormatInfo::_bind_methods() {
+    ClassDB::bind_method(D_METHOD("set_is_2d", "value"), &ORC_VertexFormatInfo::set_is_2d);
+    ClassDB::bind_method(D_METHOD("get_is_2d"), &ORC_VertexFormatInfo::get_is_2d);
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "is_2d"), "set_is_2d", "get_is_2d");
+
+    ClassDB::bind_method(D_METHOD("set_has_normal", "value"), &ORC_VertexFormatInfo::set_has_normal);
+    ClassDB::bind_method(D_METHOD("get_has_normal"), &ORC_VertexFormatInfo::get_has_normal);
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "has_normal"), "set_has_normal", "get_has_normal");
+
+    ClassDB::bind_method(D_METHOD("set_has_tangent", "value"), &ORC_VertexFormatInfo::set_has_tangent);
+    ClassDB::bind_method(D_METHOD("get_has_tangent"), &ORC_VertexFormatInfo::get_has_tangent);
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "has_tangent"), "set_has_tangent", "get_has_tangent");
+
+    ClassDB::bind_method(D_METHOD("set_has_color", "value"), &ORC_VertexFormatInfo::set_has_color);
+    ClassDB::bind_method(D_METHOD("get_has_color"), &ORC_VertexFormatInfo::get_has_color);
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "has_color"), "set_has_color", "get_has_color");
+
+    ClassDB::bind_method(D_METHOD("set_has_uv", "value"), &ORC_VertexFormatInfo::set_has_uv);
+    ClassDB::bind_method(D_METHOD("get_has_uv"), &ORC_VertexFormatInfo::get_has_uv);
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "has_uv"), "set_has_uv", "get_has_uv");
+
+    ClassDB::bind_method(D_METHOD("set_has_uv2", "value"), &ORC_VertexFormatInfo::set_has_uv2);
+    ClassDB::bind_method(D_METHOD("get_has_uv2"), &ORC_VertexFormatInfo::get_has_uv2);
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "has_uv2"), "set_has_uv2", "get_has_uv2");
+
+    ClassDB::bind_method(D_METHOD("set_has_bones", "value"), &ORC_VertexFormatInfo::set_has_bones);
+    ClassDB::bind_method(D_METHOD("get_has_bones"), &ORC_VertexFormatInfo::get_has_bones);
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "has_bones"), "set_has_bones", "get_has_bones");
+
+    ClassDB::bind_method(D_METHOD("set_has_weights", "value"), &ORC_VertexFormatInfo::set_has_weights);
+    ClassDB::bind_method(D_METHOD("get_has_weights"), &ORC_VertexFormatInfo::get_has_weights);
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "has_weights"), "set_has_weights", "get_has_weights");
+}
+
+ORC_VertexFormatInfo::ORC_VertexFormatInfo() {
+}
+
+ORC_VertexFormatInfo::~ORC_VertexFormatInfo() {
+}
+
+void ORC_VertexFormatInfo::set_is_2d(bool value) { is_2d = value; }
+bool ORC_VertexFormatInfo::get_is_2d() const { return is_2d; }
+
+void ORC_VertexFormatInfo::set_has_normal(bool value) { has_normal = value; }
+bool ORC_VertexFormatInfo::get_has_normal() const { return has_normal; }
+
+void ORC_VertexFormatInfo::set_has_tangent(bool value) { has_tangent = value; }
+bool ORC_VertexFormatInfo::get_has_tangent() const { return has_tangent; }
+
+void ORC_VertexFormatInfo::set_has_color(bool value) { has_color = value; }
+bool ORC_VertexFormatInfo::get_has_color() const { return has_color; }
+
+void ORC_VertexFormatInfo::set_has_uv(bool value) { has_uv = value; }
+bool ORC_VertexFormatInfo::get_has_uv() const { return has_uv; }
+
+void ORC_VertexFormatInfo::set_has_uv2(bool value) { has_uv2 = value; }
+bool ORC_VertexFormatInfo::get_has_uv2() const { return has_uv2; }
+
+void ORC_VertexFormatInfo::set_has_bones(bool value) { has_bones = value; }
+bool ORC_VertexFormatInfo::get_has_bones() const { return has_bones; }
+
+void ORC_VertexFormatInfo::set_has_weights(bool value) { has_weights = value; }
+bool ORC_VertexFormatInfo::get_has_weights() const { return has_weights; }
+
+// ORC_RDHelper implementation
 void ORC_RDHelper::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("get_rd"), &ORC_RDHelper::get_rd);
+    ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("get_rd"), &ORC_RDHelper::get_rd);
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("create_vertex_format", "vertex_format_def"), &ORC_RDHelper::create_vertex_format);
 }
 
 ORC_RDHelper::ORC_RDHelper() {
-    rd = RenderingServer::get_singleton()->get_rendering_device();
 }
 
 ORC_RDHelper::~ORC_RDHelper() {
 }
 
-RenderingDevice* ORC_RDHelper::get_rd() const {
-    return rd;
+RenderingDevice* ORC_RDHelper::get_rd() {
+    return RenderingServer::get_singleton()->get_rendering_device();
 }
 
-int64_t ORC_RDHelper::create_vertex_format(const Ref<Resource>& vertex_format_def) {
-    if (!vertex_format_def.is_valid()) {
+int64_t ORC_RDHelper::create_vertex_format(const Ref<ORC_VertexFormatInfo>& vf_info) {
+    if (!vf_info.is_valid()) {
         return -1;
     }
 
     RenderingDevice* rd = RenderingServer::get_singleton()->get_rendering_device();
     TypedArray<RDVertexAttribute> attrs;
 
-    bool is_2d = vertex_format_def->get("is_2d");
-    bool has_normal = vertex_format_def->get("has_normal");
-    bool has_tangent = vertex_format_def->get("has_tangent");
-    bool has_color = vertex_format_def->get("has_color");
-    bool has_uv = vertex_format_def->get("has_uv");
-    bool has_uv2 = vertex_format_def->get("has_uv2");
-    bool has_bones = vertex_format_def->get("has_bones");
-    bool has_weights = vertex_format_def->get("has_weights");
-
     // Position attribute
-    if (is_2d) {
+    if (vf_info->get_is_2d()) {
         Ref<RDVertexAttribute> position_attr;
         position_attr.instantiate();
         position_attr->set_format(RenderingDevice::DATA_FORMAT_R32G32_SFLOAT);
@@ -59,7 +127,7 @@ int64_t ORC_RDHelper::create_vertex_format(const Ref<Resource>& vertex_format_de
     }
 
     // Normal attribute
-    if (has_normal) {
+    if (vf_info->get_has_normal()) {
         Ref<RDVertexAttribute> normal_attr;
         normal_attr.instantiate();
         normal_attr->set_format(RenderingDevice::DATA_FORMAT_R32G32B32_SFLOAT);
@@ -71,7 +139,7 @@ int64_t ORC_RDHelper::create_vertex_format(const Ref<Resource>& vertex_format_de
     }
 
     // Tangent attribute
-    if (has_tangent) {
+    if (vf_info->get_has_tangent()) {
         Ref<RDVertexAttribute> tangent_attr;
         tangent_attr.instantiate();
         tangent_attr->set_format(RenderingDevice::DATA_FORMAT_R32G32B32A32_SFLOAT);
@@ -83,7 +151,7 @@ int64_t ORC_RDHelper::create_vertex_format(const Ref<Resource>& vertex_format_de
     }
 
     // Color attribute
-    if (has_color) {
+    if (vf_info->get_has_color()) {
         Ref<RDVertexAttribute> color_attr;
         color_attr.instantiate();
         color_attr->set_format(RenderingDevice::DATA_FORMAT_R32G32B32A32_SFLOAT);
@@ -95,7 +163,7 @@ int64_t ORC_RDHelper::create_vertex_format(const Ref<Resource>& vertex_format_de
     }
 
     // UV attribute
-    if (has_uv) {
+    if (vf_info->get_has_uv()) {
         Ref<RDVertexAttribute> uv_attr;
         uv_attr.instantiate();
         uv_attr->set_format(RenderingDevice::DATA_FORMAT_R32G32_SFLOAT);
@@ -107,7 +175,7 @@ int64_t ORC_RDHelper::create_vertex_format(const Ref<Resource>& vertex_format_de
     }
 
     // UV2 attribute
-    if (has_uv2) {
+    if (vf_info->get_has_uv2()) {
         Ref<RDVertexAttribute> uv2_attr;
         uv2_attr.instantiate();
         uv2_attr->set_format(RenderingDevice::DATA_FORMAT_R32G32_SFLOAT);
@@ -119,7 +187,7 @@ int64_t ORC_RDHelper::create_vertex_format(const Ref<Resource>& vertex_format_de
     }
 
     // Bones attribute
-    if (has_bones) {
+    if (vf_info->get_has_bones()) {
         Ref<RDVertexAttribute> bones_attr;
         bones_attr.instantiate();
         bones_attr->set_format(RenderingDevice::DATA_FORMAT_R32G32B32A32_SINT);
@@ -131,7 +199,7 @@ int64_t ORC_RDHelper::create_vertex_format(const Ref<Resource>& vertex_format_de
     }
 
     // Weights attribute
-    if (has_weights) {
+    if (vf_info->get_has_weights()) {
         Ref<RDVertexAttribute> weights_attr;
         weights_attr.instantiate();
         weights_attr->set_format(RenderingDevice::DATA_FORMAT_R32G32B32A32_SFLOAT);

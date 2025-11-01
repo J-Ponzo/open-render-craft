@@ -15,6 +15,51 @@
 
 namespace godot {
 
+class ORC_API ORC_VertexFormatInfo : public Resource {
+    GDCLASS(ORC_VertexFormatInfo, Resource)
+
+protected:
+    static void _bind_methods();
+
+private:
+    bool is_2d = false;
+    bool has_normal = false;
+    bool has_tangent = false;
+    bool has_color = false;
+    bool has_uv = false;
+    bool has_uv2 = false;
+    bool has_bones = false;
+    bool has_weights = false;
+
+public:
+    ORC_VertexFormatInfo();
+    ~ORC_VertexFormatInfo();
+
+    void set_is_2d(bool value);
+    bool get_is_2d() const;
+
+    void set_has_normal(bool value);
+    bool get_has_normal() const;
+
+    void set_has_tangent(bool value);
+    bool get_has_tangent() const;
+
+    void set_has_color(bool value);
+    bool get_has_color() const;
+
+    void set_has_uv(bool value);
+    bool get_has_uv() const;
+
+    void set_has_uv2(bool value);
+    bool get_has_uv2() const;
+
+    void set_has_bones(bool value);
+    bool get_has_bones() const;
+
+    void set_has_weights(bool value);
+    bool get_has_weights() const;
+};
+
 class ORC_API ORC_RDHelper : public RefCounted {
     GDCLASS(ORC_RDHelper, RefCounted)
 
@@ -22,28 +67,12 @@ protected:
     static void _bind_methods();
 
 public:
-    RenderingDevice* rd;
-
     ORC_RDHelper();
     ~ORC_RDHelper();
 
-    RenderingDevice* get_rd() const;
+    static RenderingDevice* get_rd();
     
-    static int64_t create_vertex_format(const Ref<Resource>& vertex_format_def);
-
-private:
-    // Constants for vertex format calculation
-    static constexpr int SIZEOF_FLOAT = 4;
-    static constexpr int SIZEOF_INT = 4;
-    static constexpr int POSITION_2D_NB_FLOATS = 2;
-    static constexpr int POSITION_3D_NB_FLOATS = 3;
-    static constexpr int NORMAL_NB_FLOATS = 3;
-    static constexpr int TANGENT_NB_FLOATS = 4;
-    static constexpr int COLOR_NB_FLOATS = 4;
-    static constexpr int UV_NB_FLOATS = 2;
-    static constexpr int UV2_NB_FLOATS = 2;
-    static constexpr int BONES_NB_INTS = 4;
-    static constexpr int WEIGHT_NB_FLOATS = 4;
+    static int64_t create_vertex_format(const Ref<ORC_VertexFormatInfo>& vertex_format_def);
 };
 
 }

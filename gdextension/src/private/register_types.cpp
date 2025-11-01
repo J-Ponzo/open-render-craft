@@ -38,6 +38,7 @@ void initialize_orc_module(ModuleInitializationLevel p_level) {
 	GDREGISTER_RUNTIME_CLASS(ORC_ProxyFactory);
 	GDREGISTER_RUNTIME_CLASS(ORC_ProxyCache);
 	GDREGISTER_RUNTIME_CLASS(ORC_PSO);
+	GDREGISTER_RUNTIME_CLASS(ORC_VertexFormatInfo);
 	GDREGISTER_RUNTIME_CLASS(ORC_RDHelper);
 
 #ifdef DEBUG_ENABLED

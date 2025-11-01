@@ -38,7 +38,7 @@ static func create_texture_attachment(attach_format_def : ORC_AttachmentFormat_D
 	tf.format = attach_format_def.format
 	var view = RDTextureView.new();
 
-	return ORC.rd.texture_create(tf, view)
+	return ORC_RDHelper.get_rd().texture_create(tf, view)
 
 static func create_render_pass(renderer_inst : ORC_RendererBase, render_pass_key : StringName, renderer_def : ORC_Renderer_Def) -> ORC_RenderPassBase:
 	var render_pass_def = renderer_def.renderer_pass_defs[render_pass_key]
@@ -54,7 +54,7 @@ static func create_render_pass(renderer_inst : ORC_RendererBase, render_pass_key
 	var named_attachments : Array[RID]
 	for name in render_pass_def.fb_format_def.get_all_attachment_keys():
 		named_attachments.append(renderer_inst.attachments[name])
-	render_pass_inst.framebuffer = ORC.rd.framebuffer_create(named_attachments, render_pass_inst.framebuffer_format)
+	render_pass_inst.framebuffer = ORC_RDHelper.get_rd().framebuffer_create(named_attachments, render_pass_inst.framebuffer_format)
 
 	for key : StringName in render_pass_def.explicite_pso_defs.keys():
 		render_pass_inst.explicits_pso[key] = create_pso(render_pass_def.explicite_pso_defs[key], render_pass_inst.framebuffer_format)
@@ -72,7 +72,7 @@ static func create_framebuffer_format_from_def(fb_format_def : ORC_FramebufferFo
 			attachment_format.usage_flags |= bit
 		attachment_formats.append(attachment_format)
 
-	return ORC.rd.framebuffer_format_create(attachment_formats)
+	return ORC_RDHelper.get_rd().framebuffer_format_create(attachment_formats)
 
 static func create_pso(pso_def : ORC_ExpicitPSODef, framebuffer_format : int) -> ORC_PSO:
 	var instance = ORC_PSO.new()
@@ -102,8 +102,8 @@ static func create_pso(pso_def : ORC_ExpicitPSODef, framebuffer_format : int) ->
 	instance.shader_program = compile_shader(vertex_shader_src, fragment_shader_src)
 
 	var vf_def : ORC_VertexFormatDef = pso_def.vertex_format_def
-	# instance.vertex_format = create_vertex_format(vf_def)
-	instance.vertex_format = ORC_RDHelper.create_vertex_format(vf_def)
+	var vertex_format_info = create_vertex_format_info(vf_def)
+	instance.vertex_format = ORC_RDHelper.create_vertex_format(vertex_format_info)
 
 	var rasterizationState = RDPipelineRasterizationState.new()
 	rasterizationState.cull_mode = pso_def.rasterization_state.cull_mode
@@ -169,7 +169,7 @@ static func create_pso(pso_def : ORC_ExpicitPSODef, framebuffer_format : int) ->
 	colorBlendState.enable_logic_op = pso_def.enable_logic_op
 	colorBlendState.logic_op = pso_def.logic_op
 
-	instance.pipeline = ORC.rd.render_pipeline_create(instance.shader_program, framebuffer_format, instance.vertex_format, RenderingDevice.RENDER_PRIMITIVE_TRIANGLES, rasterizationState, multisampleState, depthStencilState, colorBlendState)
+	instance.pipeline = ORC_RDHelper.get_rd().render_pipeline_create(instance.shader_program, framebuffer_format, instance.vertex_format, RenderingDevice.RENDER_PRIMITIVE_TRIANGLES, rasterizationState, multisampleState, depthStencilState, colorBlendState)
 
 	return instance
 
@@ -179,122 +179,22 @@ static func compile_shader(vertex_src : String, fragment_src : String) -> RID:
 	shader_source.source_vertex = vertex_src;
 	shader_source.source_fragment = fragment_src;
 	
-	return ORC.rd.shader_create_from_spirv(ORC.rd.shader_compile_spirv_from_source(shader_source))
+	return ORC_RDHelper.get_rd().shader_create_from_spirv(ORC_RDHelper.get_rd().shader_compile_spirv_from_source(shader_source))
 
-# TODO : check is caching is needed. If not, consts still should be moved elsewhere
+static func create_vertex_format_info(vertex_format_def : ORC_VertexFormatDef) -> ORC_VertexFormatInfo:
+	var vertex_format_info = ORC_VertexFormatInfo.new()
+	vertex_format_info.is_2d = vertex_format_def.is_2d
+	vertex_format_info.has_normal = vertex_format_def.has_normal
+	vertex_format_info.has_tangent = vertex_format_def.has_tangent
+	vertex_format_info.has_color = vertex_format_def.has_color
+	vertex_format_info.has_uv = vertex_format_def.has_uv
+	vertex_format_info.has_uv2 = vertex_format_def.has_uv2
+	vertex_format_info.has_bones = vertex_format_def.has_bones
+	vertex_format_info.has_weights = vertex_format_def.has_weights
+	return vertex_format_info
 
-const SIZEOF_FLOAT = 4
-const SIZEOF_INT = 4
-const POSITION_2D_NB_FLOATS = 2
-const POSITION_3D_NB_FLOATS = 3
-const NORMAL_NB_FLOATS = 3
-const TAGENT_NB_FLOATS = 4
-const COLOR_NB_FLOATS = 4
-const UV_NB_FLOATS = 2
-const UV2_NB_FLOATS = 2
-const BONES_NB_INTS = 4
-const WEIGHT_NB_FLOATS = 4
 
-# static var vertex_formats_cache : Dictionary[int, int]
-
-# static func get_or_create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int:
-# 	var mask : int = get_mask_from_vertex_format_def(vertex_format_def) 
-# 	if !vertex_formats_cache.has(mask):
-# 		vertex_formats_cache[mask] = create_vertex_format(vertex_format_def)
-# 	return vertex_formats_cache[mask]
-
-# static func get_mask_from_vertex_format_def(vf_def : ORC_VertexFormatDef) -> int:
-# 	return get_mask_from_bool_array([vf_def.is_2d, vf_def.has_normal, vf_def.has_tangent, vf_def.has_color, vf_def.has_uv, vf_def.has_uv2, vf_def.has_bones, vf_def.has_weights])
-
-# static func get_mask_from_bool_array(bools : Array[bool]) -> int:
-# 	if bools.size() > 32:
-# 		return -1
-# 	var mask : int = 0
-# 	for i in bools.size():
-# 		mask |= 1 << i if bools[i] else 0
-# 	return mask
 
 static func create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int:
-	var attrs : Array[RDVertexAttribute]
-	
-	if vertex_format_def.is_2d:
-		var positionAttr = RDVertexAttribute.new()
-		positionAttr.format = RenderingDevice.DATA_FORMAT_R32G32_SFLOAT;
-		positionAttr.stride = POSITION_2D_NB_FLOATS * SIZEOF_FLOAT
-		positionAttr.offset = 0
-		positionAttr.location = 0
-		positionAttr.frequency = RenderingDevice.VERTEX_FREQUENCY_VERTEX
-		attrs.append(positionAttr)
-	else:
-		var positionAttr = RDVertexAttribute.new()
-		positionAttr.format = RenderingDevice.DATA_FORMAT_R32G32B32_SFLOAT;
-		positionAttr.stride = POSITION_3D_NB_FLOATS * SIZEOF_FLOAT
-		positionAttr.offset = 0
-		positionAttr.location = 0
-		positionAttr.frequency = RenderingDevice.VERTEX_FREQUENCY_VERTEX
-		attrs.append(positionAttr)
-
-	if vertex_format_def.has_normal:
-		var normalAttr = RDVertexAttribute.new()
-		normalAttr.format = RenderingDevice.DATA_FORMAT_R32G32B32_SFLOAT;
-		normalAttr.stride = NORMAL_NB_FLOATS * SIZEOF_FLOAT
-		normalAttr.offset = 0
-		normalAttr.location = 1
-		normalAttr.frequency = RenderingDevice.VERTEX_FREQUENCY_VERTEX
-		attrs.append(normalAttr)
-
-	if vertex_format_def.has_tangent:
-		var tangentAttr = RDVertexAttribute.new()
-		tangentAttr.format = RenderingDevice.DATA_FORMAT_R32G32B32A32_SFLOAT ;
-		tangentAttr.stride = TAGENT_NB_FLOATS * SIZEOF_FLOAT
-		tangentAttr.offset = 0
-		tangentAttr.location = 2
-		tangentAttr.frequency = RenderingDevice.VERTEX_FREQUENCY_VERTEX
-		attrs.append(tangentAttr)
-
-	if vertex_format_def.has_color:
-		var colorAttr = RDVertexAttribute.new()
-		colorAttr.format = RenderingDevice.DATA_FORMAT_R32G32B32A32_SFLOAT ;
-		colorAttr.stride = COLOR_NB_FLOATS * SIZEOF_FLOAT
-		colorAttr.offset = 0
-		colorAttr.location = 3
-		colorAttr.frequency = RenderingDevice.VERTEX_FREQUENCY_VERTEX
-		attrs.append(colorAttr)
-
-	if vertex_format_def.has_uv:
-		var uvAttr = RDVertexAttribute.new()
-		uvAttr.format = RenderingDevice.DATA_FORMAT_R32G32_SFLOAT;
-		uvAttr.stride = UV_NB_FLOATS * SIZEOF_FLOAT
-		uvAttr.offset = 0
-		uvAttr.location = 4
-		uvAttr.frequency = RenderingDevice.VERTEX_FREQUENCY_VERTEX
-		attrs.append(uvAttr)
-
-	if vertex_format_def.has_uv2:
-		var uv2Attr = RDVertexAttribute.new()
-		uv2Attr.format = RenderingDevice.DATA_FORMAT_R32G32_SFLOAT;
-		uv2Attr.stride = UV_NB_FLOATS * SIZEOF_FLOAT
-		uv2Attr.offset = 0
-		uv2Attr.location = 5
-		uv2Attr.frequency = RenderingDevice.VERTEX_FREQUENCY_VERTEX
-		attrs.append(uv2Attr)
-
-	if vertex_format_def.has_bones:
-		var bonesAttr = RDVertexAttribute.new()
-		bonesAttr.format = RenderingDevice.DATA_FORMAT_R32G32B32A32_SINT;
-		bonesAttr.stride = BONES_NB_INTS * SIZEOF_INT
-		bonesAttr.offset = 0
-		bonesAttr.location = 6
-		bonesAttr.frequency = RenderingDevice.VERTEX_FREQUENCY_VERTEX
-		attrs.append(bonesAttr)
-
-	if vertex_format_def.has_weights:
-		var weightsAttr = RDVertexAttribute.new()
-		weightsAttr.format = RenderingDevice.DATA_FORMAT_R32G32B32A32_SFLOAT;
-		weightsAttr.stride = WEIGHT_NB_FLOATS * SIZEOF_FLOAT
-		weightsAttr.offset = 0
-		weightsAttr.location = 7
-		weightsAttr.frequency = RenderingDevice.VERTEX_FREQUENCY_VERTEX
-		attrs.append(weightsAttr)
-
-	return ORC.rd.vertex_format_create(attrs)
+	var vertex_format_info = create_vertex_format_info(vertex_format_def)
+	return ORC_RDHelper.create_vertex_format(vertex_format_info)
