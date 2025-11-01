@@ -34,6 +34,7 @@ public:
     void initialize_all(ModuleInitializationLevel p_level) {
         for (const auto& module : modules) {
             if (module.init_func) {
+                UtilityFunctions::print("[ORC] " + String(module.name) + " C++ implementation registered");
                 module.init_func(p_level);
             }
         }
@@ -42,6 +43,7 @@ public:
     void uninitialize_all(ModuleInitializationLevel p_level) {
         for (auto it = modules.rbegin(); it != modules.rend(); ++it) {
             if (it->uninit_func) {
+                UtilityFunctions::print("[ORC] " + String(it->name) + " C++ implementation unregistered");
                 it->uninit_func(p_level);
             }
         }
