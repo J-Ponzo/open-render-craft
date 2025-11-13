@@ -28,11 +28,11 @@ bool ORC_ProxyRegistry::register_data(Ref<ORC_ProxyData> proxy_data, int64_t uni
     if (!proxy_data.is_valid()) return false;
 
     if (unique_id != -1) {
-        id_cache[unique_id] = std::make_tuple(proxy_data, 1);
+        id_registry[unique_id] = std::make_tuple(proxy_data, 1);
     }
 
     TypeKey type_key = get_type_key(proxy_data);
-    type_cache[type_key].push_back(proxy_data);
+    type_registry[type_key].push_back(proxy_data);
 
     return true;
 }
@@ -41,8 +41,8 @@ bool ORC_ProxyRegistry::unregister_data(Ref<ORC_ProxyData> proxy_data) {
     if (!proxy_data.is_valid()) return false;
 
     TypeKey type_key = get_type_key(proxy_data);
-    auto it = type_cache.find(type_key);
-    if (it == type_cache.end()) return false;
+    auto it = type_registry.find(type_key);
+    if (it == type_registry.end()) return false;
 
     auto& vec = it->second;
     size_t old_size = vec.size();
@@ -53,18 +53,18 @@ bool ORC_ProxyRegistry::unregister_data(Ref<ORC_ProxyData> proxy_data) {
 }
 
 std::vector<Ref<ORC_ProxyData>> ORC_ProxyRegistry::get_by_type(const TypeKey& type_key) const {
-    auto it = type_cache.find(type_key);
-    return (it != type_cache.end()) ? it->second : std::vector<Ref<ORC_ProxyData>>{};
+    auto it = type_registry.find(type_key);
+    return (it != type_registry.end()) ? it->second : std::vector<Ref<ORC_ProxyData>>{};
 }
 
 Ref<ORC_ProxyData> ORC_ProxyRegistry::get_by_unique_id(int64_t unique_id) const {
-    auto it = id_cache.find(unique_id);
-    return (it != id_cache.end()) ? std::get<0>(it->second) : Ref<ORC_ProxyData>();
+    auto it = id_registry.find(unique_id);
+    return (it != id_registry.end()) ? std::get<0>(it->second) : Ref<ORC_ProxyData>();
 }
 
 bool ORC_ProxyRegistry::increment_refcount(int64_t unique_id) {
-    auto it = id_cache.find(unique_id);
-    if (it != id_cache.end()) {
+    auto it = id_registry.find(unique_id);
+    if (it != id_registry.end()) {
         std::get<1>(it->second)++;
         return true;
     }
@@ -72,12 +72,12 @@ bool ORC_ProxyRegistry::increment_refcount(int64_t unique_id) {
 }
 
 bool ORC_ProxyRegistry::decrement_refcount(int64_t unique_id) {
-    auto it = id_cache.find(unique_id);
-    if (it != id_cache.end()) {
+    auto it = id_registry.find(unique_id);
+    if (it != id_registry.end()) {
         std::get<1>(it->second)--;
         if (std::get<1>(it->second) == 0) {
             unregister_data(std::get<0>(it->second));
-            id_cache.erase(it);
+            id_registry.erase(it);
         }
         return true;
     }
@@ -159,12 +159,12 @@ static String get_primary_node_info(ORC_PrimaryData* primary) {
     }
 }
 
-String ORC_ProxyRegistry::dump_cache() const {
+String ORC_ProxyRegistry::dump_registry() const {
     String output = "=== ORC_ProxyRegistry Dump ===\n";
     
-    output += "\n--- Type Cache ---\n";
-    output += "Total types: " + String::num_int64(type_cache.size()) + "\n";
-    for (const auto& pair : type_cache) {
+    output += "\n--- Type Registry ---\n";
+    output += "Total types: " + String::num_int64(type_registry.size()) + "\n";
+    for (const auto& pair : type_registry) {
         // Determine if this is a PRIMARY or SECONDARY type
         String category = "";
         if (!pair.second.empty() && pair.second[0].is_valid()) {
@@ -218,9 +218,9 @@ String ORC_ProxyRegistry::dump_cache() const {
         }
     }
     
-    output += "\n--- ID Cache ---\n";
-    output += "Total unique IDs: " + String::num_int64(id_cache.size()) + "\n";
-    for (const auto& pair : id_cache) {
+    output += "\n--- ID Registry ---\n";
+    output += "Total unique IDs: " + String::num_int64(id_registry.size()) + "\n";
+    for (const auto& pair : id_registry) {
         output += "  ID: " + String::num_int64(pair.first) + 
                  " -> refcount: " + String::num_int64(std::get<1>(pair.second));
         const auto& data = std::get<0>(pair.second);

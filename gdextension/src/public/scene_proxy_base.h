@@ -27,7 +27,7 @@ private:
 	static void _bind_methods();
 
 	Node* scene_root;
-	Ref<ORC_ProxyRegistry> proxy_cache;
+	Ref<ORC_ProxyRegistry> proxy_registry;
 	std::unordered_map<Node*, Ref<ORC_ProxyObject>> proxy_objects_pool;
 
 	Ref<ORC_ProxyFactory> proxy_factory;
@@ -52,7 +52,7 @@ public:
 
 	template <class T>
 	std::vector<Ref<T>> get_by_type() const {
-		std::vector<Ref<ORC_ProxyData>> raw = proxy_cache->get_by_type(TypeKey(typeid(T)));
+		std::vector<Ref<ORC_ProxyData>> raw = proxy_registry->get_by_type(TypeKey(typeid(T)));
 		std::vector<Ref<T>> result;
 		result.reserve(raw.size());
 		for (const auto& data : raw) {
@@ -62,7 +62,7 @@ public:
 	}
 
 	TypedArray<ORC_ProxyData> get_by_type_gd(const Ref<GDScript>& script) const;
-	String dump_cache() const;
+	String dump_registry() const;
 };
 
 }

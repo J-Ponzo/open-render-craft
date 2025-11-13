@@ -55,8 +55,8 @@ class ORC_API ORC_ProxyRegistry : public RefCounted {
     friend class ORC_SceneProxyBase;
 
 private:
-    std::unordered_map<TypeKey, std::vector<Ref<ORC_ProxyData>>, TypeKeyHash> type_cache;
-    std::unordered_map<int64_t, std::tuple<Ref<ORC_ProxyData>, int>> id_cache;
+    std::unordered_map<TypeKey, std::vector<Ref<ORC_ProxyData>>, TypeKeyHash> type_registry;
+    std::unordered_map<int64_t, std::tuple<Ref<ORC_ProxyData>, int>> id_registry;
 
     static TypeKey get_type_key(Ref<ORC_ProxyData> proxy_data);
 
@@ -70,7 +70,7 @@ public:
     Ref<ORC_ProxyData> get_by_unique_id(int64_t unique_id) const;
     bool increment_refcount(int64_t unique_id);
     bool decrement_refcount(int64_t unique_id);
-    String dump_cache() const;
+    String dump_registry() const;
 };
 
 }

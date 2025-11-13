@@ -16,7 +16,7 @@ void ORC_SceneProxyBase::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "proxy_factory", PROPERTY_HINT_RESOURCE_TYPE, "ORC_ProxyFactory"), "set_proxy_factory", "get_proxy_factory");
 
 	ClassDB::bind_method(D_METHOD("get_by_type", "script"), &ORC_SceneProxyBase::get_by_type_gd);
-	ClassDB::bind_method(D_METHOD("dump_cache"), &ORC_SceneProxyBase::dump_cache);
+	ClassDB::bind_method(D_METHOD("dump_registry"), &ORC_SceneProxyBase::dump_registry);
 
 	ClassDB::bind_method(D_METHOD("setup", "scene"), &ORC_SceneProxyBase::setup);
 	ClassDB::bind_method(D_METHOD("pre_render"), &ORC_SceneProxyBase::pre_render);
@@ -24,13 +24,13 @@ void ORC_SceneProxyBase::_bind_methods() {
 }
 
 ORC_SceneProxyBase::ORC_SceneProxyBase() {
-	proxy_cache.instantiate();
+	proxy_registry.instantiate();
 }
 
 // TODO : not sure it's needed to unref here
 ORC_SceneProxyBase::~ORC_SceneProxyBase() {
-	if (proxy_cache.is_valid()) {
-		proxy_cache.unref();
+	if (proxy_registry.is_valid()) {
+		proxy_registry.unref();
 	}
 }
 
@@ -61,7 +61,7 @@ void ORC_SceneProxyBase::setup(Node* scene) {
 }
 
 void ORC_SceneProxyBase::on_node_enter_tree(Node* node) {
-	Ref<ORC_ProxyObject> proxy_object = proxy_factory->create_from(node, proxy_cache);
+	Ref<ORC_ProxyObject> proxy_object = proxy_factory->create_from(node, proxy_registry);
 
 	if (!proxy_object.is_valid()) return;
 
@@ -84,7 +84,7 @@ void ORC_SceneProxyBase::on_node_exit_tree(Node* node) {
 	if (it == proxy_objects_pool.end()) return;
 	Ref<ORC_ProxyObject> proxy_object = it->second;
 	
-	proxy_factory->free(proxy_object, proxy_cache);
+	proxy_factory->free(proxy_object, proxy_registry);
 	proxy_objects_pool.erase(it);
 }
 
@@ -100,18 +100,18 @@ void ORC_SceneProxyBase::cleanup() {
 
 TypedArray<ORC_ProxyData> ORC_SceneProxyBase::get_by_type_gd(const Ref<GDScript>& script) const {
 	TypedArray<ORC_ProxyData> result;
-	if (!proxy_cache.is_valid() || !script.is_valid()) return result;
+	if (!proxy_registry.is_valid() || !script.is_valid()) return result;
 	
-	std::vector<Ref<ORC_ProxyData>> raw = proxy_cache->get_by_type(TypeKey(script));
+	std::vector<Ref<ORC_ProxyData>> raw = proxy_registry->get_by_type(TypeKey(script));
 	for (const auto& data : raw) {
 		result.append(data);
 	}
 	return result;
 }
 
-String ORC_SceneProxyBase::dump_cache() const {
-	if (!proxy_cache.is_valid()) {
-		return "Proxy cache is not valid.";
+String ORC_SceneProxyBase::dump_registry() const {
+	if (!proxy_registry.is_valid()) {
+		return "Proxy registry is not valid.";
 	}
-	return proxy_cache->dump_cache();
+	return proxy_registry->dump_registry();
 }
