@@ -45,7 +45,7 @@ func create_proxy_from_override(node : Node) -> ORC_ProxyObject:
 		proxy_object = ORCTEST_MeshProxy.new()
 	return proxy_object
 	
-func create_data_from_override(node : Node, cache : ORC_ProxyCache) -> ORC_PrimaryData:
+func create_data_from_override(node : Node, cache : ORC_ProxyRegistry) -> ORC_PrimaryData:
 	var primary_data : ORC_PrimaryData = null
 	if node is Camera3D:
 		primary_data = create_and_register_primary(ORCTEST_CameraData, cache)
@@ -66,7 +66,7 @@ func create_data_from_override(node : Node, cache : ORC_ProxyCache) -> ORC_Prima
 func free_proxy_override(proxy_object : ORC_ProxyObject) -> bool:
 		return true
 		
-func free_data_override(data : ORC_ProxyData, cache : ORC_ProxyCache) -> bool:
+func free_data_override(data : ORC_ProxyData, cache : ORC_ProxyRegistry) -> bool:
 	var success = true
 	if data is ORCTEST_TopologyData:
 		var topology_data : ORCTEST_TopologyData = data
@@ -74,3 +74,4 @@ func free_data_override(data : ORC_ProxyData, cache : ORC_ProxyCache) -> bool:
 	else:
 		success = success && destroy_and_unregister_data(data, cache)
 	return success
+

@@ -6,7 +6,7 @@
 #include <godot_cpp/classes/gd_script.hpp>
 #include <proxy_object.h>
 #include <proxy_data.h>
-#include "proxy_cache.h"
+#include "proxy_registry.h"
 #include <macros.h>
 
 #ifdef ORC_RENDERER_EXPORTS
@@ -21,24 +21,24 @@ class ORC_API ORC_ProxyFactory : public RefCounted {
     GDCLASS(ORC_ProxyFactory, RefCounted)
 
 private:
-    static Ref<ORC_PrimaryData> create_and_register_primary_gd(const Ref<GDScript> script, Ref<ORC_ProxyCache> cache, int64_t unique_id = -1);
-    static Ref<ORC_SecondaryData> create_and_register_secondary_gd(const Ref<GDScript> script, Ref<ORC_ProxyCache> cache, Ref<ORC_PrimaryData> primary_data, int64_t unique_id = -1);
-    static bool destroy_and_unregister_data_gd(Ref<ORC_ProxyData> data, Ref<ORC_ProxyCache> cache, int64_t unique_id = -1);
+    static Ref<ORC_PrimaryData> create_and_register_primary_gd(const Ref<GDScript> script, Ref<ORC_ProxyRegistry> cache, int64_t unique_id = -1);
+    static Ref<ORC_SecondaryData> create_and_register_secondary_gd(const Ref<GDScript> script, Ref<ORC_ProxyRegistry> cache, Ref<ORC_PrimaryData> primary_data, int64_t unique_id = -1);
+    static bool destroy_and_unregister_data_gd(Ref<ORC_ProxyData> data, Ref<ORC_ProxyRegistry> cache, int64_t unique_id = -1);
 
 protected:
     static void _bind_methods();
 
 public:
-    Ref<ORC_ProxyObject> create_from(Node* node, Ref<ORC_ProxyCache> cache);
+    Ref<ORC_ProxyObject> create_from(Node* node, Ref<ORC_ProxyRegistry> cache);
     DECLARE_GD_OVERRIDABLE_METHOD(Ref<ORC_ProxyObject>, create_proxy_from, Node*)
-    DECLARE_GD_OVERRIDABLE_METHOD(Ref<ORC_PrimaryData>, create_data_from, Node*, Ref<ORC_ProxyCache>)
+    DECLARE_GD_OVERRIDABLE_METHOD(Ref<ORC_PrimaryData>, create_data_from, Node*, Ref<ORC_ProxyRegistry>)
 
-    bool free(Ref<ORC_ProxyObject> proxy_object, Ref<ORC_ProxyCache> cache);
+    bool free(Ref<ORC_ProxyObject> proxy_object, Ref<ORC_ProxyRegistry> cache);
     DECLARE_GD_OVERRIDABLE_METHOD(bool, free_proxy, Ref<ORC_ProxyObject>)
-    DECLARE_GD_OVERRIDABLE_METHOD(bool, free_data, Ref<ORC_ProxyData>, Ref<ORC_ProxyCache>)
+    DECLARE_GD_OVERRIDABLE_METHOD(bool, free_data, Ref<ORC_ProxyData>, Ref<ORC_ProxyRegistry>)
 
     template <class T>
-    static Ref<T> create_and_register_primary(Ref<ORC_ProxyCache> cache, int64_t unique_id = -1) {
+    static Ref<T> create_and_register_primary(Ref<ORC_ProxyRegistry> cache, int64_t unique_id = -1) {
         static_assert(std::is_base_of<ORC_PrimaryData, T>::value, "T must inherit from ORC_PrimaryData");
         
         Ref<T> ref;
@@ -55,7 +55,7 @@ public:
     }
 
     template <class T>
-    static Ref<T> create_and_register_secondary(Ref<ORC_ProxyCache> cache, Ref<ORC_PrimaryData> primary_data, int64_t unique_id = -1) {
+    static Ref<T> create_and_register_secondary(Ref<ORC_ProxyRegistry> cache, Ref<ORC_PrimaryData> primary_data, int64_t unique_id = -1) {
         static_assert(std::is_base_of<ORC_SecondaryData, T>::value, "T must inherit from ORC_SecondaryData");
 
         Ref<T> ref;

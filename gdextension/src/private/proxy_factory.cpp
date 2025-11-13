@@ -18,7 +18,7 @@ void ORC_ProxyFactory::_bind_methods() {
     ClassDB::bind_static_method("ORC_ProxyFactory", D_METHOD("destroy_and_unregister_data", "data", "cache", "unique_id"), &ORC_ProxyFactory::destroy_and_unregister_data_gd, DEFVAL(-1));
 }
 
-Ref<ORC_ProxyObject> ORC_ProxyFactory::create_from(Node* node, Ref<ORC_ProxyCache> cache) {
+Ref<ORC_ProxyObject> ORC_ProxyFactory::create_from(Node* node, Ref<ORC_ProxyRegistry> cache) {
     Ref<ORC_ProxyObject> proxy_object = create_proxy_from(node);
     if (!proxy_object.is_valid()) return Ref<ORC_ProxyObject>();
 
@@ -39,13 +39,13 @@ Ref<ORC_ProxyObject> ORC_ProxyFactory::create_proxy_from_impl(Node* node) {
     return Ref<ORC_ProxyObject>();
 }
 
-DEFINE_GD_OVERRIDABLE_METHOD_2_ARGS(ORC_ProxyFactory, Ref<ORC_PrimaryData>, create_data_from, Node*, node, Ref<ORC_ProxyCache>, cache)
-Ref<ORC_PrimaryData> ORC_ProxyFactory::create_data_from_impl(Node* node, Ref<ORC_ProxyCache> cache) {
+DEFINE_GD_OVERRIDABLE_METHOD_2_ARGS(ORC_ProxyFactory, Ref<ORC_PrimaryData>, create_data_from, Node*, node, Ref<ORC_ProxyRegistry>, cache)
+Ref<ORC_PrimaryData> ORC_ProxyFactory::create_data_from_impl(Node* node, Ref<ORC_ProxyRegistry> cache) {
     UtilityFunctions::print("ORC_ProxyFactory::create_data_from (stub)");
     return Ref<ORC_ProxyObject>();
 }
 
-bool ORC_ProxyFactory::free(Ref<ORC_ProxyObject> proxy_object, Ref<ORC_ProxyCache> cache) {
+bool ORC_ProxyFactory::free(Ref<ORC_ProxyObject> proxy_object, Ref<ORC_ProxyRegistry> cache) {
     if (!proxy_object.is_valid()) return false;
 
     Ref<ORC_PrimaryData> primary = proxy_object->get_primary_data();
@@ -73,13 +73,13 @@ bool ORC_ProxyFactory::free_proxy_impl(Ref<ORC_ProxyObject> proxy_object) {
     return false;
 }
 
-DEFINE_GD_OVERRIDABLE_METHOD_2_ARGS(ORC_ProxyFactory, bool, free_data, Ref<ORC_ProxyData>, data, Ref<ORC_ProxyCache>, cache)
-bool ORC_ProxyFactory::free_data_impl(Ref<ORC_ProxyData> data, Ref<ORC_ProxyCache> cache) {
+DEFINE_GD_OVERRIDABLE_METHOD_2_ARGS(ORC_ProxyFactory, bool, free_data, Ref<ORC_ProxyData>, data, Ref<ORC_ProxyRegistry>, cache)
+bool ORC_ProxyFactory::free_data_impl(Ref<ORC_ProxyData> data, Ref<ORC_ProxyRegistry> cache) {
     UtilityFunctions::print("ORC_ProxyFactory::free_data (stub)");
     return false;
 }
 
-Ref<ORC_PrimaryData> ORC_ProxyFactory::create_and_register_primary_gd(const Ref<GDScript> script, Ref<ORC_ProxyCache> cache, int64_t unique_id) {
+Ref<ORC_PrimaryData> ORC_ProxyFactory::create_and_register_primary_gd(const Ref<GDScript> script, Ref<ORC_ProxyRegistry> cache, int64_t unique_id) {
     Ref<ORC_PrimaryData> ref;
 
     if (unique_id != -1) ref = cache->get_by_unique_id(unique_id);
@@ -113,7 +113,7 @@ Ref<ORC_PrimaryData> ORC_ProxyFactory::create_and_register_primary_gd(const Ref<
     return ref;
 }
 
-Ref<ORC_SecondaryData> ORC_ProxyFactory::create_and_register_secondary_gd(const Ref<GDScript> script, Ref<ORC_ProxyCache> cache, Ref<ORC_PrimaryData> primary_data, int64_t unique_id) {
+Ref<ORC_SecondaryData> ORC_ProxyFactory::create_and_register_secondary_gd(const Ref<GDScript> script, Ref<ORC_ProxyRegistry> cache, Ref<ORC_PrimaryData> primary_data, int64_t unique_id) {
     Ref<ORC_SecondaryData> ref;
 
     if (unique_id != -1) ref = cache->get_by_unique_id(unique_id);
@@ -150,7 +150,7 @@ Ref<ORC_SecondaryData> ORC_ProxyFactory::create_and_register_secondary_gd(const 
     return ref;
 }
 
-bool ORC_ProxyFactory::destroy_and_unregister_data_gd(Ref<ORC_ProxyData> data, Ref<ORC_ProxyCache> cache, int64_t unique_id) {
+bool ORC_ProxyFactory::destroy_and_unregister_data_gd(Ref<ORC_ProxyData> data, Ref<ORC_ProxyRegistry> cache, int64_t unique_id) {
     if (!data.is_valid()) return false;
 
     Ref<ORC_ProxyData> ref;

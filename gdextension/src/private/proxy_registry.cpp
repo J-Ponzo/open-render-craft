@@ -1,4 +1,4 @@
-#include <proxy_cache.h>
+#include <proxy_registry.h>
 
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
@@ -7,11 +7,11 @@
 
 namespace godot {
 
-void ORC_ProxyCache::_bind_methods() {
+void ORC_ProxyRegistry::_bind_methods() {
 }
 
 // TODO : inline in .h ?
-TypeKey ORC_ProxyCache::get_type_key(Ref<ORC_ProxyData> proxy_data) {
+TypeKey ORC_ProxyRegistry::get_type_key(Ref<ORC_ProxyData> proxy_data) {
     if (!proxy_data.is_valid()) {
         return TypeKey(std::string(""));
     }
@@ -24,7 +24,7 @@ TypeKey ORC_ProxyCache::get_type_key(Ref<ORC_ProxyData> proxy_data) {
     }
 }
 
-bool ORC_ProxyCache::register_data(Ref<ORC_ProxyData> proxy_data, int64_t unique_id) {
+bool ORC_ProxyRegistry::register_data(Ref<ORC_ProxyData> proxy_data, int64_t unique_id) {
     if (!proxy_data.is_valid()) return false;
 
     if (unique_id != -1) {
@@ -37,7 +37,7 @@ bool ORC_ProxyCache::register_data(Ref<ORC_ProxyData> proxy_data, int64_t unique
     return true;
 }
 
-bool ORC_ProxyCache::unregister_data(Ref<ORC_ProxyData> proxy_data) {
+bool ORC_ProxyRegistry::unregister_data(Ref<ORC_ProxyData> proxy_data) {
     if (!proxy_data.is_valid()) return false;
 
     TypeKey type_key = get_type_key(proxy_data);
@@ -52,17 +52,17 @@ bool ORC_ProxyCache::unregister_data(Ref<ORC_ProxyData> proxy_data) {
     return true;
 }
 
-std::vector<Ref<ORC_ProxyData>> ORC_ProxyCache::get_by_type(const TypeKey& type_key) const {
+std::vector<Ref<ORC_ProxyData>> ORC_ProxyRegistry::get_by_type(const TypeKey& type_key) const {
     auto it = type_cache.find(type_key);
     return (it != type_cache.end()) ? it->second : std::vector<Ref<ORC_ProxyData>>{};
 }
 
-Ref<ORC_ProxyData> ORC_ProxyCache::get_by_unique_id(int64_t unique_id) const {
+Ref<ORC_ProxyData> ORC_ProxyRegistry::get_by_unique_id(int64_t unique_id) const {
     auto it = id_cache.find(unique_id);
     return (it != id_cache.end()) ? std::get<0>(it->second) : Ref<ORC_ProxyData>();
 }
 
-bool ORC_ProxyCache::increment_refcount(int64_t unique_id) {
+bool ORC_ProxyRegistry::increment_refcount(int64_t unique_id) {
     auto it = id_cache.find(unique_id);
     if (it != id_cache.end()) {
         std::get<1>(it->second)++;
@@ -71,7 +71,7 @@ bool ORC_ProxyCache::increment_refcount(int64_t unique_id) {
     return false;
 }
 
-bool ORC_ProxyCache::decrement_refcount(int64_t unique_id) {
+bool ORC_ProxyRegistry::decrement_refcount(int64_t unique_id) {
     auto it = id_cache.find(unique_id);
     if (it != id_cache.end()) {
         std::get<1>(it->second)--;
@@ -159,8 +159,8 @@ static String get_primary_node_info(ORC_PrimaryData* primary) {
     }
 }
 
-String ORC_ProxyCache::dump_cache() const {
-    String output = "=== ORC_ProxyCache Dump ===\n";
+String ORC_ProxyRegistry::dump_cache() const {
+    String output = "=== ORC_ProxyRegistry Dump ===\n";
     
     output += "\n--- Type Cache ---\n";
     output += "Total types: " + String::num_int64(type_cache.size()) + "\n";

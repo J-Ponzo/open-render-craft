@@ -1,5 +1,5 @@
-#ifndef ORC_PROXYCACHE_H
-#define ORC_PROXYCACHE_H
+#ifndef ORC_PROXYREGISTRY_H
+#define ORC_PROXYREGISTRY_H
 
 #include <typeindex>
 #include <vector>
@@ -30,7 +30,7 @@ struct TypeKey {
     TypeKey(const Ref<GDScript>& script) : key(script.is_valid() ? (String(script->get_global_name())).utf8().get_data() : "") {
         String global_name = script.is_valid() ? script->get_global_name() : String("");
         if (script.is_valid() && global_name.is_empty()) {
-            ERR_FAIL_MSG("[ORC_ProxyCache ERROR] : Attempted to register an empty class_name as a cache key. This typically occurs when a GDScript class is not defined in its own file. Inner classes (classes defined within another class file) are not currently supported because Godot does not provide a unique identifier for them in this context.");
+            ERR_FAIL_MSG("[ORC_ProxyRegistry ERROR] : Attempted to register an empty class_name as a cache key. This typically occurs when a GDScript class is not defined in its own file. Inner classes (classes defined within another class file) are not currently supported because Godot does not provide a unique identifier for them in this context.");
         }
     }
     
@@ -49,8 +49,8 @@ struct TypeKeyHash {
     }
 };
 
-class ORC_API ORC_ProxyCache : public RefCounted {
-    GDCLASS(ORC_ProxyCache, RefCounted)
+class ORC_API ORC_ProxyRegistry : public RefCounted {
+    GDCLASS(ORC_ProxyRegistry, RefCounted)
 
     friend class ORC_SceneProxyBase;
 
@@ -75,4 +75,4 @@ public:
 
 }
 
-#endif // ORC_PROXYCACHE_H
+#endif // ORC_PROXYREGISTRY_H

@@ -6,7 +6,7 @@
 #include <godot_cpp/classes/gd_script.hpp>
 #include <godot_cpp/variant/typed_array.hpp>
 #include <renderer_base.h>
-#include <proxy_cache.h>
+#include <proxy_registry.h>
 #include <proxy_factory.h>
 #include <macros.h>
 
@@ -27,7 +27,7 @@ private:
 	static void _bind_methods();
 
 	Node* scene_root;
-	Ref<ORC_ProxyCache> proxy_cache;
+	Ref<ORC_ProxyRegistry> proxy_cache;
 	std::unordered_map<Node*, Ref<ORC_ProxyObject>> proxy_objects_pool;
 
 	Ref<ORC_ProxyFactory> proxy_factory;
