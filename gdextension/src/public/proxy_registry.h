@@ -11,7 +11,9 @@
 #include <godot_cpp/classes/ref_counted.hpp>
 #include <godot_cpp/classes/gd_script.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
+#include <godot_cpp/variant/typed_array.hpp>
 #include <proxy_data.h>
+#include "feature_query.h"
 #include "macros.h"
 
 #ifdef ORC_RENDERER_EXPORTS
@@ -57,8 +59,16 @@ class ORC_API ORC_ProxyRegistry : public RefCounted {
 private:
     std::unordered_map<TypeKey, std::vector<Ref<ORC_ProxyData>>, TypeKeyHash> type_registry;
     std::unordered_map<int64_t, std::tuple<Ref<ORC_ProxyData>, int>> id_registry;
+    
+    std::unordered_map<ORC_ProxyData*, uint64_t> data_flags;
+    std::unordered_map<ORC_FeatureQuery*, std::vector<Ref<ORC_ProxyData>>> query_cache;
 
     static TypeKey get_type_key(Ref<ORC_ProxyData> proxy_data);
+    
+    bool matches_query(uint64_t flags, const Ref<ORC_FeatureQuery>& query) const;
+    void update_query_cache_for_data(Ref<ORC_ProxyData> proxy_data, uint64_t old_flags, uint64_t new_flags);
+    void remove_from_query_cache(Ref<ORC_ProxyData> proxy_data);
+    void add_query_to_cache(const Ref<ORC_FeatureQuery>& query);
 
 protected:
     static void _bind_methods();
@@ -71,6 +81,11 @@ public:
     bool increment_refcount(int64_t unique_id);
     bool decrement_refcount(int64_t unique_id);
     String dump_registry() const;
+    
+    bool set_flag(Ref<ORC_ProxyData> proxy_data, uint64_t flag_mask, bool value);
+    uint64_t get_flags(Ref<ORC_ProxyData> proxy_data) const;
+    TypedArray<ORC_ProxyData> get_by_query(Ref<ORC_FeatureQuery> query);
+    void clear_query_cache();
 };
 
 }

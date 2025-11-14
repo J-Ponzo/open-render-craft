@@ -4,6 +4,7 @@
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <primary_data.h>
 #include <secondary_data.h>
+#include <feature_query.h>
 
 namespace godot {
 
@@ -39,6 +40,9 @@ bool ORC_ProxyRegistry::register_data(Ref<ORC_ProxyData> proxy_data, int64_t uni
 
 bool ORC_ProxyRegistry::unregister_data(Ref<ORC_ProxyData> proxy_data) {
     if (!proxy_data.is_valid()) return false;
+
+    remove_from_query_cache(proxy_data);
+    data_flags.erase(proxy_data.ptr());
 
     TypeKey type_key = get_type_key(proxy_data);
     auto it = type_registry.find(type_key);
@@ -234,6 +238,128 @@ String ORC_ProxyRegistry::dump_registry() const {
     
     output += "\n=========================\n";
     return output;
+}
+
+bool ORC_ProxyRegistry::matches_query(uint64_t flags, const Ref<ORC_FeatureQuery>& query) const {
+    if (!query.is_valid()) return false;
+    
+    uint64_t mask = query->get_mask();
+    uint64_t value = query->get_value();
+    
+    return (flags & mask) == (value & mask);
+}
+
+void ORC_ProxyRegistry::update_query_cache_for_data(Ref<ORC_ProxyData> proxy_data, uint64_t old_flags, uint64_t new_flags) {
+    if (!proxy_data.is_valid()) return;
+    
+    for (auto& cache_entry : query_cache) {
+        ORC_FeatureQuery* query_ptr = cache_entry.first;
+        if (!query_ptr) continue;
+        
+        Ref<ORC_FeatureQuery> query;
+        query.reference_ptr(query_ptr);
+        
+        std::vector<Ref<ORC_ProxyData>>& data_list = cache_entry.second;
+        
+        bool old_match = matches_query(old_flags, query);
+        bool new_match = matches_query(new_flags, query);
+        
+        if (old_match && !new_match) {
+            data_list.erase(std::remove(data_list.begin(), data_list.end(), proxy_data), data_list.end());
+        } else if (!old_match && new_match) {
+            data_list.push_back(proxy_data);
+        }
+    }
+}
+
+void ORC_ProxyRegistry::remove_from_query_cache(Ref<ORC_ProxyData> proxy_data) {
+    if (!proxy_data.is_valid()) return;
+    
+    for (auto& cache_entry : query_cache) {
+        std::vector<Ref<ORC_ProxyData>>& data_list = cache_entry.second;
+        data_list.erase(std::remove(data_list.begin(), data_list.end(), proxy_data), data_list.end());
+    }
+}
+
+void ORC_ProxyRegistry::add_query_to_cache(const Ref<ORC_FeatureQuery>& query) {
+    if (!query.is_valid()) return;
+    
+    ORC_FeatureQuery* query_ptr = query.ptr();
+    
+    if (query_cache.find(query_ptr) != query_cache.end()) return;
+    
+    std::vector<Ref<ORC_ProxyData>> matching_data;
+    
+    for (const auto& flags_entry : data_flags) {
+        ORC_ProxyData* data_ptr = flags_entry.first;
+        uint64_t flags = flags_entry.second;
+        
+        if (!data_ptr) continue;
+        
+        Ref<ORC_ProxyData> proxy_data;
+        proxy_data.reference_ptr(data_ptr);
+        
+        if (matches_query(flags, query)) {
+            matching_data.push_back(proxy_data);
+        }
+    }
+    
+    query_cache[query_ptr] = matching_data;
+}
+
+bool ORC_ProxyRegistry::set_flag(Ref<ORC_ProxyData> proxy_data, uint64_t flag_mask, bool value) {
+    if (!proxy_data.is_valid()) return false;
+    
+    ORC_ProxyData* data_ptr = proxy_data.ptr();
+    uint64_t old_flags = data_flags[data_ptr];
+    uint64_t new_flags;
+    
+    if (value) {
+        new_flags = old_flags | flag_mask;
+    } else {
+        new_flags = old_flags & ~flag_mask;
+    }
+    
+    if (old_flags != new_flags) {
+        data_flags[data_ptr] = new_flags;
+        update_query_cache_for_data(proxy_data, old_flags, new_flags);
+    }
+    
+    return true;
+}
+
+uint64_t ORC_ProxyRegistry::get_flags(Ref<ORC_ProxyData> proxy_data) const {
+    if (!proxy_data.is_valid()) return 0;
+    
+    ORC_ProxyData* data_ptr = proxy_data.ptr();
+    auto it = data_flags.find(data_ptr);
+    return (it != data_flags.end()) ? it->second : 0;
+}
+
+TypedArray<ORC_ProxyData> ORC_ProxyRegistry::get_by_query(Ref<ORC_FeatureQuery> query) {
+    TypedArray<ORC_ProxyData> result;
+    
+    if (!query.is_valid()) return result;
+    
+    ORC_FeatureQuery* query_ptr = query.ptr();
+    
+    auto it = query_cache.find(query_ptr);
+    if (it == query_cache.end()) {
+        add_query_to_cache(query);
+        it = query_cache.find(query_ptr);
+    }
+    
+    if (it != query_cache.end()) {
+        for (const auto& data : it->second) {
+            result.append(data);
+        }
+    }
+    
+    return result;
+}
+
+void ORC_ProxyRegistry::clear_query_cache() {
+    query_cache.clear();
 }
 
 }
