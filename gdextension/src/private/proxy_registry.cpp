@@ -9,6 +9,8 @@
 namespace godot {
 
 void ORC_ProxyRegistry::_bind_methods() {
+    ClassDB::bind_method(D_METHOD("set_flag", "proxy_data", "flag_mask", "value"), &ORC_ProxyRegistry::set_flag);
+    ClassDB::bind_method(D_METHOD("get_by_query", "query"), &ORC_ProxyRegistry::get_by_query);
 }
 
 // TODO : inline in .h ?
@@ -328,14 +330,6 @@ bool ORC_ProxyRegistry::set_flag(Ref<ORC_ProxyData> proxy_data, uint64_t flag_ma
     return true;
 }
 
-uint64_t ORC_ProxyRegistry::get_flags(Ref<ORC_ProxyData> proxy_data) const {
-    if (!proxy_data.is_valid()) return 0;
-    
-    ORC_ProxyData* data_ptr = proxy_data.ptr();
-    auto it = data_flags.find(data_ptr);
-    return (it != data_flags.end()) ? it->second : 0;
-}
-
 TypedArray<ORC_ProxyData> ORC_ProxyRegistry::get_by_query(Ref<ORC_FeatureQuery> query) {
     TypedArray<ORC_ProxyData> result;
     
@@ -356,10 +350,6 @@ TypedArray<ORC_ProxyData> ORC_ProxyRegistry::get_by_query(Ref<ORC_FeatureQuery> 
     }
     
     return result;
-}
-
-void ORC_ProxyRegistry::clear_query_cache() {
-    query_cache.clear();
 }
 
 }

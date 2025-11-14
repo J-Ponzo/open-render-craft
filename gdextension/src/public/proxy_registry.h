@@ -83,9 +83,7 @@ public:
     String dump_registry() const;
     
     bool set_flag(Ref<ORC_ProxyData> proxy_data, uint64_t flag_mask, bool value);
-    uint64_t get_flags(Ref<ORC_ProxyData> proxy_data) const;
     TypedArray<ORC_ProxyData> get_by_query(Ref<ORC_FeatureQuery> query);
-    void clear_query_cache();
 };
 
 }
