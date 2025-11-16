@@ -254,11 +254,8 @@ bool ORC_ProxyRegistry::update_query_cache_for_data(Ref<ORC_ProxyData> proxy_dat
     if (!proxy_data.is_valid()) return false;
     
     for (auto& cache_entry : query_cache) {
-        ORC_FeatureQuery* query_ptr = cache_entry.first;
-        if (!query_ptr) continue;
-        
-        Ref<ORC_FeatureQuery> query;
-        query.reference_ptr(query_ptr);
+        const Ref<ORC_FeatureQuery>& query = cache_entry.first;
+        if (!query.is_valid()) continue;
         
         std::vector<Ref<ORC_ProxyData>>& data_list = cache_entry.second;
         
@@ -287,9 +284,7 @@ bool ORC_ProxyRegistry::remove_from_query_cache(Ref<ORC_ProxyData> proxy_data) {
 bool ORC_ProxyRegistry::add_query_to_cache(const Ref<ORC_FeatureQuery>& query) {
     if (!query.is_valid()) return false;
     
-    ORC_FeatureQuery* query_ptr = query.ptr();
-    
-    if (query_cache.find(query_ptr) != query_cache.end()) return false;
+    if (query_cache.find(query) != query_cache.end()) return false;
     
     std::vector<Ref<ORC_ProxyData>> matching_data;
     
@@ -308,7 +303,7 @@ bool ORC_ProxyRegistry::add_query_to_cache(const Ref<ORC_FeatureQuery>& query) {
         }
     }
     
-    query_cache[query_ptr] = matching_data;
+    query_cache[query] = matching_data;
     return true;
 }
 
@@ -356,12 +351,10 @@ TypedArray<ORC_ProxyData> ORC_ProxyRegistry::get_by_query(Ref<ORC_FeatureQuery> 
     
     if (!query.is_valid()) return result;
     
-    ORC_FeatureQuery* query_ptr = query.ptr();
-    
-    auto it = query_cache.find(query_ptr);
+    auto it = query_cache.find(query);
     if (it == query_cache.end()) {
         add_query_to_cache(query);
-        it = query_cache.find(query_ptr);
+        it = query_cache.find(query);
     }
     
     if (it != query_cache.end()) {

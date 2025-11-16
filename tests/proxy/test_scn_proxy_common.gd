@@ -1,5 +1,13 @@
 class_name ORCTEST_ScnProxyTestsCommon
 
+static func reset_proxy_update_counters() -> void:
+	ORCTEST_MockProxyObject.all_update_count = 0
+	ORCTEST_MeshProxy.mesh_update_count = 0
+	ORCTEST_CameraProxy.cam_update_count = 0
+	ORCTEST_ProxyFactory_GDMock.ORCTEST_OmniLightProxy.omni_update_count = 0
+	ORCTEST_ProxyFactory_GDMock.ORCTEST_SpotLightProxy.spot_update_count = 0
+	ORCTEST_ProxyFactory_GDMock.ORCTEST_DirectionalLightProxy.directional_update_count = 0
+
 static func load_mock_scene(scn_tree : SceneTree) -> Node:
 	var scene = load("res://addons/open-render-craft/tests/proxy/mocks/proxy_mock_scene.tscn") as PackedScene
 	assert(scene != null, "load_mock_scene() : cannot load mock scene")

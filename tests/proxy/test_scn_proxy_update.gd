@@ -14,6 +14,7 @@ func before() -> void:
 	scn_proxy = ORC_SceneProxyBase.new()
 	scn_proxy.proxy_factory = ORCTEST_ProxyFactory_GDMock.new()
 	scn_instance = ORCTEST_ScnProxyTestsCommon.load_mock_scene(get_tree())
+	ORCTEST_ScnProxyTestsCommon.reset_proxy_update_counters()
 	
 	scn_proxy.setup(scn_instance)
 	

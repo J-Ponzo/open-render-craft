@@ -51,6 +51,18 @@ struct TypeKeyHash {
     }
 };
 
+struct FeatureQueryHash {
+    size_t operator()(const Ref<ORC_FeatureQuery>& query) const {
+        return std::hash<ORC_FeatureQuery*>{}(query.ptr());
+    }
+};
+
+// struct RefQueryEqual {
+//     bool operator()(const Ref<ORC_FeatureQuery>& a, const Ref<ORC_FeatureQuery>& b) const {
+//         return a.ptr() == b.ptr();
+//     }
+// };
+
 class ORC_API ORC_ProxyRegistry : public RefCounted {
     GDCLASS(ORC_ProxyRegistry, RefCounted)
 
@@ -62,7 +74,7 @@ private:
     uint8_t next_available_bit = 0;
     // TODO try to use Ref<> instead of raw pointer
     std::unordered_map<ORC_ProxyData*, uint64_t> data_flags;
-    std::unordered_map<ORC_FeatureQuery*, std::vector<Ref<ORC_ProxyData>>> query_cache;
+    std::unordered_map<Ref<ORC_FeatureQuery>, std::vector<Ref<ORC_ProxyData>>, FeatureQueryHash> query_cache;
 
     static TypeKey get_type_key(Ref<ORC_ProxyData> proxy_data);
     
