@@ -20,11 +20,10 @@ protected:
 
 public:
     uint64_t mask;
-    uint64_t value;
-    
     void set_mask(uint64_t p_mask) { mask = p_mask; }
     uint64_t get_mask() const { return mask; }
-    
+
+    uint64_t value;
     void set_value(uint64_t p_value) { value = p_value; }
     uint64_t get_value() const { return value; }
 };

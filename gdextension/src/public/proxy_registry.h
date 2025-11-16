@@ -54,21 +54,23 @@ struct TypeKeyHash {
 class ORC_API ORC_ProxyRegistry : public RefCounted {
     GDCLASS(ORC_ProxyRegistry, RefCounted)
 
-    friend class ORC_SceneProxyBase;
-
 private:
     std::unordered_map<TypeKey, std::vector<Ref<ORC_ProxyData>>, TypeKeyHash> type_registry;
     std::unordered_map<int64_t, std::tuple<Ref<ORC_ProxyData>, int>> id_registry;
     
+    std::unordered_map<StringName, uint64_t> flag_name_to_mask;
+    uint8_t next_available_bit = 0;
+    // TODO try to use Ref<> instead of raw pointer
     std::unordered_map<ORC_ProxyData*, uint64_t> data_flags;
     std::unordered_map<ORC_FeatureQuery*, std::vector<Ref<ORC_ProxyData>>> query_cache;
 
     static TypeKey get_type_key(Ref<ORC_ProxyData> proxy_data);
     
+    uint64_t get_or_create_flag_mask(const StringName& flag_name);
     bool matches_query(uint64_t flags, const Ref<ORC_FeatureQuery>& query) const;
-    void update_query_cache_for_data(Ref<ORC_ProxyData> proxy_data, uint64_t old_flags, uint64_t new_flags);
-    void remove_from_query_cache(Ref<ORC_ProxyData> proxy_data);
-    void add_query_to_cache(const Ref<ORC_FeatureQuery>& query);
+    bool update_query_cache_for_data(Ref<ORC_ProxyData> proxy_data, uint64_t old_flags, uint64_t new_flags);
+    bool remove_from_query_cache(Ref<ORC_ProxyData> proxy_data);
+    bool add_query_to_cache(const Ref<ORC_FeatureQuery>& query);
 
 protected:
     static void _bind_methods();
@@ -80,10 +82,12 @@ public:
     Ref<ORC_ProxyData> get_by_unique_id(int64_t unique_id) const;
     bool increment_refcount(int64_t unique_id);
     bool decrement_refcount(int64_t unique_id);
-    String dump_registry() const;
     
-    bool set_flag(Ref<ORC_ProxyData> proxy_data, uint64_t flag_mask, bool value);
+    bool set_flag(Ref<ORC_ProxyData> proxy_data, const StringName& flag_name, bool value);
     TypedArray<ORC_ProxyData> get_by_query(Ref<ORC_FeatureQuery> query);
+    Ref<ORC_FeatureQuery> create_query(const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
+
+    String dump_registry() const;
 };
 
 }
