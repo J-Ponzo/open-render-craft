@@ -14,10 +14,13 @@ height = 1.0
 [node name="ProxyMockScene" type="Node3D"]
 
 [node name="Cube1" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
 transform = Transform3D(0.9659258, 0, -0.25881904, 0, 1, 0, 0.25881904, 0, 0.9659258, 0.11092245, 0, 0.014603227)
+cast_shadow = 0
 mesh = SubResource("BoxMesh_n2xit")
 
 [node name="Cube2" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
 transform = Transform3D(0.9659258, 0, -0.25881904, 0, 1, 0, 0.25881904, 0, 0.9659258, 2.042774, 0, 0.53224134)
 mesh = SubResource("BoxMesh_n2xit")
 
@@ -28,6 +31,7 @@ transform = Transform3D(1.0000001, 0, 0, 0, 1, 0, 0, 0, 1.0000001, 0, 0, 0)
 shape = SubResource("BoxShape3D_n2xit")
 
 [node name="Sphere" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
 transform = Transform3D(0.9659258, 0, -0.25881904, 0, 1, 0, 0.25881904, 0, 0.9659258, -1.8209292, 0, -0.50303483)
 mesh = SubResource("SphereMesh_n2xit")
 

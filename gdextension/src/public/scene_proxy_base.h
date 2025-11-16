@@ -62,6 +62,9 @@ public:
 	}
 
 	TypedArray<ORC_ProxyData> get_by_type_gd(const Ref<GDScript>& script) const;
+	TypedArray<ORC_ProxyData> get_by_query(const Ref<ORC_FeatureQuery>& query) const;
+	//TODO move in a Helper
+	Ref<ORC_FeatureQuery> create_query(const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
 	String dump_registry() const;
 };
 

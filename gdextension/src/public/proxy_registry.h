@@ -83,7 +83,7 @@ public:
     bool increment_refcount(int64_t unique_id);
     bool decrement_refcount(int64_t unique_id);
     
-    bool set_flag(Ref<ORC_ProxyData> proxy_data, const StringName& flag_name, bool value);
+    bool set_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name, bool value);
     TypedArray<ORC_ProxyData> get_by_query(Ref<ORC_FeatureQuery> query);
     Ref<ORC_FeatureQuery> create_query(const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
     

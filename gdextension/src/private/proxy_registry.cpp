@@ -9,10 +9,6 @@
 namespace godot {
 
 void ORC_ProxyRegistry::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("set_flag", "proxy_data", "flag_name", "value"), &ORC_ProxyRegistry::set_flag);
-    ClassDB::bind_method(D_METHOD("get_by_query", "query"), &ORC_ProxyRegistry::get_by_query);
-    
-    ClassDB::bind_method(D_METHOD("create_query", "flag_names", "flag_values"), &ORC_ProxyRegistry::create_query);
 }
 
 // TODO : inline in .h ?
@@ -32,6 +28,8 @@ TypeKey ORC_ProxyRegistry::get_type_key(Ref<ORC_ProxyData> proxy_data) {
 bool ORC_ProxyRegistry::register_data(Ref<ORC_ProxyData> proxy_data, int64_t unique_id) {
     if (!proxy_data.is_valid()) return false;
 
+    proxy_data->registry = this;
+
     if (unique_id != -1) {
         id_registry[unique_id] = std::make_tuple(proxy_data, 1);
     }
@@ -44,6 +42,8 @@ bool ORC_ProxyRegistry::register_data(Ref<ORC_ProxyData> proxy_data, int64_t uni
 
 bool ORC_ProxyRegistry::unregister_data(Ref<ORC_ProxyData> proxy_data) {
     if (!proxy_data.is_valid()) return false;
+
+    proxy_data->registry = nullptr;
 
     remove_from_query_cache(proxy_data);
     data_flags.erase(proxy_data.ptr());
@@ -330,21 +330,23 @@ uint64_t ORC_ProxyRegistry::get_or_create_flag_mask(const StringName& flag_name)
     return flag_mask;
 }
 
-bool ORC_ProxyRegistry::set_flag(Ref<ORC_ProxyData> proxy_data, const StringName& flag_name, bool value) {
-    if (!proxy_data.is_valid()) {
+bool ORC_ProxyRegistry::set_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name, bool value) {
+    if (!proxy_data) {
         ERR_FAIL_V_MSG(false, "[ORC_ProxyRegistry ERROR] : Cannot set flag on null proxy_data");
-        return false;
     }
     
     uint64_t flag_mask = get_or_create_flag_mask(flag_name);
     
-    uint64_t old_flags = data_flags[proxy_data.ptr()];
+    uint64_t old_flags = data_flags[proxy_data];
     uint64_t new_flags = value ? (old_flags | flag_mask) : (old_flags & ~flag_mask);
     
     if (old_flags == new_flags) return false;
 
-    data_flags[proxy_data.ptr()] = new_flags;
-    update_query_cache_for_data(proxy_data, old_flags, new_flags);
+    data_flags[proxy_data] = new_flags;
+    
+    Ref<ORC_ProxyData> proxy_ref;
+    proxy_ref.reference_ptr(proxy_data);
+    update_query_cache_for_data(proxy_ref, old_flags, new_flags);
     
     return true;
 }

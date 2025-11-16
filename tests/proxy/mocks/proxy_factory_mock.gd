@@ -45,19 +45,28 @@ func create_proxy_from_override(node : Node) -> ORC_ProxyObject:
 		proxy_object = ORCTEST_MeshProxy.new()
 	return proxy_object
 	
-func create_data_from_override(node : Node, cache : ORC_ProxyRegistry) -> ORC_PrimaryData:
+func create_data_from_override(node : Node, registry : ORC_ProxyRegistry) -> ORC_PrimaryData:
 	var primary_data : ORC_PrimaryData = null
 	if node is Camera3D:
-		primary_data = create_and_register_primary(ORCTEST_CameraData, cache)
+		primary_data = create_and_register_primary(ORCTEST_CameraData, registry)
+		primary_data.set_flag("IS_PRIMARY", true)
 	elif node is OmniLight3D:
-		primary_data = create_and_register_primary(ORCTEST_OmniLightData, cache)
+		primary_data = create_and_register_primary(ORCTEST_OmniLightData, registry)
+		primary_data.set_flag("IS_PRIMARY", true)
+		primary_data.set_flag("IS_LIGHT", true)
 	elif node is SpotLight3D:
-		primary_data = create_and_register_primary(ORCTEST_SpotLightData, cache)
+		primary_data = create_and_register_primary(ORCTEST_SpotLightData, registry)
+		primary_data.set_flag("IS_PRIMARY", true)
+		primary_data.set_flag("IS_LIGHT", true)
 	elif node is DirectionalLight3D:
-		primary_data = create_and_register_primary(ORCTEST_DirectionalLightData, cache)
+		primary_data = create_and_register_primary(ORCTEST_DirectionalLightData, registry)
+		primary_data.set_flag("IS_PRIMARY", true)
+		primary_data.set_flag("IS_LIGHT", true)
 	elif node is MeshInstance3D:
-		primary_data = create_and_register_primary(ORCTEST_MeshData, cache)
-		var topology_data = create_and_register_secondary(ORCTEST_TopologyData, cache, primary_data, node.mesh.get_rid().get_id())
+		primary_data = create_and_register_primary(ORCTEST_MeshData, registry)
+		primary_data.set_flag("IS_PRIMARY", true)
+		var topology_data = create_and_register_secondary(ORCTEST_TopologyData, registry, primary_data, node.mesh.get_rid().get_id())
+		topology_data.set_flag("IS_PRIMARY", false)
 		topology_data.mesh = node.mesh
 		primary_data.topologyData = topology_data
 		
@@ -74,4 +83,3 @@ func free_data_override(data : ORC_ProxyData, cache : ORC_ProxyRegistry) -> bool
 	else:
 		success = success && destroy_and_unregister_data(data, cache)
 	return success
-
