@@ -86,6 +86,8 @@ public:
     bool set_flag(Ref<ORC_ProxyData> proxy_data, const StringName& flag_name, bool value);
     TypedArray<ORC_ProxyData> get_by_query(Ref<ORC_FeatureQuery> query);
     Ref<ORC_FeatureQuery> create_query(const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
+    
+    void clear();
 
     String dump_registry() const;
 };
