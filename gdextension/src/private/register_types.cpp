@@ -9,6 +9,7 @@
 #include <proxy_object.h>
 #include <proxy_factory.h>
 #include <proxy_registry.h>
+#include <queue_processor.h>
 #include <feature_query.h>
 #include <pso.h>
 #include <rd_helper.h>
@@ -38,6 +39,7 @@ void initialize_orc_module(ModuleInitializationLevel p_level) {
 	GDREGISTER_RUNTIME_CLASS(ORC_ProxyObject);
 	GDREGISTER_RUNTIME_CLASS(ORC_ProxyFactory);
 	GDREGISTER_RUNTIME_CLASS(ORC_ProxyRegistry);
+	GDREGISTER_RUNTIME_CLASS(ORC_QueueProcessor);
 	GDREGISTER_RUNTIME_CLASS(ORC_FeatureQuery);
 	GDREGISTER_RUNTIME_CLASS(ORC_PSO);
 	GDREGISTER_RUNTIME_CLASS(ORC_VertexFormatInfo);

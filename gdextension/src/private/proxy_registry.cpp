@@ -397,12 +397,10 @@ Ref<ORC_FeatureQuery> ORC_ProxyRegistry::create_query(const TypedArray<StringNam
 }
 
 void ORC_ProxyRegistry::clear() {
-    type_registry.clear();
-    id_registry.clear();
-    data_flags.clear();
-    query_cache.clear();
-    flag_name_to_mask.clear();
-    next_available_bit = 0;
-}
-
-}
+	type_registry.clear();
+	id_registry.clear();
+	data_flags.clear();
+	query_cache.clear();
+	flag_name_to_mask.clear();
+	next_available_bit = 0;
+}}

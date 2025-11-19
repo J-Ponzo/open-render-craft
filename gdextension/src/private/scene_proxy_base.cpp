@@ -18,6 +18,9 @@ void ORC_SceneProxyBase::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_by_type", "script"), &ORC_SceneProxyBase::get_by_type_gd);
 	ClassDB::bind_method(D_METHOD("get_by_query", "query"), &ORC_SceneProxyBase::get_by_query);
     ClassDB::bind_method(D_METHOD("create_query", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_query);
+	
+	ClassDB::bind_method(D_METHOD("get_queue_data", "queue_name"), &ORC_SceneProxyBase::get_queue_data);
+	
 	ClassDB::bind_method(D_METHOD("dump_registry"), &ORC_SceneProxyBase::dump_registry);
 
 	ClassDB::bind_method(D_METHOD("setup", "scene"), &ORC_SceneProxyBase::setup);
@@ -79,6 +82,10 @@ void ORC_SceneProxyBase::pre_render(){
 		if (proxy_object->is_active_)
 			proxy_object->update();
 	}
+	
+	for (auto& pair : proxy_queues) {
+		pair.second->execute();
+	}
 }
 
 void ORC_SceneProxyBase::on_node_exit_tree(Node* node) {
@@ -99,6 +106,7 @@ void ORC_SceneProxyBase::cleanup() {
 	for (Node* node : all_nodes)
 		on_node_exit_tree(node);
 	
+	clear_queues();
 	proxy_registry->clear();
 }
 
@@ -125,6 +133,54 @@ Ref<ORC_FeatureQuery> ORC_SceneProxyBase::create_query(const TypedArray<StringNa
 	if (!proxy_registry.is_valid()) return result;
 	
 	return proxy_registry->create_query(flag_names, flag_values);
+}
+
+void ORC_SceneProxyBase::create_queue(const StringName& queue_name, const TypedArray<ORC_QueueProcessor>& processors, const StringName& parent_name) {
+	if (proxy_queues.find(queue_name) != proxy_queues.end()) {
+		ERR_FAIL_MSG("[ORC_SceneProxyBase ERROR] : Queue '" + String(queue_name) + "' already exists");
+	}
+	
+	Ref<ORC_ProxyQueue> queue;
+	queue.instantiate();
+	
+	Ref<ORC_SceneProxyBase> scene_proxy_ref(this);
+	Ref<ORC_ProcessorPipeline> pipeline = queue->get_pipeline();
+	for (int i = 0; i < processors.size(); i++) {
+		Ref<ORC_QueueProcessor> processor = processors[i];
+		if (processor.is_valid()) {
+			processor->scene_proxy = scene_proxy_ref;
+			pipeline->add_processor(processor);
+		}
+	}
+	
+	if (!parent_name.is_empty()) {
+		auto it = proxy_queues.find(parent_name);
+		if (it != proxy_queues.end()) {
+			queue->set_parent(it->second);
+		} else {
+			ERR_FAIL_MSG("[ORC_SceneProxyBase ERROR] : Parent queue '" + String(parent_name) + "' not found");
+		}
+	}
+	
+	proxy_queues[queue_name] = queue;
+}
+
+TypedArray<ORC_ProxyData> ORC_SceneProxyBase::get_queue_data(const StringName& queue_name) {
+	auto it = proxy_queues.find(queue_name);
+	if (it == proxy_queues.end()) {
+		ERR_FAIL_V_MSG(TypedArray<ORC_ProxyData>(), "[ORC_SceneProxyBase ERROR] : Queue '" + String(queue_name) + "' not found");
+	}
+	
+	Ref<ORC_ProxyQueue> queue = it->second;
+	if (!queue.is_valid()) {
+		ERR_FAIL_V_MSG(TypedArray<ORC_ProxyData>(), "[ORC_SceneProxyBase ERROR] : Queue '" + String(queue_name) + "' is invalid");
+	}
+	
+	return queue->get_cached_data();
+}
+
+void ORC_SceneProxyBase::clear_queues() {
+	proxy_queues.clear();
 }
 
 String ORC_SceneProxyBase::dump_registry() const {

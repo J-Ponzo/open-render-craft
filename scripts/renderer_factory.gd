@@ -14,7 +14,20 @@ static func create_renderer(renderer_def : ORC_Renderer_Def) -> ORC_RendererBase
 	for key : StringName in renderer_def.renderer_pass_defs.keys():
 		create_render_pass(renderer_inst, key, renderer_def)
 	
+	for queue_def in renderer_def.proxy_queue_defs:
+		create_proxy_queue(scn_proxy_inst, queue_def)
+	
 	return renderer_inst
+
+static func create_proxy_queue(scene_proxy : ORC_SceneProxyBase, queue_def : ORC_ProxyQueue_Def) -> void:
+	var processors : Array[ORC_QueueProcessor] = []
+	
+	for impl_def in queue_def.processors:
+		var processor = ORC_ImplFactory.create_impl(impl_def) as ORC_QueueProcessor
+		if processor != null:
+			processors.append(processor)
+	
+	scene_proxy.create_queue(queue_def.queue_name, processors, queue_def.parent_queue_name)
 
 static func create_attachment(renderer_inst : ORC_RendererBase, attach_key : StringName, attach_format_def : ORC_AttachmentFormat_Def) -> RID:
 	var attachment : RID = create_texture_attachment(attach_format_def)

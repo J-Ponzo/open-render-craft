@@ -1,0 +1,33 @@
+#ifndef ORC_QUEUEPROCESSOR_H
+#define ORC_QUEUEPROCESSOR_H
+
+#include <godot_cpp/classes/ref_counted.hpp>
+#include <godot_cpp/variant/typed_array.hpp>
+#include <proxy_data.h>
+#include <macros.h>
+
+namespace godot { class ORC_SceneProxyBase; }
+
+#ifdef ORC_RENDERER_EXPORTS
+#define ORC_API __declspec(dllexport)
+#else
+#define ORC_API __declspec(dllimport)
+#endif
+
+namespace godot {
+
+class ORC_API ORC_QueueProcessor : public RefCounted {
+    GDCLASS(ORC_QueueProcessor, RefCounted)
+    friend class ORC_SceneProxyBase;
+
+protected:
+    Ref<ORC_SceneProxyBase> scene_proxy;
+    static void _bind_methods();
+
+public:
+    DECLARE_GD_OVERRIDABLE_METHOD(TypedArray<ORC_ProxyData>, process, const TypedArray<ORC_ProxyData>& input)
+};
+
+}
+
+#endif // ORC_QUEUEPROCESSOR_H

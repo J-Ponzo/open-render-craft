@@ -8,7 +8,10 @@
 #include <renderer_base.h>
 #include <proxy_registry.h>
 #include <proxy_factory.h>
+#include <proxy_queue.h>
 #include <macros.h>
+
+#include <unordered_map>
 
 #ifdef ORC_RENDERER_EXPORTS
 #define ORC_API __declspec(dllexport)
@@ -29,6 +32,9 @@ private:
 	Node* scene_root;
 	Ref<ORC_ProxyRegistry> proxy_registry;
 	std::unordered_map<Node*, Ref<ORC_ProxyObject>> proxy_objects_pool;
+	
+	// Queue management
+	std::unordered_map<StringName, Ref<ORC_ProxyQueue>> proxy_queues;
 
 	Ref<ORC_ProxyFactory> proxy_factory;
 	Ref<ORC_ProxyFactory> get_proxy_factory() const { return proxy_factory; }
@@ -65,6 +71,12 @@ public:
 	TypedArray<ORC_ProxyData> get_by_query(const Ref<ORC_FeatureQuery>& query) const;
 	//TODO move in a Helper
 	Ref<ORC_FeatureQuery> create_query(const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
+	
+	// Queue management
+	void create_queue(const StringName& queue_name, const TypedArray<ORC_QueueProcessor>& processors, const StringName& parent_name = StringName());
+	TypedArray<ORC_ProxyData> get_queue_data(const StringName& queue_name);
+	void clear_queues();
+	
 	String dump_registry() const;
 };
 
