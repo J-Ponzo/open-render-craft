@@ -63,6 +63,20 @@ struct FeatureQueryHash {
 //     }
 // };
 
+class ORC_API ORC_DataQuery : public RefCounted {
+    GDCLASS(ORC_DataQuery, RefCounted)
+
+protected:
+    static void _bind_methods();
+
+public:
+    TypeKey type_key;
+    uint64_t mask;
+    uint64_t value;
+
+    ORC_DataQuery() : type_key(std::type_index(typeid(void))), mask(0), value(0) {}
+};
+
 class ORC_API ORC_ProxyRegistry : public RefCounted {
     GDCLASS(ORC_ProxyRegistry, RefCounted)
 
@@ -84,6 +98,8 @@ private:
     bool remove_from_query_cache(Ref<ORC_ProxyData> proxy_data);
     bool add_query_to_cache(const Ref<ORC_FeatureQuery>& query);
 
+    bool fill_query_features(Ref<ORC_DataQuery> query, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
+
 protected:
     static void _bind_methods();
 
@@ -99,6 +115,9 @@ public:
     TypedArray<ORC_ProxyData> get_by_query(Ref<ORC_FeatureQuery> query);
     Ref<ORC_FeatureQuery> create_query(const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
     
+    Ref<ORC_DataQuery> create_query(std::type_index type_id, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
+    Ref<ORC_DataQuery> create_query_gd(Ref<GDScript> script, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
+
     void clear();
 
     String dump_registry() const;

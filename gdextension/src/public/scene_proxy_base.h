@@ -33,7 +33,6 @@ private:
 	Ref<ORC_ProxyRegistry> proxy_registry;
 	std::unordered_map<Node*, Ref<ORC_ProxyObject>> proxy_objects_pool;
 	
-	// Queue management
 	std::unordered_map<StringName, Ref<ORC_ProxyQueue>> proxy_queues;
 
 	Ref<ORC_ProxyFactory> proxy_factory;
@@ -46,6 +45,8 @@ private:
 
 	void on_node_enter_tree(Node* node);
 	void on_node_exit_tree(Node* node);
+
+	Ref<ORC_DataQuery> create_query_gd(Ref<GDScript> script, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
 
 public:
 	ORC_SceneProxyBase();
@@ -70,9 +71,10 @@ public:
 	TypedArray<ORC_ProxyData> get_by_type_gd(const Ref<GDScript>& script) const;
 	TypedArray<ORC_ProxyData> get_by_query(const Ref<ORC_FeatureQuery>& query) const;
 	//TODO move in a Helper
-	Ref<ORC_FeatureQuery> create_query(const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
+	Ref<ORC_FeatureQuery> create_feature_query(const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
 	
-	// Queue management
+	Ref<ORC_DataQuery> create_query(std::type_index type_id, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
+	
 	void create_queue(const StringName& queue_name, const TypedArray<ORC_QueueProcessor>& processors, const StringName& parent_name = StringName());
 	TypedArray<ORC_ProxyData> get_queue_data(const StringName& queue_name);
 	void clear_queues();

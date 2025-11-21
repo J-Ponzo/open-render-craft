@@ -17,8 +17,9 @@ void ORC_SceneProxyBase::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("get_by_type", "script"), &ORC_SceneProxyBase::get_by_type_gd);
 	ClassDB::bind_method(D_METHOD("get_by_query", "query"), &ORC_SceneProxyBase::get_by_query);
-    ClassDB::bind_method(D_METHOD("create_query", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_query);
-	
+    ClassDB::bind_method(D_METHOD("create_feature_query", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_feature_query);
+	ClassDB::bind_method(D_METHOD("create_query", "script", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_query_gd);
+
 	ClassDB::bind_method(D_METHOD("get_queue_data", "queue_name"), &ORC_SceneProxyBase::get_queue_data);
 	
 	ClassDB::bind_method(D_METHOD("dump_registry"), &ORC_SceneProxyBase::dump_registry);
@@ -128,11 +129,25 @@ TypedArray<ORC_ProxyData> ORC_SceneProxyBase::get_by_query(const Ref<ORC_Feature
 	return proxy_registry->get_by_query(query);
 }
 
-Ref<ORC_FeatureQuery> ORC_SceneProxyBase::create_query(const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
+Ref<ORC_FeatureQuery> ORC_SceneProxyBase::create_feature_query(const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
 	Ref<ORC_FeatureQuery> result;
 	if (!proxy_registry.is_valid()) return result;
 	
 	return proxy_registry->create_query(flag_names, flag_values);
+}
+
+Ref<ORC_DataQuery> ORC_SceneProxyBase::create_query(std::type_index type_id, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
+	Ref<ORC_DataQuery> result;
+	if (!proxy_registry.is_valid()) return result;
+	
+	return proxy_registry->create_query(type_id, flag_names, flag_values);
+}
+
+Ref<ORC_DataQuery> ORC_SceneProxyBase::create_query_gd(Ref<GDScript> script, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
+	Ref<ORC_DataQuery> result;
+	if (!proxy_registry.is_valid()) return result;
+	
+	return proxy_registry->create_query_gd(script, flag_names, flag_values);
 }
 
 void ORC_SceneProxyBase::create_queue(const StringName& queue_name, const TypedArray<ORC_QueueProcessor>& processors, const StringName& parent_name) {

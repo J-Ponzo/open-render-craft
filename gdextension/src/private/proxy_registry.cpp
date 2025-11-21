@@ -8,6 +8,9 @@
 
 namespace godot {
 
+void ORC_DataQuery::_bind_methods() {
+}
+
 void ORC_ProxyRegistry::_bind_methods() {
 }
 
@@ -393,6 +396,56 @@ Ref<ORC_FeatureQuery> ORC_ProxyRegistry::create_query(const TypedArray<StringNam
     query->mask = mask;
     query->value = value;
     
+    return query;
+}
+
+bool ORC_ProxyRegistry::fill_query_features(Ref<ORC_DataQuery> query, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
+    if (!query.is_valid()) {
+        ERR_FAIL_V_MSG(false, "[ORC_ProxyRegistry ERROR] : query is not valid");
+        return false;
+    }
+    
+    if (flag_names.size() != flag_values.size()) {
+        ERR_FAIL_V_MSG(false, "[ORC_ProxyRegistry ERROR] : flag_names and flag_values arrays must have the same size");
+        return false;
+    }
+    
+    uint64_t mask = 0;
+    uint64_t value = 0;
+    
+    for (int i = 0; i < flag_names.size(); i++) {
+        StringName flag_name = flag_names[i];
+        bool flag_value = flag_values[i];
+        
+        uint64_t flag_mask = get_or_create_flag_mask(flag_name);
+        mask |= flag_mask;
+        
+        if (flag_value) {
+            value |= flag_mask;
+        }
+    }
+    
+    query->mask = mask;
+    query->value = value;
+    
+    return true;
+}
+
+Ref<ORC_DataQuery> ORC_ProxyRegistry::create_query_gd(Ref<GDScript> script, const TypedArray<StringName> &flag_names, const TypedArray<bool> &flag_values)
+{
+    Ref<ORC_DataQuery> query;
+    query.instantiate();
+    fill_query_features(query, flag_names, flag_values);
+    query->type_key = TypeKey(script);
+    return query;
+}
+
+Ref<ORC_DataQuery> ORC_ProxyRegistry::create_query(std::type_index type_id, const TypedArray<StringName> &flag_names, const TypedArray<bool> &flag_values)
+{
+    Ref<ORC_DataQuery> query;
+    query.instantiate();
+    fill_query_features(query, flag_names, flag_values);
+    query->type_key = TypeKey(type_id);
     return query;
 }
 
