@@ -23,6 +23,7 @@ class ORC_API ORC_ProxyQueue : public RefCounted {
     GDCLASS(ORC_ProxyQueue, RefCounted)
 
 private:
+    Ref<ORC_SceneProxyBase> scene_proxy;
     Ref<ORC_DataQuery> init_query;
     TypedArray<ORC_QueueProcessor> processors;
     TypedArray<ORC_ProxyData> cached_result;
@@ -33,12 +34,14 @@ protected:
 public:
     ORC_ProxyQueue();
     
+    void set_scene_proxy(const Ref<ORC_SceneProxyBase>& scene_proxy);
+    
     void set_init_query(const Ref<ORC_DataQuery>& query) { init_query = query; }
 
     void add_processor(const Ref<ORC_QueueProcessor>& processor);
     void clear_processors();
     
-    void execute(const TypedArray<ORC_ProxyData>& input);
+    void execute();
     TypedArray<ORC_ProxyData> get_cached_data() const { return cached_result; }
 };
 
