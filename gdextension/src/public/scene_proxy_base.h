@@ -75,7 +75,7 @@ public:
 	
 	Ref<ORC_DataQuery> create_query(std::type_index type_id, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
 	
-	void create_queue(const StringName& queue_name, const TypedArray<ORC_QueueProcessor>& processors, const StringName& parent_name = StringName());
+	void create_queue(const StringName& queue_name, const TypedArray<ORC_QueueProcessor>& processors);
 	TypedArray<ORC_ProxyData> get_queue_data(const StringName& queue_name);
 	void clear_queues();
 	

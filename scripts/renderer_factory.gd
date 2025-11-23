@@ -27,7 +27,7 @@ static func create_proxy_queue(scene_proxy : ORC_SceneProxyBase, queue_def : ORC
 		if processor != null:
 			processors.append(processor)
 	
-	scene_proxy.create_queue(queue_def.queue_name, processors, queue_def.parent_queue_name)
+	scene_proxy.create_queue(queue_def.queue_name, processors)
 
 static func create_attachment(renderer_inst : ORC_RendererBase, attach_key : StringName, attach_format_def : ORC_AttachmentFormat_Def) -> RID:
 	var attachment : RID = create_texture_attachment(attach_format_def)

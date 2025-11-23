@@ -8,30 +8,31 @@ void ORC_ProxyQueue::_bind_methods() {
 }
 
 ORC_ProxyQueue::ORC_ProxyQueue() {
-    pipeline.instantiate();
 }
 
-void ORC_ProxyQueue::set_parent(const Ref<ORC_ProxyQueue>& parent) {
-    parent_queue = parent;
+void ORC_ProxyQueue::add_processor(const Ref<ORC_QueueProcessor>& processor) {
+    if (!processor.is_valid()) {
+        ERR_FAIL_MSG("[ORC_ProxyQueue ERROR] : Cannot add null processor");
+    }
+    processors.append(processor);
 }
 
-void ORC_ProxyQueue::execute() {
-	TypedArray<ORC_ProxyData> input_data;
-	
-	if (parent_queue.is_valid()) {
-		input_data = parent_queue->get_cached_data();
-	}
-	
-	if (!pipeline.is_valid()) {
-		ERR_FAIL_MSG("[ORC_ProxyQueue ERROR] : Pipeline is not valid");
-	}
-	
-	pipeline->execute(input_data);
+void ORC_ProxyQueue::clear_processors() {
+    processors.clear();
 }
 
-TypedArray<ORC_ProxyData> ORC_ProxyQueue::get_cached_data() const {
-	if (!pipeline.is_valid()) {
-		ERR_FAIL_V_MSG(TypedArray<ORC_ProxyData>(), "[ORC_ProxyQueue ERROR] : Pipeline is not valid");
-	}
-	return pipeline->get_cached_data();
+void ORC_ProxyQueue::execute(const TypedArray<ORC_ProxyData>& input) {
+    TypedArray<ORC_ProxyData> current_data = input;
+    
+    for (int i = 0; i < processors.size(); i++) {
+        Ref<ORC_QueueProcessor> processor = processors[i];
+        if (!processor.is_valid()) {
+            ERR_PRINT("[ORC_ProxyQueue WARNING] : Skipping invalid processor at index " + String::num_int64(i));
+            continue;
+        }
+        
+        current_data = processor->process(current_data);
+    }
+    
+    cached_result = current_data;
 }

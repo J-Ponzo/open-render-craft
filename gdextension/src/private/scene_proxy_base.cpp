@@ -84,8 +84,9 @@ void ORC_SceneProxyBase::pre_render(){
 			proxy_object->update();
 	}
 	
+	TypedArray<ORC_ProxyData> empty_input;
 	for (auto& pair : proxy_queues) {
-		pair.second->execute();
+		pair.second->execute(empty_input);
 	}
 }
 
@@ -150,7 +151,7 @@ Ref<ORC_DataQuery> ORC_SceneProxyBase::create_query_gd(Ref<GDScript> script, con
 	return proxy_registry->create_query_gd(script, flag_names, flag_values);
 }
 
-void ORC_SceneProxyBase::create_queue(const StringName& queue_name, const TypedArray<ORC_QueueProcessor>& processors, const StringName& parent_name) {
+void ORC_SceneProxyBase::create_queue(const StringName& queue_name, const TypedArray<ORC_QueueProcessor>& processors) {
 	if (proxy_queues.find(queue_name) != proxy_queues.end()) {
 		ERR_FAIL_MSG("[ORC_SceneProxyBase ERROR] : Queue '" + String(queue_name) + "' already exists");
 	}
@@ -159,21 +160,11 @@ void ORC_SceneProxyBase::create_queue(const StringName& queue_name, const TypedA
 	queue.instantiate();
 	
 	Ref<ORC_SceneProxyBase> scene_proxy_ref(this);
-	Ref<ORC_ProcessorPipeline> pipeline = queue->get_pipeline();
 	for (int i = 0; i < processors.size(); i++) {
 		Ref<ORC_QueueProcessor> processor = processors[i];
 		if (processor.is_valid()) {
 			processor->scene_proxy = scene_proxy_ref;
-			pipeline->add_processor(processor);
-		}
-	}
-	
-	if (!parent_name.is_empty()) {
-		auto it = proxy_queues.find(parent_name);
-		if (it != proxy_queues.end()) {
-			queue->set_parent(it->second);
-		} else {
-			ERR_FAIL_MSG("[ORC_SceneProxyBase ERROR] : Parent queue '" + String(parent_name) + "' not found");
+			queue->add_processor(processor);
 		}
 	}
 	
