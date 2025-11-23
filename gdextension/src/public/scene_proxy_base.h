@@ -46,7 +46,8 @@ private:
 	void on_node_enter_tree(Node* node);
 	void on_node_exit_tree(Node* node);
 
-	Ref<ORC_DataQuery> create_query_gd(Ref<GDScript> script, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
+	Ref<ORC_DataQuery> create_query_gd(const Ref<GDScript>& script, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
+	Ref<ORC_DataQuery> create_query_cpp(const StringName& class_name, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
 
 public:
 	ORC_SceneProxyBase();
@@ -73,9 +74,7 @@ public:
 	//TODO move in a Helper
 	Ref<ORC_FeatureQuery> create_feature_query(const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
 	
-	Ref<ORC_DataQuery> create_query(std::type_index type_id, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
-	
-	void create_queue(const StringName& queue_name, const TypedArray<ORC_QueueProcessor>& processors);
+	void create_queue(const StringName& queue_name, const Ref<ORC_DataQuery>& init_query, const TypedArray<ORC_QueueProcessor>& processors);
 	TypedArray<ORC_ProxyData> get_queue_data(const StringName& queue_name);
 	void clear_queues();
 	

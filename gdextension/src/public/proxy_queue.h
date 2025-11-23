@@ -6,6 +6,7 @@
 #include <godot_cpp/variant/string_name.hpp>
 #include <proxy_data.h>
 #include <queue_processor.h>
+#include <proxy_registry.h>
 #include <macros.h>
 
 namespace godot { class ORC_SceneProxyBase; }
@@ -22,6 +23,7 @@ class ORC_API ORC_ProxyQueue : public RefCounted {
     GDCLASS(ORC_ProxyQueue, RefCounted)
 
 private:
+    Ref<ORC_DataQuery> init_query;
     TypedArray<ORC_QueueProcessor> processors;
     TypedArray<ORC_ProxyData> cached_result;
 
@@ -31,6 +33,8 @@ protected:
 public:
     ORC_ProxyQueue();
     
+    void set_init_query(const Ref<ORC_DataQuery>& query) { init_query = query; }
+
     void add_processor(const Ref<ORC_QueueProcessor>& processor);
     void clear_processors();
     

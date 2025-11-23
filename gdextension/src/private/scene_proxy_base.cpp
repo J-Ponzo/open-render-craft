@@ -18,8 +18,10 @@ void ORC_SceneProxyBase::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_by_type", "script"), &ORC_SceneProxyBase::get_by_type_gd);
 	ClassDB::bind_method(D_METHOD("get_by_query", "query"), &ORC_SceneProxyBase::get_by_query);
     ClassDB::bind_method(D_METHOD("create_feature_query", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_feature_query);
-	ClassDB::bind_method(D_METHOD("create_query", "script", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_query_gd);
+	ClassDB::bind_method(D_METHOD("create_query_gd", "script", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_query_gd);
+	ClassDB::bind_method(D_METHOD("create_query_cpp", "class_name", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_query_cpp);
 
+	ClassDB::bind_method(D_METHOD("create_queue", "queue_name", "init_query", "processors"), &ORC_SceneProxyBase::create_queue);
 	ClassDB::bind_method(D_METHOD("get_queue_data", "queue_name"), &ORC_SceneProxyBase::get_queue_data);
 	
 	ClassDB::bind_method(D_METHOD("dump_registry"), &ORC_SceneProxyBase::dump_registry);
@@ -137,21 +139,28 @@ Ref<ORC_FeatureQuery> ORC_SceneProxyBase::create_feature_query(const TypedArray<
 	return proxy_registry->create_query(flag_names, flag_values);
 }
 
-Ref<ORC_DataQuery> ORC_SceneProxyBase::create_query(std::type_index type_id, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
-	Ref<ORC_DataQuery> result;
-	if (!proxy_registry.is_valid()) return result;
-	
-	return proxy_registry->create_query(type_id, flag_names, flag_values);
-}
-
-Ref<ORC_DataQuery> ORC_SceneProxyBase::create_query_gd(Ref<GDScript> script, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
+Ref<ORC_DataQuery> ORC_SceneProxyBase::create_query_gd(const Ref<GDScript>& script, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
 	Ref<ORC_DataQuery> result;
 	if (!proxy_registry.is_valid()) return result;
 	
 	return proxy_registry->create_query_gd(script, flag_names, flag_values);
 }
 
-void ORC_SceneProxyBase::create_queue(const StringName& queue_name, const TypedArray<ORC_QueueProcessor>& processors) {
+Ref<ORC_DataQuery> ORC_SceneProxyBase::create_query_cpp(const StringName& class_name, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
+	Ref<ORC_DataQuery> result;
+	if (!proxy_registry.is_valid()) return result;
+
+	//TODO use a cache to avoid instantiating each time + be sure not to leak
+	Object* dummy_instance = ClassDB::instantiate(class_name);
+    if (!dummy_instance) {
+        ERR_FAIL_V_MSG(result, "[ORC_SceneProxyBase ERROR] : Cannot instantiate class '" + String(class_name) + "'");
+    }
+    
+    std::type_index type_id = typeid(*dummy_instance);
+	return proxy_registry->create_query(type_id, flag_names, flag_values);
+}
+
+void ORC_SceneProxyBase::create_queue(const StringName& queue_name, const Ref<ORC_DataQuery>& init_query, const TypedArray<ORC_QueueProcessor>& processors) {
 	if (proxy_queues.find(queue_name) != proxy_queues.end()) {
 		ERR_FAIL_MSG("[ORC_SceneProxyBase ERROR] : Queue '" + String(queue_name) + "' already exists");
 	}
@@ -159,6 +168,8 @@ void ORC_SceneProxyBase::create_queue(const StringName& queue_name, const TypedA
 	Ref<ORC_ProxyQueue> queue;
 	queue.instantiate();
 	
+	queue->set_init_query(init_query);
+
 	Ref<ORC_SceneProxyBase> scene_proxy_ref(this);
 	for (int i = 0; i < processors.size(); i++) {
 		Ref<ORC_QueueProcessor> processor = processors[i];

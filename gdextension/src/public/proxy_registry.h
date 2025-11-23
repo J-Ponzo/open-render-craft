@@ -57,12 +57,7 @@ struct FeatureQueryHash {
     }
 };
 
-// struct RefQueryEqual {
-//     bool operator()(const Ref<ORC_FeatureQuery>& a, const Ref<ORC_FeatureQuery>& b) const {
-//         return a.ptr() == b.ptr();
-//     }
-// };
-
+//TODO maybe extract this class to its own file
 class ORC_API ORC_DataQuery : public RefCounted {
     GDCLASS(ORC_DataQuery, RefCounted)
 

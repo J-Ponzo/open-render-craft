@@ -27,7 +27,18 @@ static func create_proxy_queue(scene_proxy : ORC_SceneProxyBase, queue_def : ORC
 		if processor != null:
 			processors.append(processor)
 	
-	scene_proxy.create_queue(queue_def.queue_name, processors)
+	var init_query : ORC_DataQuery = create_query_from_def(scene_proxy, queue_def.init_query)
+	scene_proxy.create_queue(queue_def.queue_name, init_query, processors)
+
+static func create_query_from_def(scene_proxy : ORC_SceneProxyBase, query_def : ORC_DataQuery_Def) -> ORC_DataQuery:
+	if query_def.type is ORC_GDImpl_Def:
+		var gd_impl_def = query_def.type as ORC_GDImpl_Def
+		var script = gd_impl_def.get_script()
+		return scene_proxy.create_query_gd(script, query_def.flag_names, query_def.flag_values)
+	elif query_def.type is ORC_CPPImpl_Def:
+		var cpp_impl_def = query_def.type as ORC_CPPImpl_Def
+		return scene_proxy.create_query_cpp(cpp_impl_def.cpp_class_name, query_def.flag_names, query_def.flag_values)
+	return null
 
 static func create_attachment(renderer_inst : ORC_RendererBase, attach_key : StringName, attach_format_def : ORC_AttachmentFormat_Def) -> RID:
 	var attachment : RID = create_texture_attachment(attach_format_def)
