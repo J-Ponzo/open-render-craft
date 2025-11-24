@@ -29,7 +29,8 @@ func after() -> void:
 func test_is_primary():	
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
-	var query : ORC_FeatureQuery = scn_proxy.create_feature_query(
+	var query : ORC_DataQuery = scn_proxy.create_query_gd(
+		null,
 		["IS_PRIMARY"],
 		[true]
 	)
@@ -40,7 +41,8 @@ func test_is_primary():
 func test_is_secondary():	
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
-	var query : ORC_FeatureQuery = scn_proxy.create_feature_query(
+	var query : ORC_DataQuery = scn_proxy.create_query_gd(
+		null,
 		["IS_PRIMARY"],
 		[false]
 	)
@@ -51,7 +53,8 @@ func test_is_secondary():
 func test_is_light():	
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
-	var query : ORC_FeatureQuery = scn_proxy.create_feature_query(
+	var query : ORC_DataQuery = scn_proxy.create_query_gd(
+		null,
 		["IS_LIGHT"],
 		[true]
 	)
@@ -63,7 +66,8 @@ func test_is_light():
 func test_shadow():	
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
-	var query : ORC_FeatureQuery = scn_proxy.create_feature_query(
+	var query : ORC_DataQuery = scn_proxy.create_query_gd(
+		null,
 		["SHADOWS"],
 		[true]
 	)
@@ -81,7 +85,8 @@ func test_update_shadow():
 
 	scn_proxy.pre_render()
 
-	var query : ORC_FeatureQuery = scn_proxy.create_feature_query(
+	var query : ORC_DataQuery = scn_proxy.create_query_gd(
+		null,
 		["SHADOWS"],
 		[true]
 	)

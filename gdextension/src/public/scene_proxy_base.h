@@ -58,6 +58,7 @@ public:
 	Ref<ORC_RendererBase> get_renderer() const { return renderer; }
 	void set_renderer(const Ref<ORC_RendererBase> &renderer) { this->renderer = renderer; }
 
+	// TODO : remove
 	template <class T>
 	std::vector<Ref<T>> get_by_type() const {
 		std::vector<Ref<ORC_ProxyData>> raw = proxy_registry->get_by_type(TypeKey(typeid(T)));
@@ -68,11 +69,9 @@ public:
 		}
 		return result;
 	}
-
+	// TODO : remove
 	TypedArray<ORC_ProxyData> get_by_type_gd(const Ref<GDScript>& script) const;
-	TypedArray<ORC_ProxyData> get_by_query(const Ref<ORC_FeatureQuery>& query) const;
-	//TODO move in a Helper
-	Ref<ORC_FeatureQuery> create_feature_query(const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
+	TypedArray<ORC_ProxyData> get_by_query(const Ref<ORC_DataQuery>& query) const;
 	
 	void create_queue(const StringName& queue_name, const Ref<ORC_DataQuery>& init_query, const TypedArray<ORC_QueueProcessor>& processors);
 	TypedArray<ORC_ProxyData> get_queue_data(const StringName& queue_name);

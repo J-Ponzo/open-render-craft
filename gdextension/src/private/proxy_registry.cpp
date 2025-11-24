@@ -4,12 +4,8 @@
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <primary_data.h>
 #include <secondary_data.h>
-#include <feature_query.h>
 
 namespace godot {
-
-void ORC_DataQuery::_bind_methods() {
-}
 
 void ORC_ProxyRegistry::_bind_methods() {
 }
@@ -247,8 +243,11 @@ String ORC_ProxyRegistry::dump_registry() const {
     return output;
 }
 
-bool ORC_ProxyRegistry::matches_query(uint64_t flags, const Ref<ORC_FeatureQuery>& query) const {
-    if (!query.is_valid()) return false;
+bool ORC_ProxyRegistry::matches_query(Ref<ORC_ProxyData> proxy_data, uint64_t flags, const Ref<ORC_DataQuery>& query) const {
+    if (!query.is_valid() || !proxy_data.is_valid()) return false;
+    
+    TypeKey data_type_key = get_type_key(proxy_data);
+    if (!(data_type_key == query->type_key)) return false;
     
     return (flags & query->mask) == (query->value & query->mask);
 }
@@ -257,13 +256,13 @@ bool ORC_ProxyRegistry::update_query_cache_for_data(Ref<ORC_ProxyData> proxy_dat
     if (!proxy_data.is_valid()) return false;
     
     for (auto& cache_entry : query_cache) {
-        const Ref<ORC_FeatureQuery>& query = cache_entry.first;
+        const Ref<ORC_DataQuery>& query = cache_entry.first;
         if (!query.is_valid()) continue;
         
         std::vector<Ref<ORC_ProxyData>>& data_list = cache_entry.second;
         
-        bool old_match = matches_query(old_flags, query);
-        bool new_match = matches_query(new_flags, query);
+        bool old_match = matches_query(proxy_data, old_flags, query);
+        bool new_match = matches_query(proxy_data, new_flags, query);
         
         if (old_match && !new_match) {
             data_list.erase(std::remove(data_list.begin(), data_list.end(), proxy_data), data_list.end());
@@ -284,7 +283,7 @@ bool ORC_ProxyRegistry::remove_from_query_cache(Ref<ORC_ProxyData> proxy_data) {
     return true;
 }
 
-bool ORC_ProxyRegistry::add_query_to_cache(const Ref<ORC_FeatureQuery>& query) {
+bool ORC_ProxyRegistry::add_query_to_cache(const Ref<ORC_DataQuery>& query) {
     if (!query.is_valid()) return false;
     
     if (query_cache.find(query) != query_cache.end()) return false;
@@ -301,7 +300,7 @@ bool ORC_ProxyRegistry::add_query_to_cache(const Ref<ORC_FeatureQuery>& query) {
         Ref<ORC_ProxyData> proxy_data;
         proxy_data.reference_ptr(data_ptr);
         
-        if (matches_query(flags, query)) {
+        if (matches_query(proxy_data, flags, query)) {
             matching_data.push_back(proxy_data);
         }
     }
@@ -349,7 +348,7 @@ bool ORC_ProxyRegistry::set_flag_internal(ORC_ProxyData* proxy_data, const Strin
     return true;
 }
 
-TypedArray<ORC_ProxyData> ORC_ProxyRegistry::get_by_query(Ref<ORC_FeatureQuery> query) {
+TypedArray<ORC_ProxyData> ORC_ProxyRegistry::get_by_query(Ref<ORC_DataQuery> query) {
     TypedArray<ORC_ProxyData> result;
     
     if (!query.is_valid()) return result;
@@ -367,36 +366,6 @@ TypedArray<ORC_ProxyData> ORC_ProxyRegistry::get_by_query(Ref<ORC_FeatureQuery> 
     }
     
     return result;
-}
-
-Ref<ORC_FeatureQuery> ORC_ProxyRegistry::create_query(const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
-    if (flag_names.size() != flag_values.size()) {
-        ERR_FAIL_V_MSG(Ref<ORC_FeatureQuery>(), "[ORC_ProxyRegistry ERROR] : flag_names and flag_values arrays must have the same size");
-        return Ref<ORC_FeatureQuery>();
-    }
-    
-    Ref<ORC_FeatureQuery> query;
-    query.instantiate();
-    
-    uint64_t mask = 0;
-    uint64_t value = 0;
-    
-    for (int i = 0; i < flag_names.size(); i++) {
-        StringName flag_name = flag_names[i];
-        bool flag_value = flag_values[i];
-        
-        uint64_t flag_mask = get_or_create_flag_mask(flag_name);
-        mask |= flag_mask;
-        
-        if (flag_value) {
-            value |= flag_mask;
-        }
-    }
-    
-    query->mask = mask;
-    query->value = value;
-    
-    return query;
 }
 
 bool ORC_ProxyRegistry::fill_query_features(Ref<ORC_DataQuery> query, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
@@ -433,6 +402,11 @@ bool ORC_ProxyRegistry::fill_query_features(Ref<ORC_DataQuery> query, const Type
 
 Ref<ORC_DataQuery> ORC_ProxyRegistry::create_query_gd(Ref<GDScript> script, const TypedArray<StringName> &flag_names, const TypedArray<bool> &flag_values)
 {
+    if (!script.is_valid()) {
+        ERR_FAIL_V_MSG(Ref<ORC_DataQuery>(), "[ORC_ProxyRegistry ERROR] : Cannot create query with null GDScript");
+        return nullptr;
+    }
+    
     Ref<ORC_DataQuery> query;
     query.instantiate();
     fill_query_features(query, flag_names, flag_values);
@@ -440,8 +414,14 @@ Ref<ORC_DataQuery> ORC_ProxyRegistry::create_query_gd(Ref<GDScript> script, cons
     return query;
 }
 
+// TODO make unit test
 Ref<ORC_DataQuery> ORC_ProxyRegistry::create_query(std::type_index type_id, const TypedArray<StringName> &flag_names, const TypedArray<bool> &flag_values)
 {
+    if (type_id == typeid(void)) {
+        ERR_FAIL_V_MSG(Ref<ORC_DataQuery>(), "[ORC_ProxyRegistry ERROR] : Cannot create query with void type_index");
+        return nullptr;
+    }
+    
     Ref<ORC_DataQuery> query;
     query.instantiate();
     fill_query_features(query, flag_names, flag_values);

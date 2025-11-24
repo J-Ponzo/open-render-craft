@@ -17,7 +17,6 @@ void ORC_SceneProxyBase::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("get_by_type", "script"), &ORC_SceneProxyBase::get_by_type_gd);
 	ClassDB::bind_method(D_METHOD("get_by_query", "query"), &ORC_SceneProxyBase::get_by_query);
-    ClassDB::bind_method(D_METHOD("create_feature_query", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_feature_query);
 	ClassDB::bind_method(D_METHOD("create_query_gd", "script", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_query_gd);
 	ClassDB::bind_method(D_METHOD("create_query_cpp", "class_name", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_query_cpp);
 
@@ -124,18 +123,11 @@ TypedArray<ORC_ProxyData> ORC_SceneProxyBase::get_by_type_gd(const Ref<GDScript>
 	return result;
 }
 
-TypedArray<ORC_ProxyData> ORC_SceneProxyBase::get_by_query(const Ref<ORC_FeatureQuery>& query) const {
+TypedArray<ORC_ProxyData> ORC_SceneProxyBase::get_by_query(const Ref<ORC_DataQuery>& query) const {
 	TypedArray<ORC_ProxyData> result;
 	if (!proxy_registry.is_valid() || !query.is_valid()) return result;
 	
 	return proxy_registry->get_by_query(query);
-}
-
-Ref<ORC_FeatureQuery> ORC_SceneProxyBase::create_feature_query(const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
-	Ref<ORC_FeatureQuery> result;
-	if (!proxy_registry.is_valid()) return result;
-	
-	return proxy_registry->create_query(flag_names, flag_values);
 }
 
 Ref<ORC_DataQuery> ORC_SceneProxyBase::create_query_gd(const Ref<GDScript>& script, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
