@@ -26,8 +26,7 @@ void ORC_ProxyQueue::clear_processors() {
 }
 
 void ORC_ProxyQueue::execute() {
-	TypedArray<ORC_ProxyData> current_data;
-	// TypedArray<ORC_ProxyData> current_data = scene_proxy->get_by_query(init_query);
+	TypedArray<ORC_ProxyData> current_data = scene_proxy->get_by_query(init_query);
     
     for (int i = 0; i < processors.size(); i++) {
         Ref<ORC_QueueProcessor> processor = processors[i];
