@@ -36,7 +36,6 @@ bool ORC_ProxyRegistry::register_data(Ref<ORC_ProxyData> proxy_data, int64_t uni
     TypeKey type_key = get_type_key(proxy_data);
     type_registry[type_key].push_back(proxy_data);
 
-    // Ajouter la nouvelle donnée aux query_cache existants qui matchent
     uint64_t flags = 0;
     auto flags_it = data_flags.find(proxy_data.ptr());
     if (flags_it != data_flags.end()) {
