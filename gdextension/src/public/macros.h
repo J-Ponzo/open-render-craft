@@ -111,4 +111,9 @@ RET_TYPE CLASS_NAME::METHOD_NAME(T1 A1, T2 A2, T3 A3, T4 A4) { \
     ClassDB::bind_method(D_METHOD(#METHOD_NAME, ##__VA_ARGS__), &CLASS_NAME::METHOD_NAME); \
     ClassDB::bind_method(D_METHOD("super_" #METHOD_NAME, ##__VA_ARGS__), &CLASS_NAME::METHOD_NAME##_impl);
 
+// Register C++ ProxyData type (combines ClassDB registration and type index registration)
+#define ORC_REGISTER_PROXY_DATA_TYPE(DATA_TYPE) \
+    GDREGISTER_RUNTIME_CLASS(DATA_TYPE); \
+    godot::ORC_ProxyRegistry::register_cpp_type<DATA_TYPE>(#DATA_TYPE);
+
 #endif

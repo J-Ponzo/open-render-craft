@@ -28,6 +28,11 @@ class ORC_API ORC_ProxyRegistry : public RefCounted {
     GDCLASS(ORC_ProxyRegistry, RefCounted)
 
 private:
+    // Static registry for C++ types (Meyers' Singleton)
+    static std::unordered_map<StringName, std::type_index>& cpp_types();
+    static TypeKey get_type_key(Ref<ORC_ProxyData> proxy_data);
+    
+    // Instance members
     std::unordered_map<TypeKey, std::vector<Ref<ORC_ProxyData>>, TypeKeyHash> type_registry;
     std::unordered_map<int64_t, std::tuple<Ref<ORC_ProxyData>, int>> id_registry;
     
@@ -36,8 +41,6 @@ private:
     // TODO try to use Ref<> instead of raw pointer
     std::unordered_map<ORC_ProxyData*, uint64_t> data_flags;
     std::unordered_map<Ref<ORC_DataQuery>, std::vector<Ref<ORC_ProxyData>>, DataQueryHash> query_cache;
-
-    static TypeKey get_type_key(Ref<ORC_ProxyData> proxy_data);
     
     uint64_t get_or_create_flag_mask(const StringName& flag_name);
     bool matches_query(Ref<ORC_ProxyData> proxy_data, uint64_t flags, const Ref<ORC_DataQuery>& query) const;
@@ -51,6 +54,15 @@ protected:
     static void _bind_methods();
 
 public:
+    // Static methods
+    template<typename T>
+    static void register_cpp_type(const StringName& class_name) {
+        cpp_types().emplace(class_name, typeid(T));
+    }
+    
+    static std::type_index get_cpp_type_index(const StringName& class_name);
+    
+    // Instance methods
     bool register_data(Ref<ORC_ProxyData> proxy_data, int64_t unique_id = -1);
     bool unregister_data(Ref<ORC_ProxyData> proxy_data);
     // TODO : remove

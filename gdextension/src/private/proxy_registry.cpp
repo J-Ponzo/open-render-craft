@@ -7,6 +7,20 @@
 
 namespace godot {
 
+std::unordered_map<StringName, std::type_index>& ORC_ProxyRegistry::cpp_types() {
+    static std::unordered_map<StringName, std::type_index> registry;
+    return registry;
+}
+
+std::type_index ORC_ProxyRegistry::get_cpp_type_index(const StringName& class_name) {
+    auto& registry = cpp_types();
+    auto it = registry.find(class_name);
+    ERR_FAIL_COND_V_MSG(it == registry.end(), typeid(void), 
+        vformat("[ORC_ProxyRegistry ERROR] : C++ type '%s' not registered. Call ORC_ProxyRegistry::register_cpp_type<YourType>(\"%s\") in your module initialization.", 
+        class_name, class_name));
+    return it->second;
+}
+
 void ORC_ProxyRegistry::_bind_methods() {
 }
 

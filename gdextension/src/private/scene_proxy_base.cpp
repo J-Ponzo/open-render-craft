@@ -140,13 +140,7 @@ Ref<ORC_DataQuery> ORC_SceneProxyBase::create_query_cpp(const StringName& class_
 	Ref<ORC_DataQuery> result;
 	if (!proxy_registry.is_valid()) return result;
 
-	//TODO use a cache to avoid instantiating each time + be sure not to leak
-	Object* dummy_instance = ClassDB::instantiate(class_name);
-    if (!dummy_instance) {
-        ERR_FAIL_V_MSG(result, "[ORC_SceneProxyBase ERROR] : Cannot instantiate class '" + String(class_name) + "'");
-    }
-    
-    std::type_index type_id = typeid(*dummy_instance);
+	std::type_index type_id = ORC_ProxyRegistry::get_cpp_type_index(class_name);
 	return proxy_registry->create_query(type_id, flag_names, flag_values);
 }
 
