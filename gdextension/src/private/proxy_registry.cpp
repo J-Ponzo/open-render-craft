@@ -36,6 +36,22 @@ bool ORC_ProxyRegistry::register_data(Ref<ORC_ProxyData> proxy_data, int64_t uni
     TypeKey type_key = get_type_key(proxy_data);
     type_registry[type_key].push_back(proxy_data);
 
+    // Ajouter la nouvelle donnée aux query_cache existants qui matchent
+    uint64_t flags = 0;
+    auto flags_it = data_flags.find(proxy_data.ptr());
+    if (flags_it != data_flags.end()) {
+        flags = flags_it->second;
+    }
+    
+    for (auto& cache_entry : query_cache) {
+        const Ref<ORC_DataQuery>& query = cache_entry.first;
+        if (!query.is_valid()) continue;
+        
+        if (matches_query(proxy_data, flags, query)) {
+            cache_entry.second.push_back(proxy_data);
+        }
+    }
+
     return true;
 }
 
@@ -290,18 +306,19 @@ bool ORC_ProxyRegistry::add_query_to_cache(const Ref<ORC_DataQuery>& query) {
     
     std::vector<Ref<ORC_ProxyData>> matching_data;
     
-    for (const auto& item : data_flags) {
-        ORC_ProxyData* data_ptr = item.first;
-        uint64_t flags = item.second;
-        
-        //TODO : assert here ?
-        if (!data_ptr) continue;
-        
-        Ref<ORC_ProxyData> proxy_data;
-        proxy_data.reference_ptr(data_ptr);
-        
-        if (matches_query(proxy_data, flags, query)) {
-            matching_data.push_back(proxy_data);
+    for (const auto& type_entry : type_registry) {
+        for (const auto& proxy_data : type_entry.second) {
+            if (!proxy_data.is_valid()) continue;
+            
+            uint64_t flags = 0;
+            auto flags_it = data_flags.find(proxy_data.ptr());
+            if (flags_it != data_flags.end()) {
+                flags = flags_it->second;
+            }
+            
+            if (matches_query(proxy_data, flags, query)) {
+                matching_data.push_back(proxy_data);
+            }
         }
     }
     

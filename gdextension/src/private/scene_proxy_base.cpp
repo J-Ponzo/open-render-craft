@@ -21,7 +21,7 @@ void ORC_SceneProxyBase::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("create_query_cpp", "class_name", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_query_cpp);
 
 	ClassDB::bind_method(D_METHOD("create_queue", "queue_name", "init_query", "processors"), &ORC_SceneProxyBase::create_queue);
-	ClassDB::bind_method(D_METHOD("get_queue_data", "queue_name"), &ORC_SceneProxyBase::get_queue_data);
+	ClassDB::bind_method(D_METHOD("fetch_queue_data", "queue_name"), &ORC_SceneProxyBase::fetch_queue_data);
 	
 	ClassDB::bind_method(D_METHOD("dump_registry"), &ORC_SceneProxyBase::dump_registry);
 
@@ -108,7 +108,6 @@ void ORC_SceneProxyBase::cleanup() {
 	for (Node* node : all_nodes)
 		on_node_exit_tree(node);
 	
-	clear_queues();
 	proxy_registry->clear();
 }
 
@@ -174,7 +173,7 @@ void ORC_SceneProxyBase::create_queue(const StringName& queue_name, const Ref<OR
 	proxy_queues[queue_name] = queue;
 }
 
-TypedArray<ORC_ProxyData> ORC_SceneProxyBase::get_queue_data(const StringName& queue_name) {
+TypedArray<ORC_ProxyData> ORC_SceneProxyBase::fetch_queue_data(const StringName& queue_name) {
 	auto it = proxy_queues.find(queue_name);
 	if (it == proxy_queues.end()) {
 		ERR_FAIL_V_MSG(TypedArray<ORC_ProxyData>(), "[ORC_SceneProxyBase ERROR] : Queue '" + String(queue_name) + "' not found");
@@ -186,10 +185,6 @@ TypedArray<ORC_ProxyData> ORC_SceneProxyBase::get_queue_data(const StringName& q
 	}
 	
 	return queue->get_cached_data();
-}
-
-void ORC_SceneProxyBase::clear_queues() {
-	proxy_queues.clear();
 }
 
 String ORC_SceneProxyBase::dump_registry() const {

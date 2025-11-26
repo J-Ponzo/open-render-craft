@@ -74,8 +74,7 @@ public:
 	TypedArray<ORC_ProxyData> get_by_query(const Ref<ORC_DataQuery>& query) const;
 	
 	void create_queue(const StringName& queue_name, const Ref<ORC_DataQuery>& init_query, const TypedArray<ORC_QueueProcessor>& processors);
-	TypedArray<ORC_ProxyData> get_queue_data(const StringName& queue_name);
-	void clear_queues();
+	TypedArray<ORC_ProxyData> fetch_queue_data(const StringName& queue_name);
 	
 	String dump_registry() const;
 };

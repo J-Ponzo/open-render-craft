@@ -33,7 +33,7 @@ static func create_proxy_queue(scene_proxy : ORC_SceneProxyBase, queue_def : ORC
 static func create_query_from_def(scene_proxy : ORC_SceneProxyBase, query_def : ORC_DataQuery_Def) -> ORC_DataQuery:
 	if query_def.type is ORC_GDImpl_Def:
 		var gd_impl_def = query_def.type as ORC_GDImpl_Def
-		var script = gd_impl_def.get_script()
+		var script = gd_impl_def.gd_script
 		return scene_proxy.create_query_gd(script, query_def.flag_names, query_def.flag_values)
 	elif query_def.type is ORC_CPPImpl_Def:
 		var cpp_impl_def = query_def.type as ORC_CPPImpl_Def
