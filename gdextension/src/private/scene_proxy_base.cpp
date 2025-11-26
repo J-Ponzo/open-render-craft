@@ -15,11 +15,8 @@ void ORC_SceneProxyBase::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_proxy_factory", "proxy_factory"), &ORC_SceneProxyBase::set_proxy_factory);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "proxy_factory", PROPERTY_HINT_RESOURCE_TYPE, "ORC_ProxyFactory"), "set_proxy_factory", "get_proxy_factory");
 
-	ClassDB::bind_method(D_METHOD("get_by_type", "script"), &ORC_SceneProxyBase::get_by_type_gd);
-	ClassDB::bind_method(D_METHOD("get_by_query", "query"), &ORC_SceneProxyBase::get_by_query);
 	ClassDB::bind_method(D_METHOD("create_query_gd", "script", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_query_gd);
 	ClassDB::bind_method(D_METHOD("create_query_cpp", "class_name", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_query_cpp);
-
 	ClassDB::bind_method(D_METHOD("create_queue", "queue_name", "init_query", "processors"), &ORC_SceneProxyBase::create_queue);
 	ClassDB::bind_method(D_METHOD("fetch_queue_data", "queue_name"), &ORC_SceneProxyBase::fetch_queue_data);
 	
@@ -109,17 +106,6 @@ void ORC_SceneProxyBase::cleanup() {
 		on_node_exit_tree(node);
 	
 	proxy_registry->clear();
-}
-
-TypedArray<ORC_ProxyData> ORC_SceneProxyBase::get_by_type_gd(const Ref<GDScript>& script) const {
-	TypedArray<ORC_ProxyData> result;
-	if (!proxy_registry.is_valid() || !script.is_valid()) return result;
-	
-	std::vector<Ref<ORC_ProxyData>> raw = proxy_registry->get_by_type(TypeKey(script));
-	for (const auto& data : raw) {
-		result.append(data);
-	}
-	return result;
 }
 
 TypedArray<ORC_ProxyData> ORC_SceneProxyBase::get_by_query(const Ref<ORC_DataQuery>& query) const {

@@ -57,22 +57,8 @@ public:
 	Ref<ORC_RendererBase> renderer;
 	Ref<ORC_RendererBase> get_renderer() const { return renderer; }
 	void set_renderer(const Ref<ORC_RendererBase> &renderer) { this->renderer = renderer; }
-
-	// TODO : remove
-	template <class T>
-	std::vector<Ref<T>> get_by_type() const {
-		std::vector<Ref<ORC_ProxyData>> raw = proxy_registry->get_by_type(TypeKey(typeid(T)));
-		std::vector<Ref<T>> result;
-		result.reserve(raw.size());
-		for (const auto& data : raw) {
-			result.push_back(Ref<T>(Object::cast_to<T>(data.ptr())));
-		}
-		return result;
-	}
-	// TODO : remove
-	TypedArray<ORC_ProxyData> get_by_type_gd(const Ref<GDScript>& script) const;
-	TypedArray<ORC_ProxyData> get_by_query(const Ref<ORC_DataQuery>& query) const;
 	
+	TypedArray<ORC_ProxyData> get_by_query(const Ref<ORC_DataQuery>& query) const;
 	void create_queue(const StringName& queue_name, const Ref<ORC_DataQuery>& init_query, const TypedArray<ORC_QueueProcessor>& processors);
 	TypedArray<ORC_ProxyData> fetch_queue_data(const StringName& queue_name);
 	

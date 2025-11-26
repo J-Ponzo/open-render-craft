@@ -47,7 +47,6 @@ private:
     bool update_query_cache_for_data(Ref<ORC_ProxyData> proxy_data, uint64_t old_flags, uint64_t new_flags);
     bool remove_from_query_cache(Ref<ORC_ProxyData> proxy_data);
     bool add_query_to_cache(const Ref<ORC_DataQuery>& query);
-
     bool fill_query_features(Ref<ORC_DataQuery> query, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
 
 protected:
@@ -65,8 +64,6 @@ public:
     // Instance methods
     bool register_data(Ref<ORC_ProxyData> proxy_data, int64_t unique_id = -1);
     bool unregister_data(Ref<ORC_ProxyData> proxy_data);
-    // TODO : remove
-    std::vector<Ref<ORC_ProxyData>> get_by_type(const TypeKey& type_key) const;
     Ref<ORC_ProxyData> get_by_unique_id(int64_t unique_id) const;
     bool increment_refcount(int64_t unique_id);
     bool decrement_refcount(int64_t unique_id);

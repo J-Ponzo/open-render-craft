@@ -88,11 +88,6 @@ bool ORC_ProxyRegistry::unregister_data(Ref<ORC_ProxyData> proxy_data) {
     return true;
 }
 
-std::vector<Ref<ORC_ProxyData>> ORC_ProxyRegistry::get_by_type(const TypeKey& type_key) const {
-    auto it = type_registry.find(type_key);
-    return (it != type_registry.end()) ? it->second : std::vector<Ref<ORC_ProxyData>>{};
-}
-
 Ref<ORC_ProxyData> ORC_ProxyRegistry::get_by_unique_id(int64_t unique_id) const {
     auto it = id_registry.find(unique_id);
     return (it != id_registry.end()) ? std::get<0>(it->second) : Ref<ORC_ProxyData>();
