@@ -33,8 +33,8 @@ private:
     static TypeKey get_type_key(Ref<ORC_ProxyData> proxy_data);
     
     // Instance members
-    std::unordered_map<TypeKey, std::vector<Ref<ORC_ProxyData>>, TypeKeyHash> type_registry;
     std::unordered_map<int64_t, std::tuple<Ref<ORC_ProxyData>, int>> id_registry;
+    std::vector<Ref<ORC_ProxyData>> all_data;
     
     std::unordered_map<StringName, uint64_t> flag_name_to_mask;
     uint8_t next_available_bit = 0;

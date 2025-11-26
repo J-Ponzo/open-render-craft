@@ -47,8 +47,7 @@ bool ORC_ProxyRegistry::register_data(Ref<ORC_ProxyData> proxy_data, int64_t uni
         id_registry[unique_id] = std::make_tuple(proxy_data, 1);
     }
 
-    TypeKey type_key = get_type_key(proxy_data);
-    type_registry[type_key].push_back(proxy_data);
+    all_data.push_back(proxy_data);
 
     uint64_t flags = 0;
     auto flags_it = data_flags.find(proxy_data.ptr());
@@ -75,15 +74,8 @@ bool ORC_ProxyRegistry::unregister_data(Ref<ORC_ProxyData> proxy_data) {
 
     remove_from_query_cache(proxy_data);
     data_flags.erase(proxy_data.ptr());
-
-    TypeKey type_key = get_type_key(proxy_data);
-    auto it = type_registry.find(type_key);
-    if (it == type_registry.end()) return false;
-
-    auto& vec = it->second;
-    size_t old_size = vec.size();
-    vec.erase(std::remove(vec.begin(), vec.end(), proxy_data), vec.end());
-    if (vec.size() == old_size) return false;
+    
+    all_data.erase(std::remove(all_data.begin(), all_data.end(), proxy_data), all_data.end());
 
     return true;
 }
@@ -193,30 +185,64 @@ static String get_primary_node_info(ORC_PrimaryData* primary) {
 String ORC_ProxyRegistry::dump_registry() const {
     String output = "=== ORC_ProxyRegistry Dump ===\n";
     
-    output += "\n--- Type Registry ---\n";
-    output += "Total types: " + String::num_int64(type_registry.size()) + "\n";
-    for (const auto& pair : type_registry) {
-        // Determine if this is a PRIMARY or SECONDARY type
-        String category = "";
-        if (!pair.second.empty() && pair.second[0].is_valid()) {
-            if (Object::cast_to<ORC_PrimaryData>(pair.second[0].ptr())) {
-                category = " [--PRIMARY--]";
-            } else if (Object::cast_to<ORC_SecondaryData>(pair.second[0].ptr())) {
-                category = " [--SECONDARY--]";
+    auto to_binary = [this](uint64_t value) -> String {
+        if (next_available_bit == 0) return "0";
+        String result = "";
+        for (int i = next_available_bit - 1; i >= 0; i--) {
+            result += ((value >> i) & 1) ? "1" : "0";
+        }
+        return result;
+    };
+    
+    output += "\n--- Flag Names ---\n";
+    output += "Total flags: " + String::num_int64(flag_name_to_mask.size()) + "\n";
+    
+    std::unordered_map<uint8_t, StringName> bit_to_flag;
+    for (const auto& pair : flag_name_to_mask) {
+        uint64_t mask = pair.second;
+        for (uint8_t bit = 0; bit < 64; bit++) {
+            if (mask == (1ULL << bit)) {
+                bit_to_flag[bit] = pair.first;
+                break;
             }
         }
+    }
+    
+    for (int bit = next_available_bit - 1; bit >= 0; bit--) {
+        auto it = bit_to_flag.find(bit);
+        if (it != bit_to_flag.end()) {
+            output += "  Bit " + String::num_int64(bit) + ": " + String(it->second) + "\n";
+        }
+    }
+    
+    output += "\n--- Query Cache ---\n";
+    output += "Total queries: " + String::num_int64(query_cache.size()) + "\n";
+    
+    int query_idx = 0;
+    for (const auto& cache_entry : query_cache) {
+        const Ref<ORC_DataQuery>& query = cache_entry.first;
+        const std::vector<Ref<ORC_ProxyData>>& data_list = cache_entry.second;
         
-        if (std::holds_alternative<std::type_index>(pair.first.key)) {
-            output += "  [C++]" + category + " " + String(std::get<std::type_index>(pair.first.key).name()) + 
-                     " -> " + String::num_int64(pair.second.size()) + " instances\n";
-        } else {
-            output += "  [GD]" + category + " " + String(std::get<std::string>(pair.first.key).c_str()) + 
-                     " -> " + String::num_int64(pair.second.size()) + " instances\n";
+        output += "\n  [Query #" + String::num_int64(query_idx++) + "] ";
+        
+        if (!query.is_valid()) {
+            output += "<invalid query>\n";
+            continue;
         }
         
-        for (size_t i = 0; i < pair.second.size(); i++) {
-            const auto& data = pair.second[i];
-            output += "    [" + String::num_int64(i) + "] ";
+        if (std::holds_alternative<std::type_index>(query->type_key.key)) {
+            output += "[C++] " + String(std::get<std::type_index>(query->type_key.key).name());
+        } else {
+            output += "[GD] " + String(std::get<std::string>(query->type_key.key).c_str());
+        }
+        
+        output += " (mask: 0b" + to_binary(query->mask) + ", value: 0b" + to_binary(query->value) + ")";
+        output += "\n    -> " + String::num_int64(data_list.size()) + " matching data:\n";
+        
+        for (size_t i = 0; i < data_list.size(); i++) {
+            const auto& data = data_list[i];
+            output += "      [" + String::num_int64(i) + "] ";
+            
             if (data.is_valid()) {
                 output += get_type_and_address(data);
                 
@@ -225,24 +251,7 @@ String ORC_ProxyRegistry::dump_registry() const {
                     output += get_primary_node_info(primary);
                 }
                 
-                ORC_SecondaryData* secondary = Object::cast_to<ORC_SecondaryData>(data.ptr());
-                if (secondary) {
-                    TypedArray<ORC_PrimaryData> primaries = secondary->get_primary_data_array();
-                    output += " shared by " + String::num_int64(primaries.size()) + ": \n";
-                    for (int j = 0; j < primaries.size(); j++) {
-                        Ref<ORC_PrimaryData> prim = primaries[j];
-                        output += "        - ";
-                        if (prim.is_valid()) {
-                            output += get_type_and_address(prim);
-                            output += get_primary_node_info(prim.ptr());
-                        } else {
-                            output += "<invalid>";
-                        }
-                        output += "\n";
-                    }
-                } else {
-                    output += "\n";
-                }
+                output += "\n";
             } else {
                 output += "<invalid>\n";
             }
@@ -300,6 +309,7 @@ bool ORC_ProxyRegistry::update_query_cache_for_data(Ref<ORC_ProxyData> proxy_dat
 bool ORC_ProxyRegistry::remove_from_query_cache(Ref<ORC_ProxyData> proxy_data) {
     if (!proxy_data.is_valid()) return false;
     
+    // TODO : mabe an early coninue if type does not match
     for (auto& cache_entry : query_cache) {
         std::vector<Ref<ORC_ProxyData>>& data_list = cache_entry.second;
         data_list.erase(std::remove(data_list.begin(), data_list.end(), proxy_data), data_list.end());
@@ -314,19 +324,17 @@ bool ORC_ProxyRegistry::add_query_to_cache(const Ref<ORC_DataQuery>& query) {
     
     std::vector<Ref<ORC_ProxyData>> matching_data;
     
-    for (const auto& type_entry : type_registry) {
-        for (const auto& proxy_data : type_entry.second) {
-            if (!proxy_data.is_valid()) continue;
-            
-            uint64_t flags = 0;
-            auto flags_it = data_flags.find(proxy_data.ptr());
-            if (flags_it != data_flags.end()) {
-                flags = flags_it->second;
-            }
-            
-            if (matches_query(proxy_data, flags, query)) {
-                matching_data.push_back(proxy_data);
-            }
+    for (const auto& proxy_data : all_data) {
+        if (!proxy_data.is_valid()) continue;
+        
+        uint64_t flags = 0;
+        auto flags_it = data_flags.find(proxy_data.ptr());
+        if (flags_it != data_flags.end()) {
+            flags = flags_it->second;
+        }
+        
+        if (matches_query(proxy_data, flags, query)) {
+            matching_data.push_back(proxy_data);
         }
     }
     
@@ -455,8 +463,8 @@ Ref<ORC_DataQuery> ORC_ProxyRegistry::create_query(std::type_index type_id, cons
 }
 
 void ORC_ProxyRegistry::clear() {
-	type_registry.clear();
 	id_registry.clear();
+	all_data.clear();
 	data_flags.clear();
 	query_cache.clear();
 	flag_name_to_mask.clear();
