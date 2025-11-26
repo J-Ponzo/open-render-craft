@@ -26,4 +26,5 @@ mono_crash.*.json
 *.pdb
 *.exp
 *.ilk
+*.TMP
 gdextension/.sconsign.dblite
