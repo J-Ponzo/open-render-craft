@@ -15,8 +15,8 @@ void ORC_SceneProxyBase::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_proxy_factory", "proxy_factory"), &ORC_SceneProxyBase::set_proxy_factory);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "proxy_factory", PROPERTY_HINT_RESOURCE_TYPE, "ORC_ProxyFactory"), "set_proxy_factory", "get_proxy_factory");
 
-	ClassDB::bind_method(D_METHOD("create_query_gd", "script", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_query_gd);
-	ClassDB::bind_method(D_METHOD("create_query_cpp", "class_name", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_query_cpp);
+	ClassDB::bind_method(D_METHOD("create_query_gd", "script", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_query_gd, DEFVAL(TypedArray<StringName>()), DEFVAL(TypedArray<bool>()));
+	ClassDB::bind_method(D_METHOD("create_query_cpp", "class_name", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_query_cpp, DEFVAL(TypedArray<StringName>()), DEFVAL(TypedArray<bool>()));
 	ClassDB::bind_method(D_METHOD("create_queue", "queue_name", "init_query", "processors"), &ORC_SceneProxyBase::create_queue);
 	ClassDB::bind_method(D_METHOD("fetch_queue_data", "queue_name"), &ORC_SceneProxyBase::fetch_queue_data);
 	
@@ -116,18 +116,30 @@ TypedArray<ORC_ProxyData> ORC_SceneProxyBase::get_by_query(const Ref<ORC_DataQue
 }
 
 Ref<ORC_DataQuery> ORC_SceneProxyBase::create_query_gd(const Ref<GDScript>& script, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
-	Ref<ORC_DataQuery> result;
-	if (!proxy_registry.is_valid()) return result;
+	if (!proxy_registry.is_valid()) return Ref<ORC_DataQuery>();
 	
-	return proxy_registry->create_query_gd(script, flag_names, flag_values);
+	if (!script.is_valid()) {
+		return Ref<ORC_DataQuery>();
+	}
+	
+	String global_name = script->get_global_name();
+	if (global_name.is_empty()) {
+		ERR_PRINT("[ORC_SceneProxyBase ERROR] : Cannot create query with a GDScript that has no global_name (inner class or unnamed script)");
+		return Ref<ORC_DataQuery>();
+	}
+	
+	return proxy_registry->create_query(TypeKey(script), flag_names, flag_values);
 }
 
 Ref<ORC_DataQuery> ORC_SceneProxyBase::create_query_cpp(const StringName& class_name, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
-	Ref<ORC_DataQuery> result;
-	if (!proxy_registry.is_valid()) return result;
+	if (!proxy_registry.is_valid()) return Ref<ORC_DataQuery>();
 
 	std::type_index type_id = ORC_ProxyRegistry::get_cpp_type_index(class_name);
-	return proxy_registry->create_query(type_id, flag_names, flag_values);
+	if (type_id == typeid(void)) {
+		return Ref<ORC_DataQuery>();
+	}
+	
+	return proxy_registry->create_query(TypeKey(type_id), flag_names, flag_values);
 }
 
 void ORC_SceneProxyBase::create_queue(const StringName& queue_name, const Ref<ORC_DataQuery>& init_query, const TypedArray<ORC_QueueProcessor>& processors) {

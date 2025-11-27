@@ -433,32 +433,13 @@ bool ORC_ProxyRegistry::fill_query_features(Ref<ORC_DataQuery> query, const Type
     return true;
 }
 
-Ref<ORC_DataQuery> ORC_ProxyRegistry::create_query_gd(Ref<GDScript> script, const TypedArray<StringName> &flag_names, const TypedArray<bool> &flag_values)
+Ref<ORC_DataQuery> ORC_ProxyRegistry::create_query(const TypeKey& type_key, const TypedArray<StringName> &flag_names, const TypedArray<bool> &flag_values)
 {
-    if (!script.is_valid()) {
-        ERR_FAIL_V_MSG(Ref<ORC_DataQuery>(), "[ORC_ProxyRegistry ERROR] : Cannot create query with null GDScript");
-        return nullptr;
-    }
-    
     Ref<ORC_DataQuery> query;
     query.instantiate();
     fill_query_features(query, flag_names, flag_values);
-    query->type_key = TypeKey(script);
-    return query;
-}
-
-// TODO make unit test
-Ref<ORC_DataQuery> ORC_ProxyRegistry::create_query(std::type_index type_id, const TypedArray<StringName> &flag_names, const TypedArray<bool> &flag_values)
-{
-    if (type_id == typeid(void)) {
-        ERR_FAIL_V_MSG(Ref<ORC_DataQuery>(), "[ORC_ProxyRegistry ERROR] : Cannot create query with void type_index");
-        return nullptr;
-    }
+    query->type_key = type_key;
     
-    Ref<ORC_DataQuery> query;
-    query.instantiate();
-    fill_query_features(query, flag_names, flag_values);
-    query->type_key = TypeKey(type_id);
     return query;
 }
 

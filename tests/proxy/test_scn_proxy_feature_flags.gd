@@ -60,7 +60,7 @@ func test_omni_is_primary():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
 	var query : ORC_DataQuery = scn_proxy.create_query_gd(
-		ORCTEST_ProxyFactory_GDMock.ORCTEST_OmniLightData,
+		ORCTEST_OmniLightData,
 		["IS_PRIMARY"],
 		[true]
 	)
@@ -75,7 +75,7 @@ func test_spot_is_primary():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
 	var query : ORC_DataQuery = scn_proxy.create_query_gd(
-		ORCTEST_ProxyFactory_GDMock.ORCTEST_SpotLightData,
+		ORCTEST_SpotLightData,
 		["IS_PRIMARY"],
 		[true]
 	)
@@ -90,7 +90,7 @@ func test_directional_is_primary():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
 	var query : ORC_DataQuery = scn_proxy.create_query_gd(
-		ORCTEST_ProxyFactory_GDMock.ORCTEST_DirectionalLightData,
+		ORCTEST_DirectionalLightData,
 		["IS_PRIMARY"],
 		[true]
 	)
@@ -116,25 +116,25 @@ func test_is_secondary():
 	var expected_secondary_count = nb_topology_data
 	assert_int(actual_secondary_count).is_equal(expected_secondary_count)
 
-func test_is_light_sum():	
+func test_is_light():	
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
 	var query_omni : ORC_DataQuery = scn_proxy.create_query_gd(
-		ORCTEST_ProxyFactory_GDMock.ORCTEST_OmniLightData,
+		ORCTEST_OmniLightData,
 		["IS_LIGHT"],
 		[true]
 	)
 	scn_proxy.create_queue("queue_omni_test_is_light", query_omni, [])
 
 	var query_spot : ORC_DataQuery = scn_proxy.create_query_gd(
-		ORCTEST_ProxyFactory_GDMock.ORCTEST_SpotLightData,
+		ORCTEST_SpotLightData,
 		["IS_LIGHT"],
 		[true]
 	)
 	scn_proxy.create_queue("queue_spot_test_is_light", query_spot, [])
 
 	var query_directional : ORC_DataQuery = scn_proxy.create_query_gd(
-		ORCTEST_ProxyFactory_GDMock.ORCTEST_DirectionalLightData,
+		ORCTEST_DirectionalLightData,
 		["IS_LIGHT"],
 		[true]
 	)
@@ -146,47 +146,19 @@ func test_is_light_sum():
 	var expected_light_count = nb_omni_data + nb_spot_data + nb_directional_data
 	assert_int(actual_light_count).is_equal(expected_light_count)
 
-func test_is_light():	
-	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
-	
-	var query_omni : ORC_DataQuery = scn_proxy.create_query_gd(
-		null,
-		["IS_LIGHT"],
-		[true]
-	)
-	scn_proxy.create_queue("queue_test_is_light", query_omni, [])
-
-	scn_proxy.pre_render()
-
-	var actual_light_count = scn_proxy.fetch_queue_data("queue_test_is_light").size()
-	var expected_light_count = nb_omni_data + nb_spot_data + nb_directional_data
-	assert_int(actual_light_count).is_equal(expected_light_count)
-
 func test_shadow():	
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
-	var query_omni : ORC_DataQuery = scn_proxy.create_query_gd(
-		ORCTEST_ProxyFactory_GDMock.ORCTEST_OmniLightData,
+	var query : ORC_DataQuery = scn_proxy.create_query_gd(
+		ORCTEST_MeshData,
 		["SHADOWS"],
 		[true]
 	)
-	scn_proxy.create_queue("queue_omni_test_shadow", query_omni, [])
-	var query_spot : ORC_DataQuery = scn_proxy.create_query_gd(
-		ORCTEST_ProxyFactory_GDMock.ORCTEST_SpotLightData,
-		["SHADOWS"],
-		[true]
-	)
-	scn_proxy.create_queue("queue_spot_test_shadow", query_spot, [])
-	var query_directional : ORC_DataQuery = scn_proxy.create_query_gd(
-		ORCTEST_ProxyFactory_GDMock.ORCTEST_DirectionalLightData,
-		["SHADOWS"],
-		[true]
-	)
-	scn_proxy.create_queue("queue_directional_test_shadow", query_directional, [])
+	scn_proxy.create_queue("queue_test_shadow", query, [])
 	scn_proxy.pre_render()
 
 
-	var actual_shadow_count = scn_proxy.fetch_queue_data("queue_omni_test_shadow").size() + scn_proxy.fetch_queue_data("queue_spot_test_shadow").size() + scn_proxy.fetch_queue_data("queue_directional_test_shadow").size()
+	var actual_shadow_count = scn_proxy.fetch_queue_data("queue_test_shadow").size()
 	var expected_shadow_count = nb_cast_shadow_at_start
 	assert_int(actual_shadow_count).is_equal(expected_shadow_count)
 
@@ -197,27 +169,15 @@ func test_update_shadow():
 	scn_instance.get_node("%Cube2").cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	scn_instance.get_node("%Sphere").cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
-	var query_omni : ORC_DataQuery = scn_proxy.create_query_gd(
-		ORCTEST_ProxyFactory_GDMock.ORCTEST_OmniLightData,
+	var query : ORC_DataQuery = scn_proxy.create_query_gd(
+		ORCTEST_MeshData,
 		["SHADOWS"],
 		[true]
 	)
-	scn_proxy.create_queue("queue_omni_test_shadow", query_omni, [])
-	var query_spot : ORC_DataQuery = scn_proxy.create_query_gd(
-		ORCTEST_ProxyFactory_GDMock.ORCTEST_SpotLightData,
-		["SHADOWS"],
-		[true]
-	)
-	scn_proxy.create_queue("queue_spot_test_shadow", query_spot, [])
-	var query_directional : ORC_DataQuery = scn_proxy.create_query_gd(
-		ORCTEST_ProxyFactory_GDMock.ORCTEST_DirectionalLightData,
-		["SHADOWS"],
-		[true]
-	)
-	scn_proxy.create_queue("queue_directional_test_shadow", query_directional, [])
+	scn_proxy.create_queue("queue_test_shadow", query, [])
 	scn_proxy.pre_render()
 
 
-	var actual_shadow_count = scn_proxy.fetch_queue_data("queue_omni_test_shadow").size() + scn_proxy.fetch_queue_data("queue_spot_test_shadow").size() + scn_proxy.fetch_queue_data("queue_directional_test_shadow").size()
+	var actual_shadow_count = scn_proxy.fetch_queue_data("queue_test_shadow").size()
 	var expected_shadow_count = nb_mesh_data - nb_cast_shadow_at_start
 	assert_int(actual_shadow_count).is_equal(expected_shadow_count)

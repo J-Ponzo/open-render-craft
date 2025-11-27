@@ -8,9 +8,6 @@ class ORCTEST_OmniLightProxy extends ORCTEST_MockProxyObject:
 		super()
 		ORCTEST_OmniLightProxy.omni_update_count += 1
 
-class ORCTEST_OmniLightData extends ORC_PrimaryData:
-	pass
-
 class ORCTEST_SpotLightProxy extends ORCTEST_MockProxyObject:
 	static var spot_update_count : int = 0
 
@@ -18,18 +15,12 @@ class ORCTEST_SpotLightProxy extends ORCTEST_MockProxyObject:
 		super()
 		ORCTEST_SpotLightProxy.spot_update_count += 1
 
-class ORCTEST_SpotLightData extends ORC_PrimaryData:
-	pass
-
 class ORCTEST_DirectionalLightProxy extends ORCTEST_MockProxyObject:
 	static var directional_update_count : int = 0
 
 	func update_override() -> void:
 		super()
 		ORCTEST_DirectionalLightProxy.directional_update_count += 1
-
-class ORCTEST_DirectionalLightData extends ORC_PrimaryData:
-	pass
 
 func create_proxy_from_override(node : Node) -> ORC_ProxyObject:
 	var proxy_object : ORC_ProxyObject = null

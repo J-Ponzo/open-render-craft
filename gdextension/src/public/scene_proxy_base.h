@@ -46,8 +46,8 @@ private:
 	void on_node_enter_tree(Node* node);
 	void on_node_exit_tree(Node* node);
 
-	Ref<ORC_DataQuery> create_query_gd(const Ref<GDScript>& script, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
-	Ref<ORC_DataQuery> create_query_cpp(const StringName& class_name, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
+	Ref<ORC_DataQuery> create_query_gd(const Ref<GDScript>& script, const TypedArray<StringName>& flag_names = TypedArray<StringName>(), const TypedArray<bool>& flag_values = TypedArray<bool>());
+	Ref<ORC_DataQuery> create_query_cpp(const StringName& class_name, const TypedArray<StringName>& flag_names = TypedArray<StringName>(), const TypedArray<bool>& flag_values = TypedArray<bool>());
 
 public:
 	ORC_SceneProxyBase();

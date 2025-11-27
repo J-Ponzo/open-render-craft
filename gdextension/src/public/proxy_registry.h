@@ -71,8 +71,7 @@ public:
     bool set_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name, bool value);
     TypedArray<ORC_ProxyData> get_by_query(Ref<ORC_DataQuery> query);
     
-    Ref<ORC_DataQuery> create_query(std::type_index type_id, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
-    Ref<ORC_DataQuery> create_query_gd(Ref<GDScript> script, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
+    Ref<ORC_DataQuery> create_query(const TypeKey& type_key, const TypedArray<StringName>& flag_names = TypedArray<StringName>(), const TypedArray<bool>& flag_values = TypedArray<bool>());
 
     void clear();
 
