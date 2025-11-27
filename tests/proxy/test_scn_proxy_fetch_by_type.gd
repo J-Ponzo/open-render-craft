@@ -15,6 +15,8 @@ func before() -> void:
 	var topologies_query : ORC_DataQuery = scn_proxy.create_query_gd(ORCTEST_TopologyData, [], [])
 	scn_proxy.create_queue("topologies", topologies_query, [])
 
+	scn_proxy.pre_render()
+
 func after() -> void:
 	scn_proxy.cleanup()
 	scn_proxy.proxy_factory = null
@@ -23,8 +25,6 @@ func after() -> void:
 
 func test_get_all_mesh():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
-
-	scn_proxy.pre_render()
 	
 	var expected_nb = 3
 	var actual_nb : int = scn_proxy.fetch_queue_data("meshes").size()
@@ -32,8 +32,6 @@ func test_get_all_mesh():
 	
 func test_get_all_topology():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
-
-	scn_proxy.pre_render()
 	
 	var expected_nb = 2
 	var actual_nb : int = scn_proxy.fetch_queue_data("topologies").size()
