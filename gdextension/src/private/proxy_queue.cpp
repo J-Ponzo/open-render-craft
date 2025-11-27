@@ -10,7 +10,7 @@ void ORC_ProxyQueue::_bind_methods() {
 ORC_ProxyQueue::ORC_ProxyQueue() {
 }
 
-void ORC_ProxyQueue::set_scene_proxy(const Ref<ORC_SceneProxyBase>& scene_proxy) {
+void ORC_ProxyQueue::set_scene_proxy(ORC_SceneProxyBase* scene_proxy) {
     this->scene_proxy = scene_proxy;
 }
 

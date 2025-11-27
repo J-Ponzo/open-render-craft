@@ -21,10 +21,11 @@ class ORC_API ORC_QueueProcessor : public RefCounted {
     friend class ORC_SceneProxyBase;
 
 protected:
-    Ref<ORC_SceneProxyBase> scene_proxy;
+    ORC_SceneProxyBase* scene_proxy;
     static void _bind_methods();
 
 public:
+    ORC_QueueProcessor() : scene_proxy(nullptr) {}
     DECLARE_GD_OVERRIDABLE_METHOD(TypedArray<ORC_ProxyData>, process, const TypedArray<ORC_ProxyData>& input)
 };
 

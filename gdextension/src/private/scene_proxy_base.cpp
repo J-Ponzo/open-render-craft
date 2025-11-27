@@ -138,14 +138,12 @@ void ORC_SceneProxyBase::create_queue(const StringName& queue_name, const Ref<OR
 	Ref<ORC_ProxyQueue> queue;
 	queue.instantiate();
 	
-	//TODO try to avoid this ref creation
-	Ref<ORC_SceneProxyBase> scene_proxy_ref(this);
-	queue->set_scene_proxy(scene_proxy_ref);
+	queue->set_scene_proxy(this);
 	queue->set_init_query(init_query);
 	for (int i = 0; i < processors.size(); i++) {
 		Ref<ORC_QueueProcessor> processor = processors[i];
 		if (processor.is_valid()) {
-			processor->scene_proxy = scene_proxy_ref;
+			processor->scene_proxy = this;
 			queue->add_processor(processor);
 		}
 	}
