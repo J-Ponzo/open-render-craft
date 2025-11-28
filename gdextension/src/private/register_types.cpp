@@ -22,6 +22,7 @@
 
 #ifdef DEBUG_ENABLED
 #include <gd_overridable_marco_mock.h>
+#include <proxy_mocks.h>
 #endif
 
 using namespace godot;
@@ -50,6 +51,27 @@ void initialize_orc_module(ModuleInitializationLevel p_level) {
 #ifdef DEBUG_ENABLED
     UtilityFunctions::print("Registering test classes (DEBUG build)");
 	GDREGISTER_RUNTIME_CLASS(ORCTEST_GDOverridableMacro_Mock);
+	
+	GDREGISTER_RUNTIME_CLASS(ORCTEST_CameraData_CPP);
+	GDREGISTER_RUNTIME_CLASS(ORCTEST_MeshData_CPP);
+	GDREGISTER_RUNTIME_CLASS(ORCTEST_OmniLightData_CPP);
+	GDREGISTER_RUNTIME_CLASS(ORCTEST_SpotLightData_CPP);
+	GDREGISTER_RUNTIME_CLASS(ORCTEST_DirectionalLightData_CPP);
+	GDREGISTER_RUNTIME_CLASS(ORCTEST_TopologyData_CPP);
+	GDREGISTER_RUNTIME_CLASS(ORCTEST_MockProxyObject_CPP);
+	GDREGISTER_RUNTIME_CLASS(ORCTEST_CameraProxy_CPP);
+	GDREGISTER_RUNTIME_CLASS(ORCTEST_MeshProxy_CPP);
+	GDREGISTER_RUNTIME_CLASS(ORCTEST_OmniLightProxy_CPP);
+	GDREGISTER_RUNTIME_CLASS(ORCTEST_SpotLightProxy_CPP);
+	GDREGISTER_RUNTIME_CLASS(ORCTEST_DirectionalLightProxy_CPP);
+	GDREGISTER_RUNTIME_CLASS(ORCTEST_ProxyFactory_CPPMock);
+	
+	ORC_ProxyRegistry::register_cpp_type<ORCTEST_CameraData_CPP>("ORCTEST_CameraData_CPP");
+	ORC_ProxyRegistry::register_cpp_type<ORCTEST_MeshData_CPP>("ORCTEST_MeshData_CPP");
+	ORC_ProxyRegistry::register_cpp_type<ORCTEST_OmniLightData_CPP>("ORCTEST_OmniLightData_CPP");
+	ORC_ProxyRegistry::register_cpp_type<ORCTEST_SpotLightData_CPP>("ORCTEST_SpotLightData_CPP");
+	ORC_ProxyRegistry::register_cpp_type<ORCTEST_DirectionalLightData_CPP>("ORCTEST_DirectionalLightData_CPP");
+	ORC_ProxyRegistry::register_cpp_type<ORCTEST_TopologyData_CPP>("ORCTEST_TopologyData_CPP");
 #endif
 
 	ORC_ImplRegistry::get_singleton().initialize_all(p_level);

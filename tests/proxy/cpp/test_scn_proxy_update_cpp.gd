@@ -12,9 +12,9 @@ var nb_directional_proxy = 1
 
 func before() -> void:
 	scn_proxy = ORC_SceneProxyBase.new()
-	scn_proxy.proxy_factory = ORCTEST_ProxyFactory_GDMock.new()
+	scn_proxy.proxy_factory = ORCTEST_ProxyFactory_CPPMock.new()
 	scn_instance = ORCTEST_ScnProxyTestsCommon.load_mock_scene(get_tree())
-	ORCTEST_ScnProxyTestsCommon.reset_proxy_update_counters()
+	ORCTEST_ScnProxyTestsCommon.reset_proxy_update_counters_cpp()
 	
 	scn_proxy.setup(scn_instance)
 	
@@ -30,41 +30,41 @@ func test_update_all_proxy():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
 	var nb_all_proxy = nb_mesh_proxy + nb_cam_proxy + nb_omni_proxy + nb_spot_proxy + nb_directional_proxy
-	var actual_all_update_count = ORCTEST_MockProxyObject.all_update_count
+	var actual_all_update_count = ORCTEST_MockProxyObject_CPP.get_update_count()
 	var expected_all_update_count = nb_updates * nb_all_proxy
 	assert_int(actual_all_update_count).is_equal(expected_all_update_count)
 
 func test_update_mesh():	
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
-	var actual_mesh_update_count = ORCTEST_MeshProxy.mesh_update_count
+	var actual_mesh_update_count = ORCTEST_MeshProxy_CPP.get_mesh_update_count()
 	var expected_mesh_update_count = nb_updates * nb_mesh_proxy
 	assert_int(actual_mesh_update_count).is_equal(expected_mesh_update_count)
 
 func test_update_cam():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
-	var actual_cam_update_count = ORCTEST_CameraProxy.cam_update_count
+	var actual_cam_update_count = ORCTEST_CameraProxy_CPP.get_cam_update_count()
 	var expected_cam_update_count = nb_updates * nb_cam_proxy
 	assert_int(actual_cam_update_count).is_equal(expected_cam_update_count)
 
 func test_update_omni():	
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
-	var actual_omni_update_count = ORCTEST_ProxyFactory_GDMock.ORCTEST_OmniLightProxy.omni_update_count
+	var actual_omni_update_count = ORCTEST_OmniLightProxy_CPP.get_omni_update_count()
 	var expected_omni_update_count = nb_updates * nb_omni_proxy
 	assert_int(actual_omni_update_count).is_equal(expected_omni_update_count)
 
 func test_update_spot():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
-	var actual_spot_update_count = ORCTEST_ProxyFactory_GDMock.ORCTEST_SpotLightProxy.spot_update_count
+	var actual_spot_update_count = ORCTEST_SpotLightProxy_CPP.get_spot_update_count()
 	var expected_spot_update_count = nb_updates * nb_spot_proxy
 	assert_int(actual_spot_update_count).is_equal(expected_spot_update_count)
 
 func test_update_directional():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
-	var actual_directional_update_count = ORCTEST_ProxyFactory_GDMock.ORCTEST_DirectionalLightProxy.directional_update_count
+	var actual_directional_update_count = ORCTEST_DirectionalLightProxy_CPP.get_directional_update_count()
 	var expected_directional_update_count = nb_updates * nb_directional_proxy
 	assert_int(actual_directional_update_count).is_equal(expected_directional_update_count)
