@@ -1,4 +1,4 @@
-#include <proxy_mocks.h>
+#include "proxy_factory_mock.h"
 
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/classes/camera3d.hpp>
@@ -7,90 +7,21 @@
 #include <godot_cpp/classes/spot_light3d.hpp>
 #include <godot_cpp/classes/directional_light3d.hpp>
 
+#include "camera_data.h"
+#include "mesh_data.h"
+#include "omni_light_data.h"
+#include "spot_light_data.h"
+#include "directional_light_data.h"
+#include "topology_data.h"
+
+#include "camera_proxy.h"
+#include "mesh_proxy.h"
+#include "omni_light_proxy.h"
+#include "spot_light_proxy.h"
+#include "directional_light_proxy.h"
+#include "mock_proxy_object.h"
+
 using namespace godot;
-
-void ORCTEST_MeshData_CPP::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("get_topology_data"), &ORCTEST_MeshData_CPP::get_topology_data);
-	ClassDB::bind_method(D_METHOD("set_topology_data", "topology_data"), &ORCTEST_MeshData_CPP::set_topology_data);
-	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "topology_data", PROPERTY_HINT_RESOURCE_TYPE, "ORC_SecondaryData"), "set_topology_data", "get_topology_data");
-}
-
-void ORCTEST_TopologyData_CPP::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("get_mesh"), &ORCTEST_TopologyData_CPP::get_mesh);
-	ClassDB::bind_method(D_METHOD("set_mesh", "mesh"), &ORCTEST_TopologyData_CPP::set_mesh);
-	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "mesh", PROPERTY_HINT_RESOURCE_TYPE, "Mesh"), "set_mesh", "get_mesh");
-}
-
-int ORCTEST_MockProxyObject_CPP::update_count = 0;
-
-void ORCTEST_MockProxyObject_CPP::_bind_methods() {
-	ClassDB::bind_static_method("ORCTEST_MockProxyObject_CPP", D_METHOD("get_update_count"), &ORCTEST_MockProxyObject_CPP::get_update_count);
-	ClassDB::bind_static_method("ORCTEST_MockProxyObject_CPP", D_METHOD("reset_update_count"), &ORCTEST_MockProxyObject_CPP::reset_update_count);
-}
-
-void ORCTEST_MockProxyObject_CPP::update_impl() {
-	update_count++;
-}
-
-int ORCTEST_CameraProxy_CPP::cam_update_count = 0;
-
-void ORCTEST_CameraProxy_CPP::_bind_methods() {
-	ClassDB::bind_static_method("ORCTEST_CameraProxy_CPP", D_METHOD("get_cam_update_count"), &ORCTEST_CameraProxy_CPP::get_cam_update_count);
-	ClassDB::bind_static_method("ORCTEST_CameraProxy_CPP", D_METHOD("reset_cam_update_count"), &ORCTEST_CameraProxy_CPP::reset_cam_update_count);
-}
-
-void ORCTEST_CameraProxy_CPP::update_impl() {
-	ORCTEST_MockProxyObject_CPP::update_impl();
-	cam_update_count++;
-}
-
-int ORCTEST_MeshProxy_CPP::mesh_update_count = 0;
-
-void ORCTEST_MeshProxy_CPP::_bind_methods() {
-	ClassDB::bind_static_method("ORCTEST_MeshProxy_CPP", D_METHOD("get_mesh_update_count"), &ORCTEST_MeshProxy_CPP::get_mesh_update_count);
-	ClassDB::bind_static_method("ORCTEST_MeshProxy_CPP", D_METHOD("reset_mesh_update_count"), &ORCTEST_MeshProxy_CPP::reset_mesh_update_count);
-}
-
-void ORCTEST_MeshProxy_CPP::update_impl() {
-	ORCTEST_MockProxyObject_CPP::update_impl();
-	mesh_update_count++;
-}
-
-int ORCTEST_OmniLightProxy_CPP::omni_update_count = 0;
-
-void ORCTEST_OmniLightProxy_CPP::_bind_methods() {
-	ClassDB::bind_static_method("ORCTEST_OmniLightProxy_CPP", D_METHOD("get_omni_update_count"), &ORCTEST_OmniLightProxy_CPP::get_omni_update_count);
-	ClassDB::bind_static_method("ORCTEST_OmniLightProxy_CPP", D_METHOD("reset_omni_update_count"), &ORCTEST_OmniLightProxy_CPP::reset_omni_update_count);
-}
-
-void ORCTEST_OmniLightProxy_CPP::update_impl() {
-	ORCTEST_MockProxyObject_CPP::update_impl();
-	omni_update_count++;
-}
-
-int ORCTEST_SpotLightProxy_CPP::spot_update_count = 0;
-
-void ORCTEST_SpotLightProxy_CPP::_bind_methods() {
-	ClassDB::bind_static_method("ORCTEST_SpotLightProxy_CPP", D_METHOD("get_spot_update_count"), &ORCTEST_SpotLightProxy_CPP::get_spot_update_count);
-	ClassDB::bind_static_method("ORCTEST_SpotLightProxy_CPP", D_METHOD("reset_spot_update_count"), &ORCTEST_SpotLightProxy_CPP::reset_spot_update_count);
-}
-
-void ORCTEST_SpotLightProxy_CPP::update_impl() {
-	ORCTEST_MockProxyObject_CPP::update_impl();
-	spot_update_count++;
-}
-
-int ORCTEST_DirectionalLightProxy_CPP::directional_update_count = 0;
-
-void ORCTEST_DirectionalLightProxy_CPP::_bind_methods() {
-	ClassDB::bind_static_method("ORCTEST_DirectionalLightProxy_CPP", D_METHOD("get_directional_update_count"), &ORCTEST_DirectionalLightProxy_CPP::get_directional_update_count);
-	ClassDB::bind_static_method("ORCTEST_DirectionalLightProxy_CPP", D_METHOD("reset_directional_update_count"), &ORCTEST_DirectionalLightProxy_CPP::reset_directional_update_count);
-}
-
-void ORCTEST_DirectionalLightProxy_CPP::update_impl() {
-	ORCTEST_MockProxyObject_CPP::update_impl();
-	directional_update_count++;
-}
 
 void ORCTEST_ProxyFactory_CPPMock::_bind_methods() {
 	ClassDB::bind_static_method("ORCTEST_ProxyFactory_CPPMock", D_METHOD("reset_all_counters"), &ORCTEST_ProxyFactory_CPPMock::reset_all_counters);

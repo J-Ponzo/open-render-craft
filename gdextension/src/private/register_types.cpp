@@ -21,8 +21,20 @@
 #include <godot_cpp/godot.hpp>
 
 #ifdef DEBUG_ENABLED
-#include <gd_overridable_marco_mock.h>
-#include <proxy_mocks.h>
+#include "../tests/macros/gd_overridable_marco_mock.h"
+#include "../tests/proxy/mocks/camera_data.h"
+#include "../tests/proxy/mocks/mesh_data.h"
+#include "../tests/proxy/mocks/omni_light_data.h"
+#include "../tests/proxy/mocks/spot_light_data.h"
+#include "../tests/proxy/mocks/directional_light_data.h"
+#include "../tests/proxy/mocks/topology_data.h"
+#include "../tests/proxy/mocks/mock_proxy_object.h"
+#include "../tests/proxy/mocks/camera_proxy.h"
+#include "../tests/proxy/mocks/mesh_proxy.h"
+#include "../tests/proxy/mocks/omni_light_proxy.h"
+#include "../tests/proxy/mocks/spot_light_proxy.h"
+#include "../tests/proxy/mocks/directional_light_proxy.h"
+#include "../tests/proxy/mocks/proxy_factory_mock.h"
 #endif
 
 using namespace godot;

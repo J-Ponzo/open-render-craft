@@ -44,9 +44,16 @@ if os.path.exists(impl_dir):
 if env["target"] == "template_debug":
     print("Building with test sources (DEBUG build)")
     tests_dir = "src/tests"
-    VariantDir(os.path.join(obj_dir, "tests"), tests_dir, duplicate=0)
-    sources += Glob(os.path.join(obj_dir, "tests", "*.cpp"))
-    env.Append(CPPPATH=[tests_dir])
+    # Compile all .cpp files recursively from the tests directory
+    for root, dirs, files in os.walk(tests_dir):
+        cpp_files = [f for f in files if f.endswith('.cpp')]
+        if cpp_files:
+            rel_path = os.path.relpath(root, tests_dir)
+            obj_subdir = os.path.join(obj_dir, "tests", rel_path) if rel_path != '.' else os.path.join(obj_dir, "tests")
+            VariantDir(obj_subdir, root, duplicate=0)
+            sources += Glob(os.path.join(obj_subdir, "*.cpp"))
+        # Add all subdirectories to include path
+        env.Append(CPPPATH=[root])
 
     print("Building with dbg sources (DEBUG build)")
     dbg_dir = "src/dbg"
