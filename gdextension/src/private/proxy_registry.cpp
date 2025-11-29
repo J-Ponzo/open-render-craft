@@ -309,7 +309,6 @@ bool ORC_ProxyRegistry::update_query_cache_for_data(Ref<ORC_ProxyData> proxy_dat
 bool ORC_ProxyRegistry::remove_from_query_cache(Ref<ORC_ProxyData> proxy_data) {
     if (!proxy_data.is_valid()) return false;
     
-    // TODO : mabe an early coninue if type does not match
     for (auto& cache_entry : query_cache) {
         std::vector<Ref<ORC_ProxyData>>& data_list = cache_entry.second;
         data_list.erase(std::remove(data_list.begin(), data_list.end(), proxy_data), data_list.end());

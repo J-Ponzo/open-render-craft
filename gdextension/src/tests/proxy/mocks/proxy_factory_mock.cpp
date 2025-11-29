@@ -92,12 +92,9 @@ bool ORCTEST_ProxyFactory_CPPMock::free_data_impl(Ref<ORC_ProxyData> data, Ref<O
 	if (topology_data) {
 		Ref<Mesh> mesh = topology_data->get_mesh();
 		int64_t mesh_id = mesh.is_valid() ? mesh->get_rid().get_id() : -1;
-		success = registry->decrement_refcount(mesh_id);
-		if (success) {
-			registry->unregister_data(data);
-		}
+		success = ORC_ProxyFactory::destroy_and_unregister_data(data, registry, mesh_id);
 	} else {
-		success = registry->unregister_data(data);
+		success = ORC_ProxyFactory::destroy_and_unregister_data(data, registry);
 	}
 	
 	return success;

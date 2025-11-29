@@ -23,10 +23,12 @@ class ORC_API ORC_ProxyFactory : public RefCounted {
 private:
     static Ref<ORC_PrimaryData> create_and_register_primary_gd(const Ref<GDScript> script, Ref<ORC_ProxyRegistry> registry, int64_t unique_id = -1);
     static Ref<ORC_SecondaryData> create_and_register_secondary_gd(const Ref<GDScript> script, Ref<ORC_ProxyRegistry> registry, Ref<ORC_PrimaryData> primary_data, int64_t unique_id = -1);
-    static bool destroy_and_unregister_data_gd(Ref<ORC_ProxyData> data, Ref<ORC_ProxyRegistry> registry, int64_t unique_id = -1);
 
 protected:
     static void _bind_methods();
+
+public:
+    static bool destroy_and_unregister_data(Ref<ORC_ProxyData> data, Ref<ORC_ProxyRegistry> registry, int64_t unique_id = -1);
 
 public:
     Ref<ORC_ProxyObject> create_from(Node* node, Ref<ORC_ProxyRegistry> registry);
@@ -62,7 +64,6 @@ public:
         if (unique_id != -1) ref = registry->get_by_unique_id(unique_id);
         if (ref.is_valid()) {
             registry->increment_refcount(unique_id);
-            return ref;
         }
         else {
             ref.instantiate();

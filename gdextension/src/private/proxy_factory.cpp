@@ -15,7 +15,7 @@ void ORC_ProxyFactory::_bind_methods() {
     
     ClassDB::bind_static_method("ORC_ProxyFactory", D_METHOD("create_and_register_primary", "script", "registry", "unique_id"), &ORC_ProxyFactory::create_and_register_primary_gd, DEFVAL(-1));
     ClassDB::bind_static_method("ORC_ProxyFactory", D_METHOD("create_and_register_secondary", "script", "registry", "primary_data", "unique_id"), &ORC_ProxyFactory::create_and_register_secondary_gd, DEFVAL(-1));
-    ClassDB::bind_static_method("ORC_ProxyFactory", D_METHOD("destroy_and_unregister_data", "data", "registry", "unique_id"), &ORC_ProxyFactory::destroy_and_unregister_data_gd, DEFVAL(-1));
+    ClassDB::bind_static_method("ORC_ProxyFactory", D_METHOD("destroy_and_unregister_data", "data", "registry", "unique_id"), &ORC_ProxyFactory::destroy_and_unregister_data, DEFVAL(-1));
 }
 
 Ref<ORC_ProxyObject> ORC_ProxyFactory::create_from(Node* node, Ref<ORC_ProxyRegistry> registry) {
@@ -79,6 +79,7 @@ bool ORC_ProxyFactory::free_data_impl(Ref<ORC_ProxyData> data, Ref<ORC_ProxyRegi
     return false;
 }
 
+// TODO : unify better with template versions
 Ref<ORC_PrimaryData> ORC_ProxyFactory::create_and_register_primary_gd(const Ref<GDScript> script, Ref<ORC_ProxyRegistry> registry, int64_t unique_id) {
     Ref<ORC_PrimaryData> ref;
 
@@ -150,7 +151,7 @@ Ref<ORC_SecondaryData> ORC_ProxyFactory::create_and_register_secondary_gd(const 
     return ref;
 }
 
-bool ORC_ProxyFactory::destroy_and_unregister_data_gd(Ref<ORC_ProxyData> data, Ref<ORC_ProxyRegistry> registry, int64_t unique_id) {
+bool ORC_ProxyFactory::destroy_and_unregister_data(Ref<ORC_ProxyData> data, Ref<ORC_ProxyRegistry> registry, int64_t unique_id) {
     if (!data.is_valid()) return false;
 
     Ref<ORC_ProxyData> ref;
