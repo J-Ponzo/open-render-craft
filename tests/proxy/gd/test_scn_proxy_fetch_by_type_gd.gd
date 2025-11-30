@@ -40,7 +40,7 @@ func test_get_all_topology():
 func test_get_all_camera():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 
-	var camera_query : ORC_DataQuery = scn_proxy.create_query_gd(ORCTEST_CameraData, [], [])
+	var camera_query : ORC_DataQuery = scn_proxy.create_query_gd(ORCTEST_CameraData)
 	scn_proxy.create_queue("cameras", camera_query, [])
 	
 	scn_proxy.pre_render()
@@ -52,7 +52,7 @@ func test_get_all_camera():
 func test_get_all_omni():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 
-	var omni_query : ORC_DataQuery = scn_proxy.create_query_gd(ORCTEST_OmniLightData, [], [])
+	var omni_query : ORC_DataQuery = scn_proxy.create_query_gd(ORCTEST_OmniLightData)
 	scn_proxy.create_queue("omnis", omni_query, [])
 	scn_proxy.pre_render()
 
@@ -63,7 +63,7 @@ func test_get_all_omni():
 func test_get_all_spot():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 
-	var spot_query : ORC_DataQuery = scn_proxy.create_query_gd(ORCTEST_SpotLightData, [], [])
+	var spot_query : ORC_DataQuery = scn_proxy.create_query_gd(ORCTEST_SpotLightData)
 	scn_proxy.create_queue("spots", spot_query, [])
 	scn_proxy.pre_render()
 

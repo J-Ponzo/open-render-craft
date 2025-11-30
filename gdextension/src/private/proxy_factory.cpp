@@ -114,6 +114,7 @@ Ref<ORC_PrimaryData> ORC_ProxyFactory::create_and_register_primary_gd(const Ref<
     return ref;
 }
 
+// TODO : unify better with template versions
 Ref<ORC_SecondaryData> ORC_ProxyFactory::create_and_register_secondary_gd(const Ref<GDScript> script, Ref<ORC_ProxyRegistry> registry, Ref<ORC_PrimaryData> primary_data, int64_t unique_id) {
     Ref<ORC_SecondaryData> ref;
 
