@@ -1,6 +1,5 @@
 extends ORCTEST_ScnProxyAddShared
 
-
 func before() -> void:
 	super.common_before()
 	scn_proxy.proxy_factory = ORCTEST_ProxyFactory_CPPMock.new()
