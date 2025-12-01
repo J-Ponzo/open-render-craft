@@ -11,6 +11,7 @@
 
 namespace godot { class ORC_SceneProxyBase; }
 
+// TODO remove ?
 #ifdef ORC_RENDERER_EXPORTS
 #define ORC_API __declspec(dllexport)
 #else
