@@ -32,9 +32,9 @@ func common_before() -> void:
 	scn_proxy.setup(scn_instance)
 
 	var meshes_query : ORC_DataQuery = create_mesh_query()
-	scn_proxy.create_queue("meshes", meshes_query, [])
+	scn_proxy.create_queue("meshes", meshes_query)
 	var topologies_query : ORC_DataQuery = create_topology_query()
-	scn_proxy.create_queue("topologies", topologies_query, [])
+	scn_proxy.create_queue("topologies", topologies_query)
 
 	scn_proxy.pre_render()
 
@@ -62,7 +62,7 @@ func common_get_all_camera():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 
 	var camera_query : ORC_DataQuery = create_camera_query()
-	scn_proxy.create_queue("cameras", camera_query, [])
+	scn_proxy.create_queue("cameras", camera_query)
 	
 	scn_proxy.pre_render()
 
@@ -74,7 +74,7 @@ func common_get_all_omni():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 
 	var omni_query : ORC_DataQuery = create_omni_query()
-	scn_proxy.create_queue("omnis", omni_query, [])
+	scn_proxy.create_queue("omnis", omni_query)
 	scn_proxy.pre_render()
 
 	var expected_nb = 1
@@ -85,7 +85,7 @@ func common_get_all_spot():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 
 	var spot_query : ORC_DataQuery = create_spot_query()
-	scn_proxy.create_queue("spots", spot_query, [])
+	scn_proxy.create_queue("spots", spot_query)
 	scn_proxy.pre_render()
 
 	var expected_nb = 1
@@ -96,7 +96,7 @@ func common_get_all_directional():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 
 	var directional_query : ORC_DataQuery = create_directional_query()
-	scn_proxy.create_queue("directionals", directional_query, [])
+	scn_proxy.create_queue("directionals", directional_query)
 	scn_proxy.pre_render()
 
 	var expected_nb = 1

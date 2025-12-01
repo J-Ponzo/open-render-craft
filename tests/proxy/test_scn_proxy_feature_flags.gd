@@ -55,7 +55,7 @@ func common_camera_is_primary():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
 	var query : ORC_DataQuery = create_camera_query(["IS_PRIMARY"], [true])
-	scn_proxy.create_queue("queue_test_camera_is_primary", query, [])
+	scn_proxy.create_queue("queue_test_camera_is_primary", query)
 	scn_proxy.pre_render()
 
 	var actual_primary_count = scn_proxy.fetch_queue_data("queue_test_camera_is_primary").size()
@@ -66,7 +66,7 @@ func common_mesh_is_primary():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
 	var query : ORC_DataQuery = create_mesh_query(["IS_PRIMARY"], [true])
-	scn_proxy.create_queue("queue_test_mesh_is_primary", query, [])
+	scn_proxy.create_queue("queue_test_mesh_is_primary", query)
 	scn_proxy.pre_render()
 
 	var actual_primary_count = scn_proxy.fetch_queue_data("queue_test_mesh_is_primary").size()
@@ -77,7 +77,7 @@ func common_omni_is_primary():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
 	var query : ORC_DataQuery = create_omni_query(["IS_PRIMARY"], [true])
-	scn_proxy.create_queue("queue_test_omni_is_primary", query, [])
+	scn_proxy.create_queue("queue_test_omni_is_primary", query)
 	scn_proxy.pre_render()
 
 	var actual_primary_count = scn_proxy.fetch_queue_data("queue_test_omni_is_primary").size()
@@ -88,7 +88,7 @@ func common_spot_is_primary():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
 	var query : ORC_DataQuery = create_spot_query(["IS_PRIMARY"], [true])
-	scn_proxy.create_queue("queue_test_spot_is_primary", query, [])
+	scn_proxy.create_queue("queue_test_spot_is_primary", query)
 	scn_proxy.pre_render()
 
 	var actual_primary_count = scn_proxy.fetch_queue_data("queue_test_spot_is_primary").size()
@@ -99,7 +99,7 @@ func common_directional_is_primary():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
 	var query : ORC_DataQuery = create_directional_query(["IS_PRIMARY"], [true])
-	scn_proxy.create_queue("queue_test_directional_is_primary", query, [])
+	scn_proxy.create_queue("queue_test_directional_is_primary", query)
 	scn_proxy.pre_render()
 
 	var actual_primary_count = scn_proxy.fetch_queue_data("queue_test_directional_is_primary").size()
@@ -110,7 +110,7 @@ func common_is_secondary():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
 	var query : ORC_DataQuery = create_topology_query(["IS_PRIMARY"], [false])
-	scn_proxy.create_queue("queue_test_is_secondary", query, [])
+	scn_proxy.create_queue("queue_test_is_secondary", query)
 	scn_proxy.pre_render()
 
 	var actual_secondary_count = scn_proxy.fetch_queue_data("queue_test_is_secondary").size()
@@ -121,13 +121,13 @@ func common_is_light():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
 	var query_omni : ORC_DataQuery = create_omni_query(["IS_LIGHT"], [true])
-	scn_proxy.create_queue("queue_omni_test_is_light", query_omni, [])
+	scn_proxy.create_queue("queue_omni_test_is_light", query_omni)
 
 	var query_spot : ORC_DataQuery = create_spot_query(["IS_LIGHT"], [true])
-	scn_proxy.create_queue("queue_spot_test_is_light", query_spot, [])
+	scn_proxy.create_queue("queue_spot_test_is_light", query_spot)
 
 	var query_directional : ORC_DataQuery = create_directional_query(["IS_LIGHT"], [true])
-	scn_proxy.create_queue("queue_directional_test_is_light", query_directional, [])
+	scn_proxy.create_queue("queue_directional_test_is_light", query_directional)
 
 	scn_proxy.pre_render()
 
@@ -139,7 +139,7 @@ func common_shadow():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
 	var query : ORC_DataQuery = create_mesh_query(["SHADOWS"], [true])
-	scn_proxy.create_queue("queue_test_shadow", query, [])
+	scn_proxy.create_queue("queue_test_shadow", query)
 	scn_proxy.pre_render()
 
 	var actual_shadow_count = scn_proxy.fetch_queue_data("queue_test_shadow").size()
@@ -154,7 +154,7 @@ func common_update_shadow():
 	scn_instance.get_node("%Sphere").cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 	var query : ORC_DataQuery = create_mesh_query(["SHADOWS"], [true])
-	scn_proxy.create_queue("queue_test_shadow", query, [])
+	scn_proxy.create_queue("queue_test_shadow", query)
 	scn_proxy.pre_render()
 
 	var actual_shadow_count = scn_proxy.fetch_queue_data("queue_test_shadow").size()

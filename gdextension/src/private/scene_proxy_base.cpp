@@ -17,7 +17,7 @@ void ORC_SceneProxyBase::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("create_query_gd", "script", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_query_gd, DEFVAL(TypedArray<StringName>()), DEFVAL(TypedArray<bool>()));
 	ClassDB::bind_method(D_METHOD("create_query_cpp", "class_name", "flag_names", "flag_values"), &ORC_SceneProxyBase::create_query_cpp, DEFVAL(TypedArray<StringName>()), DEFVAL(TypedArray<bool>()));
-	ClassDB::bind_method(D_METHOD("create_queue", "queue_name", "init_query", "processors"), &ORC_SceneProxyBase::create_queue);
+	ClassDB::bind_method(D_METHOD("create_queue", "queue_name", "init_query", "processors"), &ORC_SceneProxyBase::create_queue, DEFVAL(TypedArray<ORC_QueueProcessor>()));
 	ClassDB::bind_method(D_METHOD("fetch_queue_data", "queue_name"), &ORC_SceneProxyBase::fetch_queue_data);
 	
 	ClassDB::bind_method(D_METHOD("dump_registry"), &ORC_SceneProxyBase::dump_registry);
