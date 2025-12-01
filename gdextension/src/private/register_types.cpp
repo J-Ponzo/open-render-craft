@@ -9,6 +9,7 @@
 #include <proxy_object.h>
 #include <proxy_factory.h>
 #include <proxy_registry.h>
+#include <proxy_registry_dump.h>
 #include <queue_processor.h>
 #include <proxy_queue.h>
 #include <data_query.h>
@@ -53,6 +54,7 @@ void initialize_orc_module(ModuleInitializationLevel p_level) {
 	GDREGISTER_RUNTIME_CLASS(ORC_ProxyObject);
 	GDREGISTER_RUNTIME_CLASS(ORC_ProxyFactory);
 	GDREGISTER_RUNTIME_CLASS(ORC_ProxyRegistry);
+	GDREGISTER_RUNTIME_CLASS(ORC_ProxyRegistryDump);
 	GDREGISTER_RUNTIME_CLASS(ORC_QueueProcessor);
 	GDREGISTER_RUNTIME_CLASS(ORC_ProxyQueue);		//TODO maybe not necessary
 	GDREGISTER_RUNTIME_CLASS(ORC_DataQuery);

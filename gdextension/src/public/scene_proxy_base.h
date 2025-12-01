@@ -7,6 +7,7 @@
 #include <godot_cpp/variant/typed_array.hpp>
 #include <renderer_base.h>
 #include <proxy_registry.h>
+#include <proxy_registry_dump.h>
 #include <proxy_factory.h>
 #include <proxy_queue.h>
 #include <macros.h>
@@ -62,7 +63,7 @@ public:
 	void create_queue(const StringName& queue_name, const Ref<ORC_DataQuery>& init_query, const TypedArray<ORC_QueueProcessor>& processors = TypedArray<ORC_QueueProcessor>());
 	TypedArray<ORC_ProxyData> fetch_queue_data(const StringName& queue_name);
 	
-	String dump_registry() const;
+	Ref<ORC_ProxyRegistryDump> dump_registry() const;
 };
 
 }

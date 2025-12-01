@@ -177,9 +177,11 @@ TypedArray<ORC_ProxyData> ORC_SceneProxyBase::fetch_queue_data(const StringName&
 	return queue->get_cached_data();
 }
 
-String ORC_SceneProxyBase::dump_registry() const {
+Ref<ORC_ProxyRegistryDump> ORC_SceneProxyBase::dump_registry() const {
 	if (!proxy_registry.is_valid()) {
-		return "Proxy registry is not valid.";
+		Ref<ORC_ProxyRegistryDump> empty_dump;
+		empty_dump.instantiate();
+		return empty_dump;
 	}
 	return proxy_registry->dump_registry();
 }

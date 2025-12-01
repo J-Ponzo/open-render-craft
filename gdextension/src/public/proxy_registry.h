@@ -14,6 +14,7 @@
 #include <godot_cpp/variant/typed_array.hpp>
 #include <proxy_data.h>
 #include <data_query.h>
+#include <proxy_registry_dump.h>
 #include "macros.h"
 
 #ifdef ORC_RENDERER_EXPORTS
@@ -75,7 +76,7 @@ public:
 
     void clear();
 
-    String dump_registry() const;
+    Ref<ORC_ProxyRegistryDump> dump_registry() const;
 };
 
 }

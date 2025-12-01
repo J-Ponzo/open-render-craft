@@ -181,98 +181,18 @@ static String get_primary_node_info(ORC_PrimaryData* primary) {
     }
 }
 
-String ORC_ProxyRegistry::dump_registry() const {
-    String output = "=== ORC_ProxyRegistry Dump ===\n";
+Ref<ORC_ProxyRegistryDump> ORC_ProxyRegistry::dump_registry() const {
+    Ref<ORC_ProxyRegistryDump> dump;
+    dump.instantiate();
     
-    auto to_binary = [this](uint64_t value) -> String {
-        if (next_available_bit == 0) return "0";
-        String result = "";
-        for (int i = next_available_bit - 1; i >= 0; i--) {
-            result += ((value >> i) & 1) ? "1" : "0";
-        }
-        return result;
-    };
+    dump->id_registry = id_registry;
+    dump->all_data = all_data;
+    dump->flag_name_to_mask = flag_name_to_mask;
+    dump->next_available_bit = next_available_bit;
+    dump->data_flags = data_flags;
+    dump->query_cache = query_cache;
     
-    output += "\n--- Flag Names ---\n";
-    output += "Total flags: " + String::num_int64(flag_name_to_mask.size()) + "\n";
-    
-    std::unordered_map<uint8_t, StringName> bit_to_flag;
-    for (const auto& pair : flag_name_to_mask) {
-        uint64_t mask = pair.second;
-        for (uint8_t bit = 0; bit < 64; bit++) {
-            if (mask == (1ULL << bit)) {
-                bit_to_flag[bit] = pair.first;
-                break;
-            }
-        }
-    }
-    
-    for (int bit = next_available_bit - 1; bit >= 0; bit--) {
-        auto it = bit_to_flag.find(bit);
-        if (it != bit_to_flag.end()) {
-            output += "  Bit " + String::num_int64(bit) + ": " + String(it->second) + "\n";
-        }
-    }
-    
-    output += "\n--- Query Cache ---\n";
-    output += "Total queries: " + String::num_int64(query_cache.size()) + "\n";
-    
-    int query_idx = 0;
-    for (const auto& cache_entry : query_cache) {
-        const Ref<ORC_DataQuery>& query = cache_entry.first;
-        const std::vector<Ref<ORC_ProxyData>>& data_list = cache_entry.second;
-        
-        output += "\n  [Query #" + String::num_int64(query_idx++) + "] ";
-        
-        if (!query.is_valid()) {
-            output += "<invalid query>\n";
-            continue;
-        }
-        
-        if (std::holds_alternative<std::type_index>(query->type_key.key)) {
-            output += "[C++] " + String(std::get<std::type_index>(query->type_key.key).name());
-        } else {
-            output += "[GD] " + String(std::get<std::string>(query->type_key.key).c_str());
-        }
-        
-        output += " (mask: 0b" + to_binary(query->mask) + ", value: 0b" + to_binary(query->value) + ")";
-        output += "\n    -> " + String::num_int64(data_list.size()) + " matching data:\n";
-        
-        for (size_t i = 0; i < data_list.size(); i++) {
-            const auto& data = data_list[i];
-            output += "      [" + String::num_int64(i) + "] ";
-            
-            if (data.is_valid()) {
-                output += get_type_and_address(data);
-                
-                ORC_PrimaryData* primary = Object::cast_to<ORC_PrimaryData>(data.ptr());
-                if (primary) {
-                    output += get_primary_node_info(primary);
-                }
-                
-                output += "\n";
-            } else {
-                output += "<invalid>\n";
-            }
-        }
-    }
-    
-    output += "\n--- ID Registry ---\n";
-    output += "Total unique IDs: " + String::num_int64(id_registry.size()) + "\n";
-    for (const auto& pair : id_registry) {
-        output += "  ID: " + String::num_int64(pair.first) + 
-                 " -> refcount: " + String::num_int64(std::get<1>(pair.second));
-        const auto& data = std::get<0>(pair.second);
-        if (data.is_valid()) {
-            output += " (" + get_type_and_address(data) + ")";
-        } else {
-            output += " (<invalid>)";
-        }
-        output += "\n";
-    }
-    
-    output += "\n=========================\n";
-    return output;
+    return dump;
 }
 
 bool ORC_ProxyRegistry::matches_query(Ref<ORC_ProxyData> proxy_data, uint64_t flags, const Ref<ORC_DataQuery>& query) const {
