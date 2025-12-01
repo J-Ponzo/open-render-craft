@@ -75,7 +75,6 @@ public:
 
     void clear();
 
-    // TODO : complete
     String dump_registry() const;
 };
 

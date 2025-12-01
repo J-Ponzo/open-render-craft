@@ -24,7 +24,6 @@ std::type_index ORC_ProxyRegistry::get_cpp_type_index(const StringName& class_na
 void ORC_ProxyRegistry::_bind_methods() {
 }
 
-// TODO : inline in .h ?
 TypeKey ORC_ProxyRegistry::get_type_key(Ref<ORC_ProxyData> proxy_data) {
     if (!proxy_data.is_valid()) {
         return TypeKey(std::string(""));
