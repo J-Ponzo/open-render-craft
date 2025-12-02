@@ -20,11 +20,11 @@ protected:
 public:
     Ref<ORC_RendererBase> renderer;
     Ref<ORC_RendererBase> get_renderer() const { return renderer; }
-    void set_renderer(const Ref<ORC_RendererBase> &renderer) { this->renderer = renderer; }
+    void set_renderer(const Ref<ORC_RendererBase>& renderer) { this->renderer = renderer; }
 
     Dictionary explicits_pso;
     Dictionary get_explicits_pso() const { return explicits_pso; }
-    void set_explicits_pso(const Dictionary &explicits_pso) { this->explicits_pso = explicits_pso; }
+    void set_explicits_pso(const Dictionary& explicits_pso) { this->explicits_pso = explicits_pso; }
 
     int64_t framebuffer_format = -1;
     int64_t get_framebuffer_format() const { return framebuffer_format; }
@@ -32,7 +32,7 @@ public:
 
     RID framebuffer;
     RID get_framebuffer() const { return framebuffer; }
-    void set_framebuffer(const RID &framebuffer) { this->framebuffer = framebuffer; }
+    void set_framebuffer(const RID& framebuffer) { this->framebuffer = framebuffer; }
 
     DECLARE_GD_OVERRIDABLE_METHOD(void, setup)
     DECLARE_GD_OVERRIDABLE_METHOD(void, render)

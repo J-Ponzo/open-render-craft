@@ -15,26 +15,26 @@ class ORC_ProxyFactory : public RefCounted {
     GDCLASS(ORC_ProxyFactory, RefCounted)
 
 private:
-    static Ref<ORC_PrimaryData> create_and_register_primary_gd(const Ref<GDScript> script, Ref<ORC_ProxyRegistry> registry, int64_t unique_id = -1);
-    static Ref<ORC_SecondaryData> create_and_register_secondary_gd(const Ref<GDScript> script, Ref<ORC_ProxyRegistry> registry, Ref<ORC_PrimaryData> primary_data, int64_t unique_id = -1);
+    static Ref<ORC_PrimaryData> create_and_register_primary_gd(const Ref<GDScript>& script, const Ref<ORC_ProxyRegistry>& registry, int64_t unique_id = -1);
+    static Ref<ORC_SecondaryData> create_and_register_secondary_gd(const Ref<GDScript>& script, const Ref<ORC_ProxyRegistry>& registry, const Ref<ORC_PrimaryData>& primary_data, int64_t unique_id = -1);
 
 protected:
     static void _bind_methods();
 
 public:
-    static bool destroy_and_unregister_data(Ref<ORC_ProxyData> data, Ref<ORC_ProxyRegistry> registry, int64_t unique_id = -1);
+    static bool destroy_and_unregister_data(const Ref<ORC_ProxyData>& data, const Ref<ORC_ProxyRegistry>& registry, int64_t unique_id = -1);
 
 public:
-    Ref<ORC_ProxyObject> create_from(Node* node, Ref<ORC_ProxyRegistry> registry);
+    Ref<ORC_ProxyObject> create_from(Node* node, const Ref<ORC_ProxyRegistry>& registry);
     DECLARE_GD_OVERRIDABLE_METHOD(Ref<ORC_ProxyObject>, create_proxy_from, Node*)
-    DECLARE_GD_OVERRIDABLE_METHOD(Ref<ORC_PrimaryData>, create_data_from, Node*, Ref<ORC_ProxyRegistry>)
+    DECLARE_GD_OVERRIDABLE_METHOD(Ref<ORC_PrimaryData>, create_data_from, Node*, const Ref<ORC_ProxyRegistry>&)
 
-    bool free(Ref<ORC_ProxyObject> proxy_object, Ref<ORC_ProxyRegistry> registry);
-    DECLARE_GD_OVERRIDABLE_METHOD(bool, free_proxy, Ref<ORC_ProxyObject>)
-    DECLARE_GD_OVERRIDABLE_METHOD(bool, free_data, Ref<ORC_ProxyData>, Ref<ORC_ProxyRegistry>)
+    bool free(const Ref<ORC_ProxyObject>& proxy_object, const Ref<ORC_ProxyRegistry>& registry);
+    DECLARE_GD_OVERRIDABLE_METHOD(bool, free_proxy, const Ref<ORC_ProxyObject>&)
+    DECLARE_GD_OVERRIDABLE_METHOD(bool, free_data, const Ref<ORC_ProxyData>&, const Ref<ORC_ProxyRegistry>&)
 
     template <class T>
-    static Ref<T> create_and_register_primary(Ref<ORC_ProxyRegistry> registry, int64_t unique_id = -1) {
+    static Ref<T> create_and_register_primary(const Ref<ORC_ProxyRegistry>& registry, int64_t unique_id = -1) {
         static_assert(std::is_base_of<ORC_PrimaryData, T>::value, "T must inherit from ORC_PrimaryData");
         
         Ref<T> ref;
@@ -51,7 +51,7 @@ public:
     }
 
     template <class T>
-    static Ref<T> create_and_register_secondary(Ref<ORC_ProxyRegistry> registry, Ref<ORC_PrimaryData> primary_data, int64_t unique_id = -1) {
+    static Ref<T> create_and_register_secondary(const Ref<ORC_ProxyRegistry>& registry, const Ref<ORC_PrimaryData>& primary_data, int64_t unique_id = -1) {
         static_assert(std::is_base_of<ORC_SecondaryData, T>::value, "T must inherit from ORC_SecondaryData");
 
         Ref<T> ref;

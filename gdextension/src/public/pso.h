@@ -18,11 +18,11 @@ public:
 
     RID shader_program;
     RID get_shader_program() const { return shader_program; }
-    void set_shader_program(const RID &shader_program) { this->shader_program = shader_program; }
+    void set_shader_program(const RID& shader_program) { this->shader_program = shader_program; }
 
     RID pipeline;
     RID get_pipeline() const { return pipeline; }
-    void set_pipeline(const RID &pipeline) { this->pipeline = pipeline; }
+    void set_pipeline(const RID& pipeline) { this->pipeline = pipeline; }
 
     int64_t vertex_format = -1;
     int64_t get_vertex_format() const { return vertex_format; }

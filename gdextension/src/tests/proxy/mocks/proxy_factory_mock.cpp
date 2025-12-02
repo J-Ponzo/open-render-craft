@@ -45,7 +45,7 @@ Ref<ORC_ProxyObject> ORCTEST_ProxyFactory_CPPMock::create_proxy_from_impl(Node* 
 	return proxy_object;
 }
 
-Ref<ORC_PrimaryData> ORCTEST_ProxyFactory_CPPMock::create_data_from_impl(Node* node, Ref<ORC_ProxyRegistry> registry) {
+Ref<ORC_PrimaryData> ORCTEST_ProxyFactory_CPPMock::create_data_from_impl(Node* node, const Ref<ORC_ProxyRegistry>& registry) {
 	Ref<ORC_PrimaryData> primary_data;
 	
 	if (Object::cast_to<Camera3D>(node)) {
@@ -81,11 +81,11 @@ Ref<ORC_PrimaryData> ORCTEST_ProxyFactory_CPPMock::create_data_from_impl(Node* n
 	return primary_data;
 }
 
-bool ORCTEST_ProxyFactory_CPPMock::free_proxy_impl(Ref<ORC_ProxyObject> proxy_object) {
+bool ORCTEST_ProxyFactory_CPPMock::free_proxy_impl(const Ref<ORC_ProxyObject>& proxy_object) {
 	return true;
 }
 
-bool ORCTEST_ProxyFactory_CPPMock::free_data_impl(Ref<ORC_ProxyData> data, Ref<ORC_ProxyRegistry> registry) {
+bool ORCTEST_ProxyFactory_CPPMock::free_data_impl(const Ref<ORC_ProxyData>& data, const Ref<ORC_ProxyRegistry>& registry) {
 	bool success = true;
 	
 	ORCTEST_TopologyData_CPP* topology_data = Object::cast_to<ORCTEST_TopologyData_CPP>(data.ptr());

@@ -159,7 +159,7 @@ void ORC_SceneProxyBase::create_queue(const StringName& queue_name, const Ref<OR
 	proxy_queues[queue_name] = queue;
 }
 
-TypedArray<ORC_ProxyData> ORC_SceneProxyBase::fetch_queue_data(const StringName& queue_name) {
+TypedArray<ORC_ProxyData> ORC_SceneProxyBase::fetch_queue_data(const StringName& queue_name) const {
 	auto it = proxy_queues.find(queue_name);
 	if (it == proxy_queues.end()) {
 		ERR_FAIL_V_MSG(TypedArray<ORC_ProxyData>(), "[ORC_SceneProxyBase ERROR] : Queue '" + String(queue_name) + "' not found");

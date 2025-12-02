@@ -24,7 +24,7 @@ std::type_index ORC_ProxyRegistry::get_cpp_type_index(const StringName& class_na
 void ORC_ProxyRegistry::_bind_methods() {
 }
 
-TypeKey ORC_ProxyRegistry::get_type_key(Ref<ORC_ProxyData> proxy_data) {
+TypeKey ORC_ProxyRegistry::get_type_key(const Ref<ORC_ProxyData>& proxy_data) {
     if (!proxy_data.is_valid()) {
         return TypeKey(std::string(""));
     }
@@ -37,7 +37,7 @@ TypeKey ORC_ProxyRegistry::get_type_key(Ref<ORC_ProxyData> proxy_data) {
     }
 }
 
-bool ORC_ProxyRegistry::register_data(Ref<ORC_ProxyData> proxy_data, int64_t unique_id) {
+bool ORC_ProxyRegistry::register_data(const Ref<ORC_ProxyData>& proxy_data, int64_t unique_id) {
     if (!proxy_data.is_valid()) return false;
 
     proxy_data->registry = this;
@@ -66,7 +66,7 @@ bool ORC_ProxyRegistry::register_data(Ref<ORC_ProxyData> proxy_data, int64_t uni
     return true;
 }
 
-bool ORC_ProxyRegistry::unregister_data(Ref<ORC_ProxyData> proxy_data) {
+bool ORC_ProxyRegistry::unregister_data(const Ref<ORC_ProxyData>& proxy_data) {
     if (!proxy_data.is_valid()) return false;
 
     proxy_data->registry = nullptr;
@@ -106,7 +106,7 @@ bool ORC_ProxyRegistry::decrement_refcount(int64_t unique_id) {
     return false;
 }
 
-bool ORC_ProxyRegistry::matches_query(Ref<ORC_ProxyData> proxy_data, uint64_t flags, const Ref<ORC_DataQuery>& query) const {
+bool ORC_ProxyRegistry::matches_query(const Ref<ORC_ProxyData>& proxy_data, uint64_t flags, const Ref<ORC_DataQuery>& query) const {
     if (!query.is_valid() || !proxy_data.is_valid()) return false;
     
     TypeKey data_type_key = get_type_key(proxy_data);
@@ -115,7 +115,7 @@ bool ORC_ProxyRegistry::matches_query(Ref<ORC_ProxyData> proxy_data, uint64_t fl
     return (flags & query->mask) == (query->value & query->mask);
 }
 
-bool ORC_ProxyRegistry::update_query_cache_for_data(Ref<ORC_ProxyData> proxy_data, uint64_t old_flags, uint64_t new_flags) {
+bool ORC_ProxyRegistry::update_query_cache_for_data(const Ref<ORC_ProxyData>& proxy_data, uint64_t old_flags, uint64_t new_flags) {
     if (!proxy_data.is_valid()) return false;
     
     for (auto& cache_entry : query_cache) {
@@ -136,7 +136,7 @@ bool ORC_ProxyRegistry::update_query_cache_for_data(Ref<ORC_ProxyData> proxy_dat
     return true;
 }
 
-bool ORC_ProxyRegistry::remove_from_query_cache(Ref<ORC_ProxyData> proxy_data) {
+bool ORC_ProxyRegistry::remove_from_query_cache(const Ref<ORC_ProxyData>& proxy_data) {
     if (!proxy_data.is_valid()) return false;
     
     for (auto& cache_entry : query_cache) {
@@ -210,7 +210,7 @@ bool ORC_ProxyRegistry::set_flag_internal(ORC_ProxyData* proxy_data, const Strin
     return true;
 }
 
-TypedArray<ORC_ProxyData> ORC_ProxyRegistry::get_by_query_internal(Ref<ORC_DataQuery> query) {
+TypedArray<ORC_ProxyData> ORC_ProxyRegistry::get_by_query_internal(const Ref<ORC_DataQuery>& query) {
     TypedArray<ORC_ProxyData> result;
     
     if (!query.is_valid()) return result;
@@ -230,7 +230,7 @@ TypedArray<ORC_ProxyData> ORC_ProxyRegistry::get_by_query_internal(Ref<ORC_DataQ
     return result;
 }
 
-bool ORC_ProxyRegistry::fill_query_features(Ref<ORC_DataQuery> query, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
+bool ORC_ProxyRegistry::fill_query_features(const Ref<ORC_DataQuery>& query, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
     if (!query.is_valid()) {
         ERR_FAIL_V_MSG(false, "[ORC_ProxyRegistry ERROR] : query is not valid");
     }

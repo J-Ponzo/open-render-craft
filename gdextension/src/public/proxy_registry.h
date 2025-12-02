@@ -27,7 +27,7 @@ class ORC_ProxyRegistry : public RefCounted {
 
 private:
     static std::unordered_map<StringName, std::type_index>& cpp_types();
-    static TypeKey get_type_key(Ref<ORC_ProxyData> proxy_data);
+    static TypeKey get_type_key(const Ref<ORC_ProxyData>& proxy_data);
     
     std::unordered_map<int64_t, std::tuple<Ref<ORC_ProxyData>, int>> id_registry;
     std::vector<Ref<ORC_ProxyData>> all_data;
@@ -37,17 +37,15 @@ private:
     std::unordered_map<Ref<ORC_DataQuery>, std::vector<Ref<ORC_ProxyData>>, DataQueryHash> query_cache;
     
     uint64_t get_or_create_flag_mask(const StringName& flag_name);
-    bool matches_query(Ref<ORC_ProxyData> proxy_data, uint64_t flags, const Ref<ORC_DataQuery>& query) const;
-    bool update_query_cache_for_data(Ref<ORC_ProxyData> proxy_data, uint64_t old_flags, uint64_t new_flags);
-    bool remove_from_query_cache(Ref<ORC_ProxyData> proxy_data);
+    bool matches_query(const Ref<ORC_ProxyData>& proxy_data, uint64_t flags, const Ref<ORC_DataQuery>& query) const;
+    bool update_query_cache_for_data(const Ref<ORC_ProxyData>& proxy_data, uint64_t old_flags, uint64_t new_flags);
+    bool remove_from_query_cache(const Ref<ORC_ProxyData>& proxy_data);
     bool add_query_to_cache(const Ref<ORC_DataQuery>& query);
-    bool fill_query_features(Ref<ORC_DataQuery> query, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
+    bool fill_query_features(const Ref<ORC_DataQuery>& query, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
 
     bool set_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name, bool value);
-    // TODO check const & keywords
-    TypedArray<ORC_ProxyData> get_by_query_internal(Ref<ORC_DataQuery> query);
+    TypedArray<ORC_ProxyData> get_by_query_internal(const Ref<ORC_DataQuery>& query);
     Ref<ORC_DataQuery> create_query_internal(const TypeKey& type_key, const TypedArray<StringName>& flag_names = TypedArray<StringName>(), const TypedArray<bool>& flag_values = TypedArray<bool>());
-
 
 protected:
     static void _bind_methods();
@@ -59,8 +57,8 @@ public:
     }
     static std::type_index get_cpp_type_index(const StringName& class_name);
     
-    bool register_data(Ref<ORC_ProxyData> proxy_data, int64_t unique_id = -1);
-    bool unregister_data(Ref<ORC_ProxyData> proxy_data);
+    bool register_data(const Ref<ORC_ProxyData>& proxy_data, int64_t unique_id = -1);
+    bool unregister_data(const Ref<ORC_ProxyData>& proxy_data);
     Ref<ORC_ProxyData> get_by_unique_id(int64_t unique_id) const;
     bool increment_refcount(int64_t unique_id);
     bool decrement_refcount(int64_t unique_id);

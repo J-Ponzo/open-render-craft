@@ -18,7 +18,7 @@ void ORC_ProxyFactory::_bind_methods() {
     ClassDB::bind_static_method("ORC_ProxyFactory", D_METHOD("destroy_and_unregister_data", "data", "registry", "unique_id"), &ORC_ProxyFactory::destroy_and_unregister_data, DEFVAL(-1));
 }
 
-Ref<ORC_ProxyObject> ORC_ProxyFactory::create_from(Node* node, Ref<ORC_ProxyRegistry> registry) {
+Ref<ORC_ProxyObject> ORC_ProxyFactory::create_from(Node* node, const Ref<ORC_ProxyRegistry>& registry) {
     Ref<ORC_ProxyObject> proxy_object = create_proxy_from(node);
     if (!proxy_object.is_valid()) return Ref<ORC_ProxyObject>();
 
@@ -39,13 +39,13 @@ Ref<ORC_ProxyObject> ORC_ProxyFactory::create_proxy_from_impl(Node* node) {
     return Ref<ORC_ProxyObject>();
 }
 
-DEFINE_GD_OVERRIDABLE_METHOD_2_ARGS(ORC_ProxyFactory, Ref<ORC_PrimaryData>, create_data_from, Node*, node, Ref<ORC_ProxyRegistry>, registry)
-Ref<ORC_PrimaryData> ORC_ProxyFactory::create_data_from_impl(Node* node, Ref<ORC_ProxyRegistry> registry) {
+DEFINE_GD_OVERRIDABLE_METHOD_2_ARGS(ORC_ProxyFactory, Ref<ORC_PrimaryData>, create_data_from, Node*, node, const Ref<ORC_ProxyRegistry>&, registry)
+Ref<ORC_PrimaryData> ORC_ProxyFactory::create_data_from_impl(Node* node, const Ref<ORC_ProxyRegistry>& registry) {
     UtilityFunctions::print("ORC_ProxyFactory::create_data_from (stub)");
     return Ref<ORC_ProxyObject>();
 }
 
-bool ORC_ProxyFactory::free(Ref<ORC_ProxyObject> proxy_object, Ref<ORC_ProxyRegistry> registry) {
+bool ORC_ProxyFactory::free(const Ref<ORC_ProxyObject>& proxy_object, const Ref<ORC_ProxyRegistry>& registry) {
     if (!proxy_object.is_valid()) return false;
 
     Ref<ORC_PrimaryData> primary = proxy_object->get_primary_data();
@@ -67,20 +67,20 @@ bool ORC_ProxyFactory::free(Ref<ORC_ProxyObject> proxy_object, Ref<ORC_ProxyRegi
     return success;
 }
 
-DEFINE_GD_OVERRIDABLE_METHOD_1_ARGS(ORC_ProxyFactory, bool, free_proxy, Ref<ORC_ProxyObject>, proxy_object)
-bool ORC_ProxyFactory::free_proxy_impl(Ref<ORC_ProxyObject> proxy_object) {
+DEFINE_GD_OVERRIDABLE_METHOD_1_ARGS(ORC_ProxyFactory, bool, free_proxy, const Ref<ORC_ProxyObject>&, proxy_object)
+bool ORC_ProxyFactory::free_proxy_impl(const Ref<ORC_ProxyObject>& proxy_object) {
     UtilityFunctions::print("ORC_ProxyFactory::free_proxy (stub)");
     return false;
 }
 
-DEFINE_GD_OVERRIDABLE_METHOD_2_ARGS(ORC_ProxyFactory, bool, free_data, Ref<ORC_ProxyData>, data, Ref<ORC_ProxyRegistry>, registry)
-bool ORC_ProxyFactory::free_data_impl(Ref<ORC_ProxyData> data, Ref<ORC_ProxyRegistry> registry) {
+DEFINE_GD_OVERRIDABLE_METHOD_2_ARGS(ORC_ProxyFactory, bool, free_data, const Ref<ORC_ProxyData>&, data, const Ref<ORC_ProxyRegistry>&, registry)
+bool ORC_ProxyFactory::free_data_impl(const Ref<ORC_ProxyData>& data, const Ref<ORC_ProxyRegistry>& registry) {
     UtilityFunctions::print("ORC_ProxyFactory::free_data (stub)");
     return false;
 }
 
 // TODO : unify better with template versions
-Ref<ORC_PrimaryData> ORC_ProxyFactory::create_and_register_primary_gd(const Ref<GDScript> script, Ref<ORC_ProxyRegistry> registry, int64_t unique_id) {
+Ref<ORC_PrimaryData> ORC_ProxyFactory::create_and_register_primary_gd(const Ref<GDScript>& script, const Ref<ORC_ProxyRegistry>& registry, int64_t unique_id) {
     Ref<ORC_PrimaryData> ref;
 
     if (unique_id != -1) ref = registry->get_by_unique_id(unique_id);
@@ -115,7 +115,7 @@ Ref<ORC_PrimaryData> ORC_ProxyFactory::create_and_register_primary_gd(const Ref<
 }
 
 // TODO : unify better with template versions
-Ref<ORC_SecondaryData> ORC_ProxyFactory::create_and_register_secondary_gd(const Ref<GDScript> script, Ref<ORC_ProxyRegistry> registry, Ref<ORC_PrimaryData> primary_data, int64_t unique_id) {
+Ref<ORC_SecondaryData> ORC_ProxyFactory::create_and_register_secondary_gd(const Ref<GDScript>& script, const Ref<ORC_ProxyRegistry>& registry, const Ref<ORC_PrimaryData>& primary_data, int64_t unique_id) {
     Ref<ORC_SecondaryData> ref;
 
     if (unique_id != -1) ref = registry->get_by_unique_id(unique_id);
@@ -152,7 +152,7 @@ Ref<ORC_SecondaryData> ORC_ProxyFactory::create_and_register_secondary_gd(const 
     return ref;
 }
 
-bool ORC_ProxyFactory::destroy_and_unregister_data(Ref<ORC_ProxyData> data, Ref<ORC_ProxyRegistry> registry, int64_t unique_id) {
+bool ORC_ProxyFactory::destroy_and_unregister_data(const Ref<ORC_ProxyData>& data, const Ref<ORC_ProxyRegistry>& registry, int64_t unique_id) {
     if (!data.is_valid()) return false;
 
     Ref<ORC_ProxyData> ref;

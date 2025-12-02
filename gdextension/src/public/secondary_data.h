@@ -18,7 +18,7 @@ protected:
 public:
     TypedArray<ORC_PrimaryData> primary_data_array;
     TypedArray<ORC_PrimaryData> get_primary_data_array() const { return primary_data_array; }
-    void set_primary_data_array(const TypedArray<ORC_PrimaryData> &primary_data_array) { this->primary_data_array = primary_data_array; }
+    void set_primary_data_array(const TypedArray<ORC_PrimaryData>& primary_data_array) { this->primary_data_array = primary_data_array; }
 };
 
 }
