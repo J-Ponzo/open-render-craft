@@ -27,7 +27,6 @@ class ORC_ProxyRegistry : public RefCounted {
 
 private:
     static std::unordered_map<StringName, std::type_index>& cpp_types();
-    static TypeKey get_type_key(const Ref<ORC_ProxyData>& proxy_data);
     
     std::unordered_map<int64_t, std::tuple<Ref<ORC_ProxyData>, int>> id_registry;
     std::vector<Ref<ORC_ProxyData>> all_data;

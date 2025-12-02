@@ -45,6 +45,7 @@ public:
         }
 
         ref.instantiate();
+        ref->type_key = TypeKey(std::type_index(typeid(T)));
         registry->register_data(ref, unique_id);
         
         return ref;
@@ -61,6 +62,7 @@ public:
         }
         else {
             ref.instantiate();
+            ref->type_key = TypeKey(std::type_index(typeid(T)));
             registry->register_data(ref, unique_id);
         }
         

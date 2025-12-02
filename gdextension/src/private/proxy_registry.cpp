@@ -24,19 +24,6 @@ std::type_index ORC_ProxyRegistry::get_cpp_type_index(const StringName& class_na
 void ORC_ProxyRegistry::_bind_methods() {
 }
 
-TypeKey ORC_ProxyRegistry::get_type_key(const Ref<ORC_ProxyData>& proxy_data) {
-    if (!proxy_data.is_valid()) {
-        return TypeKey(std::string(""));
-    }
-
-    Ref<GDScript> script = proxy_data->get_script();
-    if (script.is_valid()) {
-        return TypeKey(script);
-    } else {
-        return TypeKey(typeid(*proxy_data.ptr()));
-    }
-}
-
 bool ORC_ProxyRegistry::register_data(const Ref<ORC_ProxyData>& proxy_data, int64_t unique_id) {
     if (!proxy_data.is_valid()) return false;
 
@@ -109,8 +96,7 @@ bool ORC_ProxyRegistry::decrement_refcount(int64_t unique_id) {
 bool ORC_ProxyRegistry::matches_query(const Ref<ORC_ProxyData>& proxy_data, uint64_t flags, const Ref<ORC_DataQuery>& query) const {
     if (!query.is_valid() || !proxy_data.is_valid()) return false;
     
-    TypeKey data_type_key = get_type_key(proxy_data);
-    if (!(data_type_key == query->type_key)) return false;
+    if (!(proxy_data->get_type_key() == query->type_key)) return false;
     
     return (flags & query->mask) == (query->value & query->mask);
 }

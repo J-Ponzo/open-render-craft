@@ -105,6 +105,7 @@ Ref<ORC_PrimaryData> ORC_ProxyFactory::create_and_register_primary_gd(const Ref<
         return Ref<ORC_PrimaryData>();
     }
     ref = Ref<ORC_PrimaryData>(pdata);
+    ref->type_key = TypeKey(script);
     if (registry.is_valid()) {
         if (!registry->register_data(ref, unique_id)) {
             UtilityFunctions::print("create_and_register_gd: failed to register data in registry");
@@ -139,6 +140,7 @@ Ref<ORC_SecondaryData> ORC_ProxyFactory::create_and_register_secondary_gd(const 
             return Ref<ORC_SecondaryData>();
         }
         ref = Ref<ORC_SecondaryData>(sdata);
+        ref->type_key = TypeKey(script);
         if (registry.is_valid()) {
             if (!registry->register_data(ref, unique_id)) {
                 UtilityFunctions::print("create_and_register_gd: failed to register data in registry");
