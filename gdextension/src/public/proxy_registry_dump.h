@@ -25,7 +25,7 @@ public:
     std::vector<Ref<ORC_ProxyData>> all_data;
     std::unordered_map<StringName, uint64_t> flag_name_to_mask;
     uint8_t next_available_bit;
-    std::unordered_map<ORC_ProxyData*, uint64_t> data_flags;
+    std::unordered_map<Ref<ORC_ProxyData>, uint64_t, ProxyDataHash> data_flags;
     std::unordered_map<Ref<ORC_DataQuery>, std::vector<Ref<ORC_ProxyData>>, DataQueryHash> query_cache;
 
     ORC_ProxyRegistryDump();

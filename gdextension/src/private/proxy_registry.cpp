@@ -49,7 +49,7 @@ bool ORC_ProxyRegistry::register_data(Ref<ORC_ProxyData> proxy_data, int64_t uni
     all_data.push_back(proxy_data);
 
     uint64_t flags = 0;
-    auto flags_it = data_flags.find(proxy_data.ptr());
+    auto flags_it = data_flags.find(proxy_data);
     if (flags_it != data_flags.end()) {
         flags = flags_it->second;
     }
@@ -72,7 +72,7 @@ bool ORC_ProxyRegistry::unregister_data(Ref<ORC_ProxyData> proxy_data) {
     proxy_data->registry = nullptr;
 
     remove_from_query_cache(proxy_data);
-    data_flags.erase(proxy_data.ptr());
+    data_flags.erase(proxy_data);
     
     all_data.erase(std::remove(all_data.begin(), all_data.end(), proxy_data), all_data.end());
 
@@ -157,7 +157,7 @@ bool ORC_ProxyRegistry::add_query_to_cache(const Ref<ORC_DataQuery>& query) {
         if (!proxy_data.is_valid()) continue;
         
         uint64_t flags = 0;
-        auto flags_it = data_flags.find(proxy_data.ptr());
+        auto flags_it = data_flags.find(proxy_data);
         if (flags_it != data_flags.end()) {
             flags = flags_it->second;
         }

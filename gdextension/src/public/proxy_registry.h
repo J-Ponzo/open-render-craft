@@ -26,18 +26,14 @@ class ORC_ProxyRegistry : public RefCounted {
     friend class ORC_ProxyData;
 
 private:
-    // Static registry for C++ types (Meyers' Singleton)
     static std::unordered_map<StringName, std::type_index>& cpp_types();
     static TypeKey get_type_key(Ref<ORC_ProxyData> proxy_data);
     
-    // Instance members
     std::unordered_map<int64_t, std::tuple<Ref<ORC_ProxyData>, int>> id_registry;
     std::vector<Ref<ORC_ProxyData>> all_data;
-    
     std::unordered_map<StringName, uint64_t> flag_name_to_mask;
     uint8_t next_available_bit = 0;
-    // TODO try to use Ref<> instead of raw pointer
-    std::unordered_map<ORC_ProxyData*, uint64_t> data_flags;
+    std::unordered_map<Ref<ORC_ProxyData>, uint64_t, ProxyDataHash> data_flags;
     std::unordered_map<Ref<ORC_DataQuery>, std::vector<Ref<ORC_ProxyData>>, DataQueryHash> query_cache;
     
     uint64_t get_or_create_flag_mask(const StringName& flag_name);
