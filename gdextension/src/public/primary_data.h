@@ -7,18 +7,12 @@
 #include <proxy_object.h>
 #include <secondary_data.h>
 
-#ifdef ORC_RENDERER_EXPORTS
-#define ORC_API __declspec(dllexport)
-#else
-#define ORC_API __declspec(dllimport)
-#endif
-
 namespace godot {
 
 class ORC_ProxyObject;
 class ORC_SecondaryData;
 
-class ORC_API ORC_PrimaryData : public ORC_ProxyData {
+class ORC_PrimaryData : public ORC_ProxyData {
     GDCLASS(ORC_PrimaryData, ORC_ProxyData)
 
 protected:

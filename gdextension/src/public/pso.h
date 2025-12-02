@@ -4,15 +4,9 @@
 #include <godot_cpp/classes/ref_counted.hpp>
 #include <godot_cpp/variant/rid.hpp>
 
-#ifdef ORC_RENDERER_EXPORTS
-#define ORC_API __declspec(dllexport)
-#else
-#define ORC_API __declspec(dllimport)
-#endif
-
 namespace godot {
 
-class ORC_API ORC_PSO : public RefCounted {
+class ORC_PSO : public RefCounted {
     GDCLASS(ORC_PSO, RefCounted)
 
 protected:

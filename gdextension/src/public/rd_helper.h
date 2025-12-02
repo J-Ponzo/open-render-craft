@@ -7,15 +7,9 @@
 #include <godot_cpp/classes/resource.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
 
-#ifdef ORC_RENDERER_EXPORTS
-#define ORC_API __declspec(dllexport)
-#else
-#define ORC_API __declspec(dllimport)
-#endif
-
 namespace godot {
 
-class ORC_API ORC_VertexFormatInfo : public Resource {
+class ORC_VertexFormatInfo : public Resource {
     GDCLASS(ORC_VertexFormatInfo, Resource)
 
 protected:
@@ -60,7 +54,7 @@ public:
     bool get_has_weights() const;
 };
 
-class ORC_API ORC_RDHelper : public RefCounted {
+class ORC_RDHelper : public RefCounted {
     GDCLASS(ORC_RDHelper, RefCounted)
 
 protected:

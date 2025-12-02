@@ -14,17 +14,11 @@
 
 #include <unordered_map>
 
-#ifdef ORC_RENDERER_EXPORTS
-#define ORC_API __declspec(dllexport)
-#else
-#define ORC_API __declspec(dllimport)
-#endif
-
 namespace godot {
 
 class ORC_RendererBase;
 
-class ORC_API ORC_SceneProxyBase : public RefCounted {
+class ORC_SceneProxyBase : public RefCounted {
 	GDCLASS(ORC_SceneProxyBase, RefCounted)
 
 private:

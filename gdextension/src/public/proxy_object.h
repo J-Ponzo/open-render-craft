@@ -6,17 +6,11 @@
 #include <macros.h>
 #include <primary_data.h>
 
-#ifdef ORC_RENDERER_EXPORTS
-#define ORC_API __declspec(dllexport)
-#else
-#define ORC_API __declspec(dllimport)
-#endif
-
 namespace godot {
 
 class ORC_PrimaryData;
 
-class ORC_API ORC_ProxyObject : public RefCounted {
+class ORC_ProxyObject : public RefCounted {
     GDCLASS(ORC_ProxyObject, RefCounted)
 
 protected:

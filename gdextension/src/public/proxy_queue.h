@@ -11,16 +11,9 @@
 
 namespace godot { class ORC_SceneProxyBase; }
 
-// TODO remove ?
-#ifdef ORC_RENDERER_EXPORTS
-#define ORC_API __declspec(dllexport)
-#else
-#define ORC_API __declspec(dllimport)
-#endif
-
 namespace godot {
 
-class ORC_API ORC_ProxyQueue : public RefCounted {
+class ORC_ProxyQueue : public RefCounted {
     GDCLASS(ORC_ProxyQueue, RefCounted)
 
 private:

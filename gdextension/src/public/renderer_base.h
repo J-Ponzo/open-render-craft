@@ -5,17 +5,11 @@
 #include <scene_proxy_base.h>
 #include <macros.h>
 
-#ifdef ORC_RENDERER_EXPORTS
-#define ORC_API __declspec(dllexport)
-#else
-#define ORC_API __declspec(dllimport)
-#endif
-
 namespace godot {
 
 class ORC_SceneProxyBase;
 
-class ORC_API ORC_RendererBase : public RefCounted {
+class ORC_RendererBase : public RefCounted {
 	GDCLASS(ORC_RendererBase, RefCounted)
 
 protected:

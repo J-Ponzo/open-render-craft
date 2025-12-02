@@ -8,15 +8,9 @@
 
 namespace godot { class ORC_SceneProxyBase; }
 
-#ifdef ORC_RENDERER_EXPORTS
-#define ORC_API __declspec(dllexport)
-#else
-#define ORC_API __declspec(dllimport)
-#endif
-
 namespace godot {
 
-class ORC_API ORC_QueueProcessor : public RefCounted {
+class ORC_QueueProcessor : public RefCounted {
     GDCLASS(ORC_QueueProcessor, RefCounted)
     friend class ORC_SceneProxyBase;
 

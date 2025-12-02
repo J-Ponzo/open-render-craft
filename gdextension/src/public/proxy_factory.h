@@ -9,15 +9,9 @@
 #include "proxy_registry.h"
 #include <macros.h>
 
-#ifdef ORC_RENDERER_EXPORTS
-#define ORC_API __declspec(dllexport)
-#else
-#define ORC_API __declspec(dllimport)
-#endif
-
 namespace godot {
 
-class ORC_API ORC_ProxyFactory : public RefCounted {
+class ORC_ProxyFactory : public RefCounted {
     GDCLASS(ORC_ProxyFactory, RefCounted)
 
 private:

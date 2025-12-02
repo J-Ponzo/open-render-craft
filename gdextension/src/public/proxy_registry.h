@@ -17,15 +17,9 @@
 #include <proxy_registry_dump.h>
 #include "macros.h"
 
-#ifdef ORC_RENDERER_EXPORTS
-#define ORC_API __declspec(dllexport)
-#else
-#define ORC_API __declspec(dllimport)
-#endif
-
 namespace godot {
 
-class ORC_API ORC_ProxyRegistry : public RefCounted {
+class ORC_ProxyRegistry : public RefCounted {
     GDCLASS(ORC_ProxyRegistry, RefCounted)
 
     friend class ORC_SceneProxyBase;

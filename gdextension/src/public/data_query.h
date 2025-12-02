@@ -9,12 +9,6 @@
 #include <godot_cpp/variant/utility_functions.hpp>
 #include "macros.h"
 
-#ifdef ORC_RENDERER_EXPORTS
-#define ORC_API __declspec(dllexport)
-#else
-#define ORC_API __declspec(dllimport)
-#endif
-
 namespace godot {
 
 // TODO extract this from here. It was in proxy_registry before but it caused circular dependency
@@ -46,7 +40,7 @@ struct TypeKeyHash {
     }
 };
 
-class ORC_API ORC_DataQuery : public RefCounted {
+class ORC_DataQuery : public RefCounted {
     GDCLASS(ORC_DataQuery, RefCounted)
 
 protected:

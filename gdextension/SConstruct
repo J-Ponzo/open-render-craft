@@ -5,7 +5,6 @@ import sys
 env = SConscript("godot-cpp/SConstruct")
 
 env.Append(CPPPATH=["src/public"])
-env.Append(CPPDEFINES=["ORC_RENDERER_EXPORTS"])
     
 env['OBJSUFFIX'] = '.o'
 

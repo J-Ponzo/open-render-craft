@@ -12,15 +12,9 @@
 #include <unordered_map>
 #include <tuple>
 
-#ifdef ORC_RENDERER_EXPORTS
-#define ORC_API __declspec(dllexport)
-#else
-#define ORC_API __declspec(dllimport)
-#endif
-
 namespace godot {
 
-class ORC_API ORC_ProxyRegistryDump : public RefCounted {
+class ORC_ProxyRegistryDump : public RefCounted {
     GDCLASS(ORC_ProxyRegistryDump, RefCounted)
 
 private:
