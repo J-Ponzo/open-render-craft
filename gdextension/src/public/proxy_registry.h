@@ -28,6 +28,9 @@ namespace godot {
 class ORC_API ORC_ProxyRegistry : public RefCounted {
     GDCLASS(ORC_ProxyRegistry, RefCounted)
 
+    friend class ORC_SceneProxyBase;
+    friend class ORC_ProxyData;
+
 private:
     // Static registry for C++ types (Meyers' Singleton)
     static std::unordered_map<StringName, std::type_index>& cpp_types();
@@ -50,32 +53,28 @@ private:
     bool add_query_to_cache(const Ref<ORC_DataQuery>& query);
     bool fill_query_features(Ref<ORC_DataQuery> query, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
 
+    bool set_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name, bool value);
+    // TODO check const & keywords
+    TypedArray<ORC_ProxyData> get_by_query_internal(Ref<ORC_DataQuery> query);
+    Ref<ORC_DataQuery> create_query_internal(const TypeKey& type_key, const TypedArray<StringName>& flag_names = TypedArray<StringName>(), const TypedArray<bool>& flag_values = TypedArray<bool>());
+
+
 protected:
     static void _bind_methods();
 
 public:
-    // Static methods
     template<typename T>
     static void register_cpp_type(const StringName& class_name) {
         cpp_types().emplace(class_name, typeid(T));
     }
-    
     static std::type_index get_cpp_type_index(const StringName& class_name);
     
-    // Instance methods
     bool register_data(Ref<ORC_ProxyData> proxy_data, int64_t unique_id = -1);
     bool unregister_data(Ref<ORC_ProxyData> proxy_data);
     Ref<ORC_ProxyData> get_by_unique_id(int64_t unique_id) const;
     bool increment_refcount(int64_t unique_id);
     bool decrement_refcount(int64_t unique_id);
-    
-    bool set_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name, bool value);
-    TypedArray<ORC_ProxyData> get_by_query(Ref<ORC_DataQuery> query);
-    
-    Ref<ORC_DataQuery> create_query(const TypeKey& type_key, const TypedArray<StringName>& flag_names = TypedArray<StringName>(), const TypedArray<bool>& flag_values = TypedArray<bool>());
-
     void clear();
-
     Ref<ORC_ProxyRegistryDump> dump_registry() const;
 };
 

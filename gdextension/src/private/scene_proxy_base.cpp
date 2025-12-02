@@ -112,7 +112,7 @@ TypedArray<ORC_ProxyData> ORC_SceneProxyBase::get_by_query(const Ref<ORC_DataQue
 	TypedArray<ORC_ProxyData> result;
 	if (!proxy_registry.is_valid() || !query.is_valid()) return result;
 	
-	return proxy_registry->get_by_query(query);
+	return proxy_registry->get_by_query_internal(query);
 }
 
 Ref<ORC_DataQuery> ORC_SceneProxyBase::create_query_gd(const Ref<GDScript>& script, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
@@ -128,7 +128,7 @@ Ref<ORC_DataQuery> ORC_SceneProxyBase::create_query_gd(const Ref<GDScript>& scri
 		return Ref<ORC_DataQuery>();
 	}
 	
-	return proxy_registry->create_query(TypeKey(script), flag_names, flag_values);
+	return proxy_registry->create_query_internal(TypeKey(script), flag_names, flag_values);
 }
 
 Ref<ORC_DataQuery> ORC_SceneProxyBase::create_query_cpp(const StringName& class_name, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
@@ -139,7 +139,7 @@ Ref<ORC_DataQuery> ORC_SceneProxyBase::create_query_cpp(const StringName& class_
 		return Ref<ORC_DataQuery>();
 	}
 	
-	return proxy_registry->create_query(TypeKey(type_id), flag_names, flag_values);
+	return proxy_registry->create_query_internal(TypeKey(type_id), flag_names, flag_values);
 }
 
 void ORC_SceneProxyBase::create_queue(const StringName& queue_name, const Ref<ORC_DataQuery>& init_query, const TypedArray<ORC_QueueProcessor>& processors) {

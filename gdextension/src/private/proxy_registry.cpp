@@ -56,7 +56,7 @@ bool ORC_ProxyRegistry::register_data(Ref<ORC_ProxyData> proxy_data, int64_t uni
     
     for (auto& cache_entry : query_cache) {
         const Ref<ORC_DataQuery>& query = cache_entry.first;
-        if (!query.is_valid()) continue;
+        DEV_ASSERT(query.is_valid() && "Invalid query found in cache - this should never happen");
         
         if (matches_query(proxy_data, flags, query)) {
             cache_entry.second.push_back(proxy_data);
@@ -106,95 +106,6 @@ bool ORC_ProxyRegistry::decrement_refcount(int64_t unique_id) {
     return false;
 }
 
-// TODO : put in helper file
-template <typename T>
-static String get_type_name(const Ref<T>& ref) {
-    if (!ref.is_valid()) return "<invalid>";
-    
-    Ref<GDScript> script = ref->get_script();
-    if (script.is_valid() && !script->get_global_name().is_empty()) {
-        return script->get_global_name();
-    } else {
-        return ref->get_class();
-    }
-}
-
-// TODO : put in helper file
-static String get_type_name(const Object* obj) {
-    if (!obj) return "<null>";
-    
-    Ref<GDScript> script = obj->get_script();
-    if (script.is_valid() && !script->get_global_name().is_empty()) {
-        return script->get_global_name();
-    } else {
-        return obj->get_class();
-    }
-}
-
-// TODO : put in helper file
-template <typename T>
-static String get_type_and_address(const Ref<T>& ref) {
-    if (!ref.is_valid()) return "<invalid>";
-    
-    String result = get_type_name(ref);
-    
-    // Add object name if it's a Node
-    Node* node = Object::cast_to<Node>(ref.ptr());
-    if (node) {
-        result += "[\"" + node->get_name() + "\"]";
-    }
-    
-    result += "@" + String::num_int64((int64_t)ref.ptr());
-    return result;
-}
-
-// TODO : put in helper file
-static String get_type_and_address(const Object* obj) {
-    if (!obj) return "<null>";
-    
-    String result = get_type_name(obj);
-    
-    // Add object name if it's a Node
-    const Node* node = Object::cast_to<Node>(obj);
-    if (node) {
-        result += "[\"" + node->get_name() + "\"]";
-    }
-    
-    result += "@" + String::num_int64((int64_t)obj);
-    return result;
-}
-
-// TODO : put in helper file
-static String get_primary_node_info(ORC_PrimaryData* primary) {
-    if (!primary) return "";
-    
-    Ref<ORC_ProxyObject> proxy_obj = primary->get_proxy_object();
-    if (proxy_obj.is_valid()) {
-        Node* node = proxy_obj->get_node();
-        if (node) {
-            return " (" + get_type_and_address(node) + ")";
-        } else {
-            return " (node: <null>)";
-        }
-    } else {
-        return " (proxy_object: <invalid>)";
-    }
-}
-
-Ref<ORC_ProxyRegistryDump> ORC_ProxyRegistry::dump_registry() const {
-    Ref<ORC_ProxyRegistryDump> dump;
-    dump.instantiate();
-    
-    dump->id_registry = id_registry;
-    dump->all_data = all_data;
-    dump->flag_name_to_mask = flag_name_to_mask;
-    dump->next_available_bit = next_available_bit;
-    dump->data_flags = data_flags;
-    dump->query_cache = query_cache;
-    
-    return dump;
-}
-
 bool ORC_ProxyRegistry::matches_query(Ref<ORC_ProxyData> proxy_data, uint64_t flags, const Ref<ORC_DataQuery>& query) const {
     if (!query.is_valid() || !proxy_data.is_valid()) return false;
     
@@ -209,7 +120,7 @@ bool ORC_ProxyRegistry::update_query_cache_for_data(Ref<ORC_ProxyData> proxy_dat
     
     for (auto& cache_entry : query_cache) {
         const Ref<ORC_DataQuery>& query = cache_entry.first;
-        if (!query.is_valid()) continue;
+        DEV_ASSERT(query.is_valid() && "Invalid query found in cache - this should never happen");
         
         std::vector<Ref<ORC_ProxyData>>& data_list = cache_entry.second;
         
@@ -299,7 +210,7 @@ bool ORC_ProxyRegistry::set_flag_internal(ORC_ProxyData* proxy_data, const Strin
     return true;
 }
 
-TypedArray<ORC_ProxyData> ORC_ProxyRegistry::get_by_query(Ref<ORC_DataQuery> query) {
+TypedArray<ORC_ProxyData> ORC_ProxyRegistry::get_by_query_internal(Ref<ORC_DataQuery> query) {
     TypedArray<ORC_ProxyData> result;
     
     if (!query.is_valid()) return result;
@@ -322,12 +233,10 @@ TypedArray<ORC_ProxyData> ORC_ProxyRegistry::get_by_query(Ref<ORC_DataQuery> que
 bool ORC_ProxyRegistry::fill_query_features(Ref<ORC_DataQuery> query, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
     if (!query.is_valid()) {
         ERR_FAIL_V_MSG(false, "[ORC_ProxyRegistry ERROR] : query is not valid");
-        return false;
     }
     
     if (flag_names.size() != flag_values.size()) {
         ERR_FAIL_V_MSG(false, "[ORC_ProxyRegistry ERROR] : flag_names and flag_values arrays must have the same size");
-        return false;
     }
     
     uint64_t mask = 0;
@@ -351,7 +260,7 @@ bool ORC_ProxyRegistry::fill_query_features(Ref<ORC_DataQuery> query, const Type
     return true;
 }
 
-Ref<ORC_DataQuery> ORC_ProxyRegistry::create_query(const TypeKey& type_key, const TypedArray<StringName> &flag_names, const TypedArray<bool> &flag_values)
+Ref<ORC_DataQuery> ORC_ProxyRegistry::create_query_internal(const TypeKey& type_key, const TypedArray<StringName> &flag_names, const TypedArray<bool> &flag_values)
 {
     Ref<ORC_DataQuery> query;
     query.instantiate();
@@ -368,4 +277,20 @@ void ORC_ProxyRegistry::clear() {
 	query_cache.clear();
 	flag_name_to_mask.clear();
 	next_available_bit = 0;
-}}
+}
+
+Ref<ORC_ProxyRegistryDump> ORC_ProxyRegistry::dump_registry() const {
+    Ref<ORC_ProxyRegistryDump> dump;
+    dump.instantiate();
+    
+    dump->id_registry = id_registry;
+    dump->all_data = all_data;
+    dump->flag_name_to_mask = flag_name_to_mask;
+    dump->next_available_bit = next_available_bit;
+    dump->data_flags = data_flags;
+    dump->query_cache = query_cache;
+    
+    return dump;
+}
+
+} // namespace godot
