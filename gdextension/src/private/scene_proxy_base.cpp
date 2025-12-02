@@ -144,10 +144,8 @@ void ORC_SceneProxyBase::create_queue(const StringName& queue_name, const Ref<OR
 		ERR_FAIL_MSG("[ORC_SceneProxyBase ERROR] : Queue '" + String(queue_name) + "' already exists");
 	}
 	
-	ORC_ProxyQueue* queue = new ORC_ProxyQueue();
+	ORC_ProxyQueue* queue = new ORC_ProxyQueue(this, init_query);
 	
-	queue->set_scene_proxy(this);
-	queue->set_init_query(init_query);
 	for (int i = 0; i < processors.size(); i++) {
 		Ref<ORC_QueueProcessor> processor = processors[i];
 		if (processor.is_valid()) {

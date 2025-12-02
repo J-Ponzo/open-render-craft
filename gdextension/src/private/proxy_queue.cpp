@@ -3,11 +3,8 @@
 
 using namespace godot;
 
-ORC_ProxyQueue::ORC_ProxyQueue() {
-}
-
-void ORC_ProxyQueue::set_scene_proxy(ORC_SceneProxyBase* scene_proxy) {
-    this->scene_proxy = scene_proxy;
+ORC_ProxyQueue::ORC_ProxyQueue(ORC_SceneProxyBase* scene_proxy, const Ref<ORC_DataQuery>& init_query) 
+    : scene_proxy(scene_proxy), init_query(init_query) {
 }
 
 void ORC_ProxyQueue::add_processor(const Ref<ORC_QueueProcessor>& processor) {
@@ -15,10 +12,6 @@ void ORC_ProxyQueue::add_processor(const Ref<ORC_QueueProcessor>& processor) {
         ERR_FAIL_MSG("[ORC_ProxyQueue ERROR] : Cannot add null processor");
     }
     processors.append(processor);
-}
-
-void ORC_ProxyQueue::clear_processors() {
-    processors.clear();
 }
 
 void ORC_ProxyQueue::execute() {

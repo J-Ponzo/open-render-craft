@@ -17,6 +17,7 @@
 namespace godot {
 
 class ORC_RendererBase;
+class ORC_ProxyQueue;
 
 class ORC_SceneProxyBase : public RefCounted {
 	GDCLASS(ORC_SceneProxyBase, RefCounted)
