@@ -1,11 +1,7 @@
 #include <proxy_queue.h>
 #include <scene_proxy_base.h>
-#include <godot_cpp/core/class_db.hpp>
 
 using namespace godot;
-
-void ORC_ProxyQueue::_bind_methods() {
-}
 
 ORC_ProxyQueue::ORC_ProxyQueue() {
 }

@@ -31,26 +31,23 @@ ORC_SceneProxyBase::ORC_SceneProxyBase() {
 	proxy_registry.instantiate();
 }
 
-// TODO : not sure it's needed to unref here
 ORC_SceneProxyBase::~ORC_SceneProxyBase() {
-	if (proxy_registry.is_valid()) {
-		proxy_registry.unref();
+	for (auto& pair : proxy_queues) {
+		delete pair.second;
 	}
+	proxy_queues.clear();
 }
 
-// TODO func ptr may not be usefull
-static void find_all_in_tree(Node* root, bool(*selector)(Node*), std::vector<Node*>& out_nodes) {
-	if (selector(root)) {
-        out_nodes.push_back(root);
-    }
+static void get_all_nodes_recursive(Node* root, std::vector<Node*>& out_nodes) {
+	out_nodes.push_back(root);
 
-	 Array children = root->get_children();
-    for (int i = 0; i < children.size(); i++) {
-        Node *child = Object::cast_to<Node>(children[i]);
-        if (child) {
-            find_all_in_tree(child, selector, out_nodes);
-        }
-    }
+	Array children = root->get_children();
+	for (int i = 0; i < children.size(); i++) {
+		Node *child = Object::cast_to<Node>(children[i]);
+		if (child) {
+			get_all_nodes_recursive(child, out_nodes);
+		}
+	}
 }
 
 void ORC_SceneProxyBase::setup(Node* scene) {
@@ -59,7 +56,7 @@ void ORC_SceneProxyBase::setup(Node* scene) {
 	this->scene_root->get_tree()->connect("node_removed", callable_mp(this, &ORC_SceneProxyBase::on_node_exit_tree));
 
 	std::vector<Node*> all_nodes;
-	find_all_in_tree(this->scene_root, [](Node* node) { return true; }, all_nodes);
+	get_all_nodes_recursive(this->scene_root, all_nodes);
 	for (Node* node : all_nodes)
 		on_node_enter_tree(node);
 }
@@ -101,7 +98,7 @@ void ORC_SceneProxyBase::cleanup() {
 	this->scene_root->get_tree()->disconnect("node_removed", callable_mp(this, &ORC_SceneProxyBase::on_node_exit_tree));
 
 	std::vector<Node*> all_nodes;
-	find_all_in_tree(this->scene_root, [](Node* node) { return true; }, all_nodes);
+	get_all_nodes_recursive(this->scene_root, all_nodes);
 	for (Node* node : all_nodes)
 		on_node_exit_tree(node);
 	
@@ -147,8 +144,7 @@ void ORC_SceneProxyBase::create_queue(const StringName& queue_name, const Ref<OR
 		ERR_FAIL_MSG("[ORC_SceneProxyBase ERROR] : Queue '" + String(queue_name) + "' already exists");
 	}
 	
-	Ref<ORC_ProxyQueue> queue;
-	queue.instantiate();
+	ORC_ProxyQueue* queue = new ORC_ProxyQueue();
 	
 	queue->set_scene_proxy(this);
 	queue->set_init_query(init_query);
@@ -169,8 +165,8 @@ TypedArray<ORC_ProxyData> ORC_SceneProxyBase::fetch_queue_data(const StringName&
 		ERR_FAIL_V_MSG(TypedArray<ORC_ProxyData>(), "[ORC_SceneProxyBase ERROR] : Queue '" + String(queue_name) + "' not found");
 	}
 	
-	Ref<ORC_ProxyQueue> queue = it->second;
-	if (!queue.is_valid()) {
+	ORC_ProxyQueue* queue = it->second;
+	if (queue == nullptr) {
 		ERR_FAIL_V_MSG(TypedArray<ORC_ProxyData>(), "[ORC_SceneProxyBase ERROR] : Queue '" + String(queue_name) + "' is invalid");
 	}
 	

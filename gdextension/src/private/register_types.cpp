@@ -56,7 +56,6 @@ void initialize_orc_module(ModuleInitializationLevel p_level) {
 	GDREGISTER_RUNTIME_CLASS(ORC_ProxyRegistry);
 	GDREGISTER_RUNTIME_CLASS(ORC_ProxyRegistryDump);
 	GDREGISTER_RUNTIME_CLASS(ORC_QueueProcessor);
-	GDREGISTER_RUNTIME_CLASS(ORC_ProxyQueue);		//TODO maybe not necessary
 	GDREGISTER_RUNTIME_CLASS(ORC_DataQuery);
 	GDREGISTER_RUNTIME_CLASS(ORC_PSO);
 	GDREGISTER_RUNTIME_CLASS(ORC_VertexFormatInfo);

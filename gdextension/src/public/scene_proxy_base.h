@@ -28,7 +28,7 @@ private:
 	Ref<ORC_ProxyRegistry> proxy_registry;
 	std::unordered_map<Node*, Ref<ORC_ProxyObject>> proxy_objects_pool;
 	
-	std::unordered_map<StringName, Ref<ORC_ProxyQueue>> proxy_queues;
+	std::unordered_map<StringName, ORC_ProxyQueue*> proxy_queues;
 
 	Ref<ORC_ProxyFactory> proxy_factory;
 	Ref<ORC_ProxyFactory> get_proxy_factory() const { return proxy_factory; }
