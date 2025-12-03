@@ -14,9 +14,10 @@
 #define BONES_NB_INTS 4
 #define WEIGHT_NB_FLOATS 4
 
+static const char* ERR_INVALID_VERTEX_FORMAT_INFO = "[ORC] Invalid vertex format info.";
+
 using namespace godot;
 
-// ORC_VertexFormatInfo implementation
 void ORC_VertexFormatInfo::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_is_2d", "value"), &ORC_VertexFormatInfo::set_is_2d);
     ClassDB::bind_method(D_METHOD("get_is_2d"), &ORC_VertexFormatInfo::get_is_2d);
@@ -81,7 +82,6 @@ bool ORC_VertexFormatInfo::get_has_bones() const { return has_bones; }
 void ORC_VertexFormatInfo::set_has_weights(bool value) { has_weights = value; }
 bool ORC_VertexFormatInfo::get_has_weights() const { return has_weights; }
 
-// ORC_RDHelper implementation
 void ORC_RDHelper::_bind_methods() {
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("get_rd"), &ORC_RDHelper::get_rd);
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("create_vertex_format", "vertex_format_def"), &ORC_RDHelper::create_vertex_format);
@@ -98,9 +98,7 @@ RenderingDevice* ORC_RDHelper::get_rd() {
 }
 
 int64_t ORC_RDHelper::create_vertex_format(const Ref<ORC_VertexFormatInfo>& vf_info) {
-    if (!vf_info.is_valid()) {
-        return -1;
-    }
+    if (!vf_info.is_valid()) ERR_FAIL_V_MSG(-1, ERR_INVALID_VERTEX_FORMAT_INFO);
 
     RenderingDevice* rd = RenderingServer::get_singleton()->get_rendering_device();
     TypedArray<RDVertexAttribute> attrs;

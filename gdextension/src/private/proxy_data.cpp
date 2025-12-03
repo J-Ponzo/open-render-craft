@@ -11,10 +11,6 @@ void ORC_ProxyData::_bind_methods() {
 }
 
 bool ORC_ProxyData::set_flag(const StringName& flag_name, bool value) {
-    if (!registry) {
-        ERR_FAIL_V_MSG(false, "[ORC_ProxyData ERROR] : No registry associated with this ProxyData");
-        return false;
-    }
-    
+    DEV_ASSERT(registry != nullptr && "No registry associated with this ProxyData.");
     return registry->set_flag_internal(this, flag_name, value);
 }

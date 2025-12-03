@@ -45,6 +45,7 @@ private:
 	Ref<ORC_DataQuery> create_query_gd(const Ref<GDScript>& script, const TypedArray<StringName>& flag_names = TypedArray<StringName>(), const TypedArray<bool>& flag_values = TypedArray<bool>());
 	Ref<ORC_DataQuery> create_query_cpp(const StringName& class_name, const TypedArray<StringName>& flag_names = TypedArray<StringName>(), const TypedArray<bool>& flag_values = TypedArray<bool>());
 
+
 public:
 	ORC_SceneProxyBase();
 	~ORC_SceneProxyBase();
@@ -54,6 +55,7 @@ public:
 	Ref<ORC_RendererBase> get_renderer() const { return renderer; }
 	void set_renderer(const Ref<ORC_RendererBase>& renderer) { this->renderer = renderer; }
 	
+	//TODO make private with friend class
 	TypedArray<ORC_ProxyData> get_by_query(const Ref<ORC_DataQuery>& query) const;
 	void create_queue(const StringName& queue_name, const Ref<ORC_DataQuery>& init_query, const TypedArray<ORC_QueueProcessor>& processors = TypedArray<ORC_QueueProcessor>());
 	TypedArray<ORC_ProxyData> fetch_queue_data(const StringName& queue_name) const;

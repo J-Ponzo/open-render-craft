@@ -6,16 +6,19 @@
 #include <proxy_data.h>
 #include <macros.h>
 
-namespace godot { class ORC_SceneProxyBase; }
-
 namespace godot {
+
+class ORC_SceneProxyBase;
 
 class ORC_QueueProcessor : public RefCounted {
     GDCLASS(ORC_QueueProcessor, RefCounted)
     friend class ORC_SceneProxyBase;
 
-protected:
+private:
+    //TODO use ref<> ?
     ORC_SceneProxyBase* scene_proxy;
+
+protected:
     static void _bind_methods();
 
 public:

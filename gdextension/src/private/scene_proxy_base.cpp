@@ -6,6 +6,12 @@
 
 using namespace godot;
 
+static const char* ERR_INVALID_SCRIPT = "[ORC] Script is not valid.";
+static const char* ERR_GDSCRIPT_NO_GLOBAL_NAME = "[ORC] Cannot create query with a GDScript that has no global_name (inner class or unnamed script).";
+static const char* ERR_QUEUE_ALREADY_EXISTS = "[ORC] Queue '%s' already exists.";
+static const char* ERR_QUEUE_NOT_FOUND = "[ORC] Queue '%s' not found.";
+static const char* ERR_QUEUE_INVALID = "[ORC] Queue '%s' is invalid.";
+
 void ORC_SceneProxyBase::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_renderer"), &ORC_SceneProxyBase::get_renderer);
     ClassDB::bind_method(D_METHOD("set_renderer", "renderer"), &ORC_SceneProxyBase::set_renderer);
@@ -114,16 +120,10 @@ TypedArray<ORC_ProxyData> ORC_SceneProxyBase::get_by_query(const Ref<ORC_DataQue
 
 Ref<ORC_DataQuery> ORC_SceneProxyBase::create_query_gd(const Ref<GDScript>& script, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
 	if (!proxy_registry.is_valid()) return Ref<ORC_DataQuery>();
-	
-	if (!script.is_valid()) {
-		return Ref<ORC_DataQuery>();
-	}
+	if (!script.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_DataQuery>(), ERR_INVALID_SCRIPT);
 	
 	String global_name = script->get_global_name();
-	if (global_name.is_empty()) {
-		ERR_PRINT("[ORC_SceneProxyBase ERROR] : Cannot create query with a GDScript that has no global_name (inner class or unnamed script)");
-		return Ref<ORC_DataQuery>();
-	}
+	if (global_name.is_empty()) ERR_FAIL_V_MSG(Ref<ORC_DataQuery>(), ERR_GDSCRIPT_NO_GLOBAL_NAME);
 	
 	return proxy_registry->create_query_internal(TypeKey(script), flag_names, flag_values);
 }
@@ -140,9 +140,7 @@ Ref<ORC_DataQuery> ORC_SceneProxyBase::create_query_cpp(const StringName& class_
 }
 
 void ORC_SceneProxyBase::create_queue(const StringName& queue_name, const Ref<ORC_DataQuery>& init_query, const TypedArray<ORC_QueueProcessor>& processors) {
-	if (proxy_queues.find(queue_name) != proxy_queues.end()) {
-		ERR_FAIL_MSG("[ORC_SceneProxyBase ERROR] : Queue '" + String(queue_name) + "' already exists");
-	}
+	if (proxy_queues.find(queue_name) != proxy_queues.end()) ERR_FAIL_MSG(vformat(ERR_QUEUE_ALREADY_EXISTS, String(queue_name)));
 	
 	ORC_ProxyQueue* queue = new ORC_ProxyQueue(this, init_query);
 	
@@ -159,14 +157,10 @@ void ORC_SceneProxyBase::create_queue(const StringName& queue_name, const Ref<OR
 
 TypedArray<ORC_ProxyData> ORC_SceneProxyBase::fetch_queue_data(const StringName& queue_name) const {
 	auto it = proxy_queues.find(queue_name);
-	if (it == proxy_queues.end()) {
-		ERR_FAIL_V_MSG(TypedArray<ORC_ProxyData>(), "[ORC_SceneProxyBase ERROR] : Queue '" + String(queue_name) + "' not found");
-	}
+	if (it == proxy_queues.end()) ERR_FAIL_V_MSG(TypedArray<ORC_ProxyData>(), vformat(ERR_QUEUE_NOT_FOUND, String(queue_name)));
 	
 	ORC_ProxyQueue* queue = it->second;
-	if (queue == nullptr) {
-		ERR_FAIL_V_MSG(TypedArray<ORC_ProxyData>(), "[ORC_SceneProxyBase ERROR] : Queue '" + String(queue_name) + "' is invalid");
-	}
+	if (queue == nullptr) ERR_FAIL_V_MSG(TypedArray<ORC_ProxyData>(), vformat(ERR_QUEUE_INVALID, String(queue_name)));
 	
 	return queue->get_cached_data();
 }

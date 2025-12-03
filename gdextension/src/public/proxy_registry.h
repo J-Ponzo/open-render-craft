@@ -29,6 +29,7 @@ private:
     static std::unordered_map<StringName, std::type_index>& cpp_types();
     
     std::unordered_map<int64_t, std::tuple<Ref<ORC_ProxyData>, int>> id_registry;
+    // TODO : rename data_pool
     std::vector<Ref<ORC_ProxyData>> all_data;
     std::unordered_map<StringName, uint64_t> flag_name_to_mask;
     uint8_t next_available_bit = 0;

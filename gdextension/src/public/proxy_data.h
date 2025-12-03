@@ -15,7 +15,6 @@
 namespace godot {
 
 class ORC_ProxyRegistry;
-
 class ORC_ProxyData;
 
 struct TypeKey {
@@ -25,10 +24,7 @@ struct TypeKey {
     TypeKey(const std::string& s) : key(s) {}
     TypeKey(const Ref<GDScript>& script) : key(script.is_valid() ? (String(script->get_global_name())).utf8().get_data() : "") {
         String global_name = script.is_valid() ? script->get_global_name() : String("");
-        if (script.is_valid() && global_name.is_empty()) {
-            // TODO : verifier chaque ERR_FAIL_MSG
-            ERR_FAIL_MSG("[ORC_ProxyRegistry ERROR] : Attempted to register an empty class_name as a cache key. This typically occurs when a GDScript class is not defined in its own file. Inner classes (classes defined within another class file) are not currently supported because Godot does not provide a unique identifier for them in this context.");
-        }
+        if (script.is_valid() && global_name.is_empty()) ERR_FAIL_MSG("Empty class_name as cache key. Inner classes are not supported.");
     }
     
     bool operator==(const TypeKey& other) const {
@@ -59,6 +55,7 @@ class ORC_ProxyData : public RefCounted {
     friend class ORC_ProxyFactory;
 
 private:
+    // TODO : use Ref<> ?
     ORC_ProxyRegistry* registry = nullptr;
     TypeKey type_key = TypeKey(std::type_index(typeid(void)));
 

@@ -3,14 +3,14 @@
 
 using namespace godot;
 
+static const char* ERR_NULL_PROCESSOR = "[ORC] Cannot add null processor.";
+
 ORC_ProxyQueue::ORC_ProxyQueue(ORC_SceneProxyBase* scene_proxy, const Ref<ORC_DataQuery>& init_query) 
     : scene_proxy(scene_proxy), init_query(init_query) {
 }
 
 void ORC_ProxyQueue::add_processor(const Ref<ORC_QueueProcessor>& processor) {
-    if (!processor.is_valid()) {
-        ERR_FAIL_MSG("[ORC_ProxyQueue ERROR] : Cannot add null processor");
-    }
+    if (!processor.is_valid()) ERR_FAIL_MSG(ERR_NULL_PROCESSOR);
     processors.append(processor);
 }
 
@@ -19,10 +19,7 @@ void ORC_ProxyQueue::execute() {
     
     for (int i = 0; i < processors.size(); i++) {
         Ref<ORC_QueueProcessor> processor = processors[i];
-        if (!processor.is_valid()) {
-            ERR_PRINT("[ORC_ProxyQueue WARNING] : Skipping invalid processor at index " + String::num_int64(i));
-            continue;
-        }
+        DEV_ASSERT(processor.is_valid() && "Invalid processor in queue - should never happen");
         
         current_data = processor->process(current_data);
     }

@@ -7,6 +7,12 @@
 
 namespace godot {
 
+static const char* ERR_CPP_TYPE_NOT_REGISTERED = "[ORC] C++ type '%s' not registered. Call ORC_ProxyRegistry::register_cpp_type<YourType>(\"%s\") in your module initialization.";
+static const char* ERR_MAX_FLAGS_REACHED = "[ORC] Maximum number of flags (64) reached. Cannot create new flag: %s";
+static const char* ERR_NULL_PROXY_DATA = "[ORC] Cannot set flag on null proxy_data.";
+static const char* ERR_INVALID_QUERY = "[ORC] Query is not valid.";
+static const char* ERR_FLAG_ARRAY_SIZE_MISMATCH = "[ORC] flag_names and flag_values arrays must have the same size.";
+
 std::unordered_map<StringName, std::type_index>& ORC_ProxyRegistry::cpp_types() {
     static std::unordered_map<StringName, std::type_index> registry;
     return registry;
@@ -15,9 +21,7 @@ std::unordered_map<StringName, std::type_index>& ORC_ProxyRegistry::cpp_types() 
 std::type_index ORC_ProxyRegistry::get_cpp_type_index(const StringName& class_name) {
     auto& registry = cpp_types();
     auto it = registry.find(class_name);
-    ERR_FAIL_COND_V_MSG(it == registry.end(), typeid(void), 
-        vformat("[ORC_ProxyRegistry ERROR] : C++ type '%s' not registered. Call ORC_ProxyRegistry::register_cpp_type<YourType>(\"%s\") in your module initialization.", 
-        class_name, class_name));
+    if (it == registry.end()) ERR_FAIL_V_MSG(typeid(void), vformat(ERR_CPP_TYPE_NOT_REGISTERED, class_name, class_name));
     return it->second;
 }
 
@@ -164,9 +168,7 @@ uint64_t ORC_ProxyRegistry::get_or_create_flag_mask(const StringName& flag_name)
         return it->second;
     }
     
-    if (next_available_bit >= 64) {
-        ERR_FAIL_V_MSG(0, "[ORC_ProxyRegistry ERROR] : Maximum number of flags (64) reached. Cannot create new flag: " + String(flag_name));
-    }
+    if (next_available_bit >= 64) ERR_FAIL_V_MSG(0, vformat(ERR_MAX_FLAGS_REACHED, String(flag_name)));
     
     uint64_t flag_mask = 1ULL << next_available_bit;
     flag_name_to_mask[flag_name] = flag_mask;
@@ -176,9 +178,7 @@ uint64_t ORC_ProxyRegistry::get_or_create_flag_mask(const StringName& flag_name)
 }
 
 bool ORC_ProxyRegistry::set_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name, bool value) {
-    if (!proxy_data) {
-        ERR_FAIL_V_MSG(false, "[ORC_ProxyRegistry ERROR] : Cannot set flag on null proxy_data");
-    }
+    if (!proxy_data) ERR_FAIL_V_MSG(false, ERR_NULL_PROXY_DATA);
     
     uint64_t flag_mask = get_or_create_flag_mask(flag_name);
     
@@ -217,13 +217,8 @@ TypedArray<ORC_ProxyData> ORC_ProxyRegistry::get_by_query_internal(const Ref<ORC
 }
 
 bool ORC_ProxyRegistry::fill_query_features(const Ref<ORC_DataQuery>& query, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
-    if (!query.is_valid()) {
-        ERR_FAIL_V_MSG(false, "[ORC_ProxyRegistry ERROR] : query is not valid");
-    }
-    
-    if (flag_names.size() != flag_values.size()) {
-        ERR_FAIL_V_MSG(false, "[ORC_ProxyRegistry ERROR] : flag_names and flag_values arrays must have the same size");
-    }
+    if (!query.is_valid()) ERR_FAIL_V_MSG(false, ERR_INVALID_QUERY);
+    if (flag_names.size() != flag_values.size()) ERR_FAIL_V_MSG(false, ERR_FLAG_ARRAY_SIZE_MISMATCH);
     
     uint64_t mask = 0;
     uint64_t value = 0;

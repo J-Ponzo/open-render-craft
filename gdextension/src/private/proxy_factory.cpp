@@ -7,6 +7,12 @@
 
 namespace godot {
 
+static const char* ERR_SCRIPT_INVALID = "[ORC] Script is not valid.";
+static const char* ERR_SCRIPT_INSTANTIATION_FAILED = "[ORC] Script instantiation failed.";
+static const char* ERR_NOT_PRIMARY_DATA = "[ORC] Instantiated object is not ORC_PrimaryData.";
+static const char* ERR_NOT_SECONDARY_DATA = "[ORC] Instantiated object is not ORC_SecondaryData.";
+static const char* ERR_REGISTER_FAILED = "[ORC] Failed to register data in registry.";
+
 void ORC_ProxyFactory::_bind_methods() {
     BIND_GD_OVERRIDABLE_METHOD(ORC_ProxyFactory, create_proxy_from, "node")
     BIND_GD_OVERRIDABLE_METHOD(ORC_ProxyFactory, create_data_from, "node", "registry")
@@ -35,13 +41,11 @@ Ref<ORC_ProxyObject> ORC_ProxyFactory::create_from(Node* node, const Ref<ORC_Pro
 
 DEFINE_GD_OVERRIDABLE_METHOD_1_ARGS(ORC_ProxyFactory, Ref<ORC_ProxyObject>, create_proxy_from, Node*, node)
 Ref<ORC_ProxyObject> ORC_ProxyFactory::create_proxy_from_impl(Node* node) {
-    UtilityFunctions::print("ORC_ProxyFactory::create_proxy_from (stub)");
     return Ref<ORC_ProxyObject>();
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_2_ARGS(ORC_ProxyFactory, Ref<ORC_PrimaryData>, create_data_from, Node*, node, const Ref<ORC_ProxyRegistry>&, registry)
 Ref<ORC_PrimaryData> ORC_ProxyFactory::create_data_from_impl(Node* node, const Ref<ORC_ProxyRegistry>& registry) {
-    UtilityFunctions::print("ORC_ProxyFactory::create_data_from (stub)");
     return Ref<ORC_ProxyObject>();
 }
 
@@ -69,13 +73,11 @@ bool ORC_ProxyFactory::free(const Ref<ORC_ProxyObject>& proxy_object, const Ref<
 
 DEFINE_GD_OVERRIDABLE_METHOD_1_ARGS(ORC_ProxyFactory, bool, free_proxy, const Ref<ORC_ProxyObject>&, proxy_object)
 bool ORC_ProxyFactory::free_proxy_impl(const Ref<ORC_ProxyObject>& proxy_object) {
-    UtilityFunctions::print("ORC_ProxyFactory::free_proxy (stub)");
     return false;
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_2_ARGS(ORC_ProxyFactory, bool, free_data, const Ref<ORC_ProxyData>&, data, const Ref<ORC_ProxyRegistry>&, registry)
 bool ORC_ProxyFactory::free_data_impl(const Ref<ORC_ProxyData>& data, const Ref<ORC_ProxyRegistry>& registry) {
-    UtilityFunctions::print("ORC_ProxyFactory::free_data (stub)");
     return false;
 }
 
@@ -89,27 +91,19 @@ Ref<ORC_PrimaryData> ORC_ProxyFactory::create_and_register_primary_gd(const Ref<
         return ref;
     }
 
-    if (!script.is_valid()) {
-        UtilityFunctions::print("create_and_register_gd: script is not valid");
-        return Ref<ORC_PrimaryData>();
-    }
+    if (!script.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_PrimaryData>(), ERR_SCRIPT_INVALID);
+    
     Variant v = script->new_();
     Object *obj = Object::cast_to<Object>(v);
-    if (!obj) {
-        UtilityFunctions::print("create_and_register_gd: script instantiation failed");
-        return Ref<ORC_PrimaryData>();
-    }
+    if (!obj) ERR_FAIL_V_MSG(Ref<ORC_PrimaryData>(), ERR_SCRIPT_INSTANTIATION_FAILED);
+    
     ORC_PrimaryData *pdata = Object::cast_to<ORC_PrimaryData>(obj);
-    if (!pdata) {
-        UtilityFunctions::print("create_and_register_gd: instantiated object is not ORC_PrimaryData");
-        return Ref<ORC_PrimaryData>();
-    }
+    if (!pdata) ERR_FAIL_V_MSG(Ref<ORC_PrimaryData>(), ERR_NOT_PRIMARY_DATA);
+    
     ref = Ref<ORC_PrimaryData>(pdata);
     ref->type_key = TypeKey(script);
     if (registry.is_valid()) {
-        if (!registry->register_data(ref, unique_id)) {
-            UtilityFunctions::print("create_and_register_gd: failed to register data in registry");
-        }
+        if (!registry->register_data(ref, unique_id)) WARN_PRINT(ERR_REGISTER_FAILED);
     }
 
     return ref;
@@ -124,27 +118,19 @@ Ref<ORC_SecondaryData> ORC_ProxyFactory::create_and_register_secondary_gd(const 
         registry->increment_refcount(unique_id);
     }
     else {  
-        if (!script.is_valid()) {
-            UtilityFunctions::print("create_and_register_gd: script is not valid");
-            return Ref<ORC_SecondaryData>();
-        }
+        if (!script.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_SecondaryData>(), ERR_SCRIPT_INVALID);
+        
         Variant v = script->new_();
         Object *obj = Object::cast_to<Object>(v);
-        if (!obj) {
-            UtilityFunctions::print("create_and_register_gd: script instantiation failed");
-            return Ref<ORC_SecondaryData>();
-        }
+        if (!obj) ERR_FAIL_V_MSG(Ref<ORC_SecondaryData>(), ERR_SCRIPT_INSTANTIATION_FAILED);
+        
         ORC_SecondaryData *sdata = Object::cast_to<ORC_SecondaryData>(obj);
-        if (!sdata) {
-            UtilityFunctions::print("create_and_register_gd: instantiated object is not ORC_SecondaryData");
-            return Ref<ORC_SecondaryData>();
-        }
+        if (!sdata) ERR_FAIL_V_MSG(Ref<ORC_SecondaryData>(), ERR_NOT_SECONDARY_DATA);
+        
         ref = Ref<ORC_SecondaryData>(sdata);
         ref->type_key = TypeKey(script);
         if (registry.is_valid()) {
-            if (!registry->register_data(ref, unique_id)) {
-                UtilityFunctions::print("create_and_register_gd: failed to register data in registry");
-            }
+            if (!registry->register_data(ref, unique_id)) WARN_PRINT(ERR_REGISTER_FAILED);
         }
     }
 

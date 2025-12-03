@@ -7,6 +7,7 @@
 
 namespace godot {
 
+//TODO : do not expose to GDScript and make an actual struct instead ?
 class ORC_DataQuery : public RefCounted {
     GDCLASS(ORC_DataQuery, RefCounted)
 

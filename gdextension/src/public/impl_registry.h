@@ -31,6 +31,7 @@ public:
         modules.push_back({name, init_func, uninit_func});
     }
     
+    //TODO log error if init_func is nullptr?
     void initialize_all(ModuleInitializationLevel p_level) {
         for (const auto& module : modules) {
             if (module.init_func) {
@@ -40,6 +41,7 @@ public:
         }
     }
     
+    //TODO log error if uninit_func is nullptr?
     void uninitialize_all(ModuleInitializationLevel p_level) {
         for (auto it = modules.rbegin(); it != modules.rend(); ++it) {
             if (it->uninit_func) {
