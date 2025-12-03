@@ -154,9 +154,9 @@ func common_update_shadow():
 	scn_instance.get_node("%Sphere").cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 	var query : ORC_DataQuery = create_mesh_query(["SHADOWS"], [true])
-	scn_proxy.create_queue("queue_test_shadow", query)
+	scn_proxy.create_queue("queue_test_update_shadow", query)
 	scn_proxy.pre_render()
 
-	var actual_shadow_count = scn_proxy.fetch_queue_data("queue_test_shadow").size()
+	var actual_shadow_count = scn_proxy.fetch_queue_data("queue_test_update_shadow").size()
 	var expected_shadow_count = nb_mesh_data - nb_cast_shadow_at_start
 	assert_int(actual_shadow_count).is_equal(expected_shadow_count)
