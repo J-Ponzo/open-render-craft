@@ -7,11 +7,13 @@
 
 namespace godot {
 
-static const char* ERR_SCRIPT_INVALID = "[ORC] Script is not valid.";
-static const char* ERR_SCRIPT_INSTANTIATION_FAILED = "[ORC] Script instantiation failed.";
-static const char* ERR_NOT_PRIMARY_DATA = "[ORC] Instantiated object is not ORC_PrimaryData.";
-static const char* ERR_NOT_SECONDARY_DATA = "[ORC] Instantiated object is not ORC_SecondaryData.";
-static const char* ERR_REGISTER_FAILED = "[ORC] Failed to register data in registry.";
+static const char* ERR_PF_SCRIPT_INVALID = "[ORC] Script is not valid.";
+static const char* ERR_PF_SCRIPT_INSTANTIATION_FAILED = "[ORC] Script instantiation failed.";
+static const char* ERR_PF_NOT_PRIMARY_DATA = "[ORC] Instantiated object is not ORC_PrimaryData.";
+static const char* ERR_PF_NOT_SECONDARY_DATA = "[ORC] Instantiated object is not ORC_SecondaryData.";
+static const char* ERR_PF_INVALID_PRIMARY_DATA = "[ORC] Primary data is not valid.";
+static const char* ERR_PF_INVALID_REGISTRY = "[ORC] Registry is not valid.";
+static const char* ERR_PF_INVALID_DATA = "[ORC] Data is not valid.";
 
 void ORC_ProxyFactory::_bind_methods() {
     BIND_GD_OVERRIDABLE_METHOD(ORC_ProxyFactory, create_proxy_from, "node")
@@ -25,13 +27,15 @@ void ORC_ProxyFactory::_bind_methods() {
 }
 
 Ref<ORC_ProxyObject> ORC_ProxyFactory::create_from(Node* node, const Ref<ORC_ProxyRegistry>& registry) {
+    DEV_ASSERT(registry.is_valid() && "Registry is not valid.");
+    
     Ref<ORC_ProxyObject> proxy_object = create_proxy_from(node);
     if (!proxy_object.is_valid()) return Ref<ORC_ProxyObject>();
 
     proxy_object->set_node(node);
 
     Ref<ORC_PrimaryData> primary_data = create_data_from(node, registry);
-    if (!primary_data.is_valid()) return Ref<ORC_ProxyObject>();
+    if (!primary_data.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_ProxyObject>(), ERR_PF_INVALID_PRIMARY_DATA);
 
     proxy_object->set_primary_data(primary_data);
     primary_data->set_proxy_object(proxy_object);
@@ -50,9 +54,13 @@ Ref<ORC_PrimaryData> ORC_ProxyFactory::create_data_from_impl(Node* node, const R
 }
 
 bool ORC_ProxyFactory::free(const Ref<ORC_ProxyObject>& proxy_object, const Ref<ORC_ProxyRegistry>& registry) {
-    if (!proxy_object.is_valid()) return false;
+    DEV_ASSERT(registry.is_valid() && "Registry is not valid.");
+    
+    if (!proxy_object.is_valid()) ERR_FAIL_V_MSG(false, "[ORC] Proxy object is not valid.");
 
     Ref<ORC_PrimaryData> primary = proxy_object->get_primary_data();
+    DEV_ASSERT(registry.is_valid() && "Registry is not valid.");
+    DEV_ASSERT(primary.is_valid() && "Primary data is not valid.");
 
     bool success = true;
     for (Ref<ORC_SecondaryData> secondary : primary->secondary_data_array) {
@@ -91,19 +99,19 @@ Ref<ORC_ProxyData> ORC_ProxyFactory::create_and_register_data_gd(const Ref<GDScr
         return ref;
     }
 
-    if (!script.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_ProxyData>(), ERR_SCRIPT_INVALID);
+    if (!script.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_ProxyData>(), ERR_PF_SCRIPT_INVALID);
     
     Variant v = script->new_();
     Object *obj = Object::cast_to<Object>(v);
-    if (!obj) ERR_FAIL_V_MSG(Ref<ORC_ProxyData>(), ERR_SCRIPT_INSTANTIATION_FAILED);
+    if (!obj) ERR_FAIL_V_MSG(Ref<ORC_ProxyData>(), ERR_PF_SCRIPT_INSTANTIATION_FAILED);
     
     if (is_primary) {
         ORC_ProxyData *pdata = Object::cast_to<ORC_PrimaryData>(obj);
-        if (!pdata) ERR_FAIL_V_MSG(Ref<ORC_ProxyData>(), ERR_NOT_PRIMARY_DATA);
+        if (!pdata) ERR_FAIL_V_MSG(Ref<ORC_ProxyData>(), ERR_PF_NOT_PRIMARY_DATA);
         ref = Ref<ORC_PrimaryData>(pdata);
     } else {
         ORC_ProxyData *pdata = Object::cast_to<ORC_SecondaryData>(obj);
-        if (!pdata) ERR_FAIL_V_MSG(Ref<ORC_ProxyData>(), ERR_NOT_SECONDARY_DATA);
+        if (!pdata) ERR_FAIL_V_MSG(Ref<ORC_ProxyData>(), ERR_PF_NOT_SECONDARY_DATA);
         ref = Ref<ORC_SecondaryData>(pdata);
     }
 
@@ -114,10 +122,15 @@ Ref<ORC_ProxyData> ORC_ProxyFactory::create_and_register_data_gd(const Ref<GDScr
 }
 
 Ref<ORC_PrimaryData> ORC_ProxyFactory::create_and_register_primary_gd(const Ref<GDScript>& script, const Ref<ORC_ProxyRegistry>& registry, int64_t unique_id) {
+    DEV_ASSERT(registry.is_valid() && "Registry is not valid.");
     return create_and_register_data_gd(script, registry, unique_id, true);
 }
 
 Ref<ORC_SecondaryData> ORC_ProxyFactory::create_and_register_secondary_gd(const Ref<GDScript>& script, const Ref<ORC_ProxyRegistry>& registry, const Ref<ORC_PrimaryData>& primary_data, int64_t unique_id) {
+    DEV_ASSERT(registry.is_valid() && "Registry is not valid.");
+
+    if (!primary_data.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_SecondaryData>(), ERR_PF_INVALID_PRIMARY_DATA);
+
     Ref<ORC_SecondaryData> ref = create_and_register_data_gd(script, registry, unique_id, false);
 
     primary_data->secondary_data_array.append(ref);
@@ -127,7 +140,9 @@ Ref<ORC_SecondaryData> ORC_ProxyFactory::create_and_register_secondary_gd(const 
 }
 
 bool ORC_ProxyFactory::destroy_and_unregister_data(const Ref<ORC_ProxyData>& data, const Ref<ORC_ProxyRegistry>& registry, int64_t unique_id) {
-    if (!data.is_valid()) return false;
+    DEV_ASSERT(registry.is_valid() && "Registry is not valid.");
+    
+    if (!data.is_valid()) ERR_FAIL_V_MSG(false, ERR_PF_INVALID_DATA);
 
     Ref<ORC_ProxyData> ref;
     if (unique_id != -1) ref = registry->get_by_unique_id(unique_id);

@@ -14,7 +14,7 @@
 #define BONES_NB_INTS 4
 #define WEIGHT_NB_FLOATS 4
 
-static const char* ERR_INVALID_VERTEX_FORMAT_INFO = "[ORC] Invalid vertex format info.";
+static const char* ERR_RDH_INVALID_VERTEX_FORMAT_INFO = "[ORC] Invalid vertex format info.";
 
 using namespace godot;
 
@@ -98,7 +98,7 @@ RenderingDevice* ORC_RDHelper::get_rd() {
 }
 
 int64_t ORC_RDHelper::create_vertex_format(const Ref<ORC_VertexFormatInfo>& vf_info) {
-    if (!vf_info.is_valid()) ERR_FAIL_V_MSG(-1, ERR_INVALID_VERTEX_FORMAT_INFO);
+    if (!vf_info.is_valid()) ERR_FAIL_V_MSG(-1, ERR_RDH_INVALID_VERTEX_FORMAT_INFO);
 
     RenderingDevice* rd = RenderingServer::get_singleton()->get_rendering_device();
     TypedArray<RDVertexAttribute> attrs;

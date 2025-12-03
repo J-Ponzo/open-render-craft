@@ -3,14 +3,14 @@
 
 using namespace godot;
 
-static const char* ERR_NULL_PROCESSOR = "[ORC] Cannot add null processor.";
+static const char* ERR_PQ_NULL_PROCESSOR = "[ORC] Cannot add null processor.";
 
 ORC_ProxyQueue::ORC_ProxyQueue(ORC_SceneProxyBase* scene_proxy, const Ref<ORC_DataQuery>& init_query) 
     : scene_proxy(scene_proxy), init_query(init_query) {
 }
 
 void ORC_ProxyQueue::add_processor(const Ref<ORC_QueueProcessor>& processor) {
-    if (!processor.is_valid()) ERR_FAIL_MSG(ERR_NULL_PROCESSOR);
+    if (!processor.is_valid()) ERR_FAIL_MSG(ERR_PQ_NULL_PROCESSOR);
     processors.append(processor);
 }
 

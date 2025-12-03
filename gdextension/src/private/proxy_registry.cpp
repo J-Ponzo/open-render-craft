@@ -7,11 +7,14 @@
 
 namespace godot {
 
-static const char* ERR_CPP_TYPE_NOT_REGISTERED = "[ORC] C++ type '%s' not registered. Call ORC_ProxyRegistry::register_cpp_type<YourType>(\"%s\") in your module initialization.";
-static const char* ERR_MAX_FLAGS_REACHED = "[ORC] Maximum number of flags (64) reached. Cannot create new flag: %s";
-static const char* ERR_NULL_PROXY_DATA = "[ORC] Cannot set flag on null proxy_data.";
-static const char* ERR_INVALID_QUERY = "[ORC] Query is not valid.";
-static const char* ERR_FLAG_ARRAY_SIZE_MISMATCH = "[ORC] flag_names and flag_values arrays must have the same size.";
+static const char* ERR_PR_CPP_TYPE_NOT_REGISTERED = "[ORC] C++ type '%s' not registered. Call ORC_ProxyRegistry::register_cpp_type<YourType>(\"%s\") in your module initialization.";
+static const char* ERR_PR_MAX_FLAGS_REACHED = "[ORC] Maximum number of flags (64) reached. Cannot create new flag: %s";
+static const char* ERR_PR_NULL_PROXY_DATA = "[ORC] Cannot set flag on null proxy_data.";
+static const char* ERR_PR_INVALID_PROXY_DATA = "[ORC] Proxy data is not valid.";
+static const char* ERR_PR_INVALID_QUERY = "[ORC] Query is not valid.";
+static const char* ERR_PR_FLAG_ARRAY_SIZE_MISMATCH = "[ORC] flag_names and flag_values arrays must have the same size.";
+static const char* ERR_PR_UNIQUE_ID_NOT_FOUND = "[ORC] Unique ID not found in registry.";
+static const char* ERR_PR_QUERY_ALREADY_CACHED = "[ORC] Query is already in cache.";
 
 std::unordered_map<StringName, std::type_index>& ORC_ProxyRegistry::cpp_types() {
     static std::unordered_map<StringName, std::type_index> registry;
@@ -21,7 +24,7 @@ std::unordered_map<StringName, std::type_index>& ORC_ProxyRegistry::cpp_types() 
 std::type_index ORC_ProxyRegistry::get_cpp_type_index(const StringName& class_name) {
     auto& registry = cpp_types();
     auto it = registry.find(class_name);
-    if (it == registry.end()) ERR_FAIL_V_MSG(typeid(void), vformat(ERR_CPP_TYPE_NOT_REGISTERED, class_name, class_name));
+    if (it == registry.end()) ERR_FAIL_V_MSG(typeid(void), vformat(ERR_PR_CPP_TYPE_NOT_REGISTERED, class_name, class_name));
     return it->second;
 }
 
@@ -29,7 +32,7 @@ void ORC_ProxyRegistry::_bind_methods() {
 }
 
 bool ORC_ProxyRegistry::register_data(const Ref<ORC_ProxyData>& proxy_data, int64_t unique_id) {
-    if (!proxy_data.is_valid()) return false;
+    if (!proxy_data.is_valid()) ERR_FAIL_V_MSG(false, ERR_PR_INVALID_PROXY_DATA);
 
     proxy_data->registry = this;
 
@@ -58,7 +61,7 @@ bool ORC_ProxyRegistry::register_data(const Ref<ORC_ProxyData>& proxy_data, int6
 }
 
 bool ORC_ProxyRegistry::unregister_data(const Ref<ORC_ProxyData>& proxy_data) {
-    if (!proxy_data.is_valid()) return false;
+    if (!proxy_data.is_valid()) ERR_FAIL_V_MSG(false, ERR_PR_INVALID_PROXY_DATA);
 
     proxy_data->registry = nullptr;
 
@@ -77,28 +80,27 @@ Ref<ORC_ProxyData> ORC_ProxyRegistry::get_by_unique_id(int64_t unique_id) const 
 
 bool ORC_ProxyRegistry::increment_refcount(int64_t unique_id) {
     auto it = id_registry.find(unique_id);
-    if (it != id_registry.end()) {
-        std::get<1>(it->second)++;
-        return true;
-    }
-    return false;
+    if (it == id_registry.end()) ERR_FAIL_V_MSG(false, ERR_PR_UNIQUE_ID_NOT_FOUND);
+    
+    std::get<1>(it->second)++;
+    return true;
 }
 
 bool ORC_ProxyRegistry::decrement_refcount(int64_t unique_id) {
     auto it = id_registry.find(unique_id);
-    if (it != id_registry.end()) {
-        std::get<1>(it->second)--;
-        if (std::get<1>(it->second) == 0) {
-            unregister_data(std::get<0>(it->second));
-            id_registry.erase(it);
-        }
-        return true;
+    if (it == id_registry.end()) ERR_FAIL_V_MSG(false, ERR_PR_UNIQUE_ID_NOT_FOUND);
+    
+    std::get<1>(it->second)--;
+    if (std::get<1>(it->second) == 0) {
+        unregister_data(std::get<0>(it->second));
+        id_registry.erase(it);
     }
-    return false;
+    return true;
 }
 
 bool ORC_ProxyRegistry::matches_query(const Ref<ORC_ProxyData>& proxy_data, uint64_t flags, const Ref<ORC_DataQuery>& query) const {
-    if (!query.is_valid() || !proxy_data.is_valid()) return false;
+    if (!proxy_data.is_valid()) ERR_FAIL_V_MSG(false, ERR_PR_INVALID_PROXY_DATA);
+    if (!query.is_valid()) ERR_FAIL_V_MSG(false, ERR_PR_INVALID_QUERY);
     
     if (!(proxy_data->get_type_key() == query->type_key)) return false;
     
@@ -106,7 +108,7 @@ bool ORC_ProxyRegistry::matches_query(const Ref<ORC_ProxyData>& proxy_data, uint
 }
 
 bool ORC_ProxyRegistry::update_query_cache_for_data(const Ref<ORC_ProxyData>& proxy_data, uint64_t old_flags, uint64_t new_flags) {
-    if (!proxy_data.is_valid()) return false;
+    if (!proxy_data.is_valid()) ERR_FAIL_V_MSG(false, ERR_PR_INVALID_PROXY_DATA);
     
     for (auto& cache_entry : query_cache) {
         const Ref<ORC_DataQuery>& query = cache_entry.first;
@@ -127,7 +129,7 @@ bool ORC_ProxyRegistry::update_query_cache_for_data(const Ref<ORC_ProxyData>& pr
 }
 
 bool ORC_ProxyRegistry::remove_from_query_cache(const Ref<ORC_ProxyData>& proxy_data) {
-    if (!proxy_data.is_valid()) return false;
+    if (!proxy_data.is_valid()) ERR_FAIL_V_MSG(false, ERR_PR_INVALID_PROXY_DATA);
     
     for (auto& cache_entry : query_cache) {
         std::vector<Ref<ORC_ProxyData>>& data_list = cache_entry.second;
@@ -137,9 +139,8 @@ bool ORC_ProxyRegistry::remove_from_query_cache(const Ref<ORC_ProxyData>& proxy_
 }
 
 bool ORC_ProxyRegistry::add_query_to_cache(const Ref<ORC_DataQuery>& query) {
-    if (!query.is_valid()) return false;
-    
-    if (query_cache.find(query) != query_cache.end()) return false;
+    if (!query.is_valid()) ERR_FAIL_V_MSG(false, ERR_PR_INVALID_QUERY);
+    if (query_cache.find(query) != query_cache.end()) ERR_FAIL_V_MSG(false, ERR_PR_QUERY_ALREADY_CACHED);
     
     std::vector<Ref<ORC_ProxyData>> matching_data;
     
@@ -168,7 +169,7 @@ uint64_t ORC_ProxyRegistry::get_or_create_flag_mask(const StringName& flag_name)
         return it->second;
     }
     
-    if (next_available_bit >= 64) ERR_FAIL_V_MSG(0, vformat(ERR_MAX_FLAGS_REACHED, String(flag_name)));
+    if (next_available_bit >= 64) ERR_FAIL_V_MSG(0, vformat(ERR_PR_MAX_FLAGS_REACHED, String(flag_name)));
     
     uint64_t flag_mask = 1ULL << next_available_bit;
     flag_name_to_mask[flag_name] = flag_mask;
@@ -178,7 +179,7 @@ uint64_t ORC_ProxyRegistry::get_or_create_flag_mask(const StringName& flag_name)
 }
 
 bool ORC_ProxyRegistry::set_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name, bool value) {
-    if (!proxy_data) ERR_FAIL_V_MSG(false, ERR_NULL_PROXY_DATA);
+    if (!proxy_data) ERR_FAIL_V_MSG(false, ERR_PR_NULL_PROXY_DATA);
     
     uint64_t flag_mask = get_or_create_flag_mask(flag_name);
     
@@ -198,9 +199,9 @@ bool ORC_ProxyRegistry::set_flag_internal(ORC_ProxyData* proxy_data, const Strin
 
 TypedArray<ORC_ProxyData> ORC_ProxyRegistry::get_by_query_internal(const Ref<ORC_DataQuery>& query) {
     TypedArray<ORC_ProxyData> result;
-    
-    if (!query.is_valid()) return result;
-    
+
+    if (!query.is_valid()) ERR_FAIL_V_MSG(result, ERR_PR_INVALID_QUERY);
+
     auto it = query_cache.find(query);
     if (it == query_cache.end()) {
         add_query_to_cache(query);
@@ -217,8 +218,8 @@ TypedArray<ORC_ProxyData> ORC_ProxyRegistry::get_by_query_internal(const Ref<ORC
 }
 
 bool ORC_ProxyRegistry::fill_query_features(const Ref<ORC_DataQuery>& query, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
-    if (!query.is_valid()) ERR_FAIL_V_MSG(false, ERR_INVALID_QUERY);
-    if (flag_names.size() != flag_values.size()) ERR_FAIL_V_MSG(false, ERR_FLAG_ARRAY_SIZE_MISMATCH);
+    if (!query.is_valid()) ERR_FAIL_V_MSG(false, ERR_PR_INVALID_QUERY);
+    if (flag_names.size() != flag_values.size()) ERR_FAIL_V_MSG(false, ERR_PR_FLAG_ARRAY_SIZE_MISMATCH);
     
     uint64_t mask = 0;
     uint64_t value = 0;

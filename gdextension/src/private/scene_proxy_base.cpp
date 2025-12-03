@@ -6,11 +6,13 @@
 
 using namespace godot;
 
-static const char* ERR_INVALID_SCRIPT = "[ORC] Script is not valid.";
-static const char* ERR_GDSCRIPT_NO_GLOBAL_NAME = "[ORC] Cannot create query with a GDScript that has no global_name (inner class or unnamed script).";
-static const char* ERR_QUEUE_ALREADY_EXISTS = "[ORC] Queue '%s' already exists.";
-static const char* ERR_QUEUE_NOT_FOUND = "[ORC] Queue '%s' not found.";
-static const char* ERR_QUEUE_INVALID = "[ORC] Queue '%s' is invalid.";
+static const char* ERR_SPB_INVALID_SCRIPT = "[ORC] Script is not valid.";
+static const char* ERR_SPB_GDSCRIPT_NO_GLOBAL_NAME = "[ORC] Cannot create query with a GDScript that has no global_name (inner class or unnamed script).";
+static const char* ERR_SPB_QUEUE_ALREADY_EXISTS = "[ORC] Queue '%s' already exists.";
+static const char* ERR_SPB_QUEUE_NOT_FOUND = "[ORC] Queue '%s' not found.";
+static const char* ERR_SPB_QUEUE_INVALID = "[ORC] Queue '%s' is invalid.";
+static const char* ERR_SPB_INVALID_QUERY = "[ORC] Query is not valid.";
+static const char* ERR_SPB_CPP_TYPE_NOT_FOUND = "[ORC] C++ type not found for class_name.";
 
 void ORC_SceneProxyBase::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_renderer"), &ORC_SceneProxyBase::get_renderer);
@@ -50,9 +52,7 @@ static void get_all_nodes_recursive(Node* root, std::vector<Node*>& out_nodes) {
 	Array children = root->get_children();
 	for (int i = 0; i < children.size(); i++) {
 		Node *child = Object::cast_to<Node>(children[i]);
-		if (child) {
-			get_all_nodes_recursive(child, out_nodes);
-		}
+		get_all_nodes_recursive(child, out_nodes);
 	}
 }
 
@@ -112,35 +112,33 @@ void ORC_SceneProxyBase::cleanup() {
 }
 
 TypedArray<ORC_ProxyData> ORC_SceneProxyBase::get_by_query(const Ref<ORC_DataQuery>& query) const {
-	TypedArray<ORC_ProxyData> result;
-	if (!proxy_registry.is_valid() || !query.is_valid()) return result;
+	DEV_ASSERT(proxy_registry.is_valid() && "Proxy registry is not valid.");
+	if (!query.is_valid()) ERR_FAIL_V_MSG(TypedArray<ORC_ProxyData>(), ERR_SPB_INVALID_QUERY);
 	
 	return proxy_registry->get_by_query_internal(query);
 }
 
 Ref<ORC_DataQuery> ORC_SceneProxyBase::create_query_gd(const Ref<GDScript>& script, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
-	if (!proxy_registry.is_valid()) return Ref<ORC_DataQuery>();
-	if (!script.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_DataQuery>(), ERR_INVALID_SCRIPT);
+	DEV_ASSERT(proxy_registry.is_valid() && "Proxy registry is not valid.");
+	if (!script.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_DataQuery>(), ERR_SPB_INVALID_SCRIPT);
 	
 	String global_name = script->get_global_name();
-	if (global_name.is_empty()) ERR_FAIL_V_MSG(Ref<ORC_DataQuery>(), ERR_GDSCRIPT_NO_GLOBAL_NAME);
+	if (global_name.is_empty()) ERR_FAIL_V_MSG(Ref<ORC_DataQuery>(), ERR_SPB_GDSCRIPT_NO_GLOBAL_NAME);
 	
 	return proxy_registry->create_query_internal(TypeKey(script), flag_names, flag_values);
 }
 
 Ref<ORC_DataQuery> ORC_SceneProxyBase::create_query_cpp(const StringName& class_name, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values) {
-	if (!proxy_registry.is_valid()) return Ref<ORC_DataQuery>();
+	DEV_ASSERT(proxy_registry.is_valid() && "Proxy registry is not valid.");
 
 	std::type_index type_id = ORC_ProxyRegistry::get_cpp_type_index(class_name);
-	if (type_id == typeid(void)) {
-		return Ref<ORC_DataQuery>();
-	}
+	if (type_id == typeid(void)) ERR_FAIL_V_MSG(Ref<ORC_DataQuery>(), ERR_SPB_CPP_TYPE_NOT_FOUND);
 	
 	return proxy_registry->create_query_internal(TypeKey(type_id), flag_names, flag_values);
 }
 
 void ORC_SceneProxyBase::create_queue(const StringName& queue_name, const Ref<ORC_DataQuery>& init_query, const TypedArray<ORC_QueueProcessor>& processors) {
-	if (proxy_queues.find(queue_name) != proxy_queues.end()) ERR_FAIL_MSG(vformat(ERR_QUEUE_ALREADY_EXISTS, String(queue_name)));
+	if (proxy_queues.find(queue_name) != proxy_queues.end()) ERR_FAIL_MSG(vformat(ERR_SPB_QUEUE_ALREADY_EXISTS, String(queue_name)));
 	
 	ORC_ProxyQueue* queue = new ORC_ProxyQueue(this, init_query);
 	
@@ -157,10 +155,10 @@ void ORC_SceneProxyBase::create_queue(const StringName& queue_name, const Ref<OR
 
 TypedArray<ORC_ProxyData> ORC_SceneProxyBase::fetch_queue_data(const StringName& queue_name) const {
 	auto it = proxy_queues.find(queue_name);
-	if (it == proxy_queues.end()) ERR_FAIL_V_MSG(TypedArray<ORC_ProxyData>(), vformat(ERR_QUEUE_NOT_FOUND, String(queue_name)));
+	if (it == proxy_queues.end()) ERR_FAIL_V_MSG(TypedArray<ORC_ProxyData>(), vformat(ERR_SPB_QUEUE_NOT_FOUND, String(queue_name)));
 	
 	ORC_ProxyQueue* queue = it->second;
-	if (queue == nullptr) ERR_FAIL_V_MSG(TypedArray<ORC_ProxyData>(), vformat(ERR_QUEUE_INVALID, String(queue_name)));
+	if (queue == nullptr) ERR_FAIL_V_MSG(TypedArray<ORC_ProxyData>(), vformat(ERR_SPB_QUEUE_INVALID, String(queue_name)));
 	
 	return queue->get_cached_data();
 }
