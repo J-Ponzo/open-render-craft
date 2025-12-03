@@ -81,58 +81,44 @@ bool ORC_ProxyFactory::free_data_impl(const Ref<ORC_ProxyData>& data, const Ref<
     return false;
 }
 
-// TODO : unify better with template versions
-Ref<ORC_PrimaryData> ORC_ProxyFactory::create_and_register_primary_gd(const Ref<GDScript>& script, const Ref<ORC_ProxyRegistry>& registry, int64_t unique_id) {
-    Ref<ORC_PrimaryData> ref;
+Ref<ORC_ProxyData> ORC_ProxyFactory::create_and_register_data_gd(const Ref<GDScript>& script, const Ref<ORC_ProxyRegistry>& registry, int64_t unique_id, bool is_primary) {
+    DEV_ASSERT(registry.is_valid() && "Registry is not valid.");
 
+    Ref<ORC_ProxyData> ref;
     if (unique_id != -1) ref = registry->get_by_unique_id(unique_id);
     if (ref.is_valid()) {
         registry->increment_refcount(unique_id);
         return ref;
     }
 
-    if (!script.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_PrimaryData>(), ERR_SCRIPT_INVALID);
+    if (!script.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_ProxyData>(), ERR_SCRIPT_INVALID);
     
     Variant v = script->new_();
     Object *obj = Object::cast_to<Object>(v);
-    if (!obj) ERR_FAIL_V_MSG(Ref<ORC_PrimaryData>(), ERR_SCRIPT_INSTANTIATION_FAILED);
+    if (!obj) ERR_FAIL_V_MSG(Ref<ORC_ProxyData>(), ERR_SCRIPT_INSTANTIATION_FAILED);
     
-    ORC_PrimaryData *pdata = Object::cast_to<ORC_PrimaryData>(obj);
-    if (!pdata) ERR_FAIL_V_MSG(Ref<ORC_PrimaryData>(), ERR_NOT_PRIMARY_DATA);
-    
-    ref = Ref<ORC_PrimaryData>(pdata);
-    ref->type_key = TypeKey(script);
-    if (registry.is_valid()) {
-        if (!registry->register_data(ref, unique_id)) WARN_PRINT(ERR_REGISTER_FAILED);
+    if (is_primary) {
+        ORC_ProxyData *pdata = Object::cast_to<ORC_PrimaryData>(obj);
+        if (!pdata) ERR_FAIL_V_MSG(Ref<ORC_ProxyData>(), ERR_NOT_PRIMARY_DATA);
+        ref = Ref<ORC_PrimaryData>(pdata);
+    } else {
+        ORC_ProxyData *pdata = Object::cast_to<ORC_SecondaryData>(obj);
+        if (!pdata) ERR_FAIL_V_MSG(Ref<ORC_ProxyData>(), ERR_NOT_SECONDARY_DATA);
+        ref = Ref<ORC_SecondaryData>(pdata);
     }
+
+    ref->type_key = TypeKey(script);
+    registry->register_data(ref, unique_id);
 
     return ref;
 }
 
-// TODO : unify better with template versions
-Ref<ORC_SecondaryData> ORC_ProxyFactory::create_and_register_secondary_gd(const Ref<GDScript>& script, const Ref<ORC_ProxyRegistry>& registry, const Ref<ORC_PrimaryData>& primary_data, int64_t unique_id) {
-    Ref<ORC_SecondaryData> ref;
+Ref<ORC_PrimaryData> ORC_ProxyFactory::create_and_register_primary_gd(const Ref<GDScript>& script, const Ref<ORC_ProxyRegistry>& registry, int64_t unique_id) {
+    return create_and_register_data_gd(script, registry, unique_id, true);
+}
 
-    if (unique_id != -1) ref = registry->get_by_unique_id(unique_id);
-    if (ref.is_valid()) {
-        registry->increment_refcount(unique_id);
-    }
-    else {  
-        if (!script.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_SecondaryData>(), ERR_SCRIPT_INVALID);
-        
-        Variant v = script->new_();
-        Object *obj = Object::cast_to<Object>(v);
-        if (!obj) ERR_FAIL_V_MSG(Ref<ORC_SecondaryData>(), ERR_SCRIPT_INSTANTIATION_FAILED);
-        
-        ORC_SecondaryData *sdata = Object::cast_to<ORC_SecondaryData>(obj);
-        if (!sdata) ERR_FAIL_V_MSG(Ref<ORC_SecondaryData>(), ERR_NOT_SECONDARY_DATA);
-        
-        ref = Ref<ORC_SecondaryData>(sdata);
-        ref->type_key = TypeKey(script);
-        if (registry.is_valid()) {
-            if (!registry->register_data(ref, unique_id)) WARN_PRINT(ERR_REGISTER_FAILED);
-        }
-    }
+Ref<ORC_SecondaryData> ORC_ProxyFactory::create_and_register_secondary_gd(const Ref<GDScript>& script, const Ref<ORC_ProxyRegistry>& registry, const Ref<ORC_PrimaryData>& primary_data, int64_t unique_id) {
+    Ref<ORC_SecondaryData> ref = create_and_register_data_gd(script, registry, unique_id, false);
 
     primary_data->secondary_data_array.append(ref);
     ref->primary_data_array.append(primary_data);
