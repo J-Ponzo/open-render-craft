@@ -22,6 +22,7 @@ public:
     Ref<ORC_RendererBase> get_renderer() const { return renderer; }
     void set_renderer(const Ref<ORC_RendererBase>& renderer) { this->renderer = renderer; }
 
+    // Use unordered_map instead
     Dictionary explicits_pso;
     Dictionary get_explicits_pso() const { return explicits_pso; }
     void set_explicits_pso(const Dictionary& explicits_pso) { this->explicits_pso = explicits_pso; }

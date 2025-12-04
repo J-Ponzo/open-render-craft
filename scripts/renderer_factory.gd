@@ -8,11 +8,11 @@ static func create_renderer(renderer_def : ORC_Renderer_Def) -> ORC_RendererBase
 	scn_proxy_inst.renderer = renderer_inst
 	scn_proxy_inst.proxy_factory = proxy_factory_inst
 	
-	for key : StringName in renderer_def.attachment_format_defs.keys():
-		create_attachment(renderer_inst, key, renderer_def.attachment_format_defs[key])
+	for attach_format_def in renderer_def.attachment_format_defs:
+		create_attachment(renderer_inst, attach_format_def)
 
-	for key : StringName in renderer_def.renderer_pass_defs.keys():
-		create_render_pass(renderer_inst, key, renderer_def)
+	for render_pass_def in renderer_def.renderer_pass_defs:
+		create_render_pass(renderer_inst, render_pass_def, renderer_def)
 	
 	for queue_def in renderer_def.proxy_queue_defs:
 		create_proxy_queue(scn_proxy_inst, queue_def)
@@ -40,9 +40,9 @@ static func create_query_from_def(scene_proxy : ORC_SceneProxyBase, query_def : 
 		return scene_proxy.create_query_cpp(cpp_impl_def.cpp_class_name, query_def.flag_names, query_def.flag_values)
 	return null
 
-static func create_attachment(renderer_inst : ORC_RendererBase, attach_key : StringName, attach_format_def : ORC_AttachmentFormat_Def) -> RID:
+static func create_attachment(renderer_inst : ORC_RendererBase, attach_format_def : ORC_AttachmentFormat_Def) -> RID:
 	var attachment : RID = create_texture_attachment(attach_format_def)
-	renderer_inst.attachments[attach_key] = attachment
+	renderer_inst.create_attachment(attach_format_def.attachment_name, attachment)
 	return attachment
 
 static func create_texture_attachment(attach_format_def : ORC_AttachmentFormat_Def) -> RID:
@@ -64,20 +64,19 @@ static func create_texture_attachment(attach_format_def : ORC_AttachmentFormat_D
 
 	return ORC_RDHelper.get_rd().texture_create(tf, view)
 
-static func create_render_pass(renderer_inst : ORC_RendererBase, render_pass_key : StringName, renderer_def : ORC_Renderer_Def) -> ORC_RenderPassBase:
-	var render_pass_def = renderer_def.renderer_pass_defs[render_pass_key]
+static func create_render_pass(renderer_inst : ORC_RendererBase, render_pass_def : ORC_RenderPassDef, renderer_def : ORC_Renderer_Def) -> ORC_RenderPassBase:
 	var render_pass_inst = ORC_ImplFactory.create_impl(render_pass_def.pass_impl) as ORC_RenderPassBase
 	if render_pass_inst == null:
 		return null
 		
 	render_pass_inst.renderer = renderer_inst
-	renderer_inst.render_passes[render_pass_key] = render_pass_inst
+	renderer_inst.create_render_pass(render_pass_def.pass_name, render_pass_inst)
 
 	render_pass_inst.framebuffer_format = create_framebuffer_format_from_def(render_pass_def.fb_format_def, renderer_def.attachment_format_defs)
 
 	var named_attachments : Array[RID]
 	for name in render_pass_def.fb_format_def.get_all_attachment_keys():
-		named_attachments.append(renderer_inst.attachments[name])
+		named_attachments.append(renderer_inst.get_attachment(name))
 	render_pass_inst.framebuffer = ORC_RDHelper.get_rd().framebuffer_create(named_attachments, render_pass_inst.framebuffer_format)
 
 	for key : StringName in render_pass_def.explicite_pso_defs.keys():
@@ -85,14 +84,17 @@ static func create_render_pass(renderer_inst : ORC_RendererBase, render_pass_key
 
 	return render_pass_inst
 
-static func create_framebuffer_format_from_def(fb_format_def : ORC_FramebufferFormat_Def, attachment_format_defs : Dictionary[StringName, ORC_AttachmentFormat_Def]) -> int:
+static func create_framebuffer_format_from_def(fb_format_def : ORC_FramebufferFormat_Def, attachment_format_defs : Array[ORC_AttachmentFormat_Def]) -> int:
 	var attachment_formats : Array[RDAttachmentFormat]
+	var attachments_by_name : Dictionary = {}
+	for attach_def in attachment_format_defs:
+		attachments_by_name[attach_def.attachment_name] = attach_def
 
 	for attach_key : StringName in fb_format_def.get_all_attachment_keys():
 		var attachment_format : RDAttachmentFormat = RDAttachmentFormat.new()
-		attachment_format.format = attachment_format_defs[attach_key].format
+		attachment_format.format = attachments_by_name[attach_key].format
 		attachment_format.usage_flags = 0
-		for bit in attachment_format_defs[attach_key].usage_flags:
+		for bit in attachments_by_name[attach_key].usage_flags:
 			attachment_format.usage_flags |= bit
 		attachment_formats.append(attachment_format)
 
