@@ -179,7 +179,7 @@ uint64_t ORC_ProxyRegistry::get_or_create_flag_mask(const StringName& flag_name)
 }
 
 bool ORC_ProxyRegistry::set_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name, bool value) {
-    if (!proxy_data) ERR_FAIL_V_MSG(false, ERR_PR_NULL_PROXY_DATA);
+    DEV_ASSERT(proxy_data != nullptr && "Cannot set flag on null proxy_data.");
     
     uint64_t flag_mask = get_or_create_flag_mask(flag_name);
     
@@ -195,6 +195,20 @@ bool ORC_ProxyRegistry::set_flag_internal(ORC_ProxyData* proxy_data, const Strin
     update_query_cache_for_data(proxy_ref, old_flags, new_flags);
     
     return true;
+}
+
+bool ORC_ProxyRegistry::has_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name) {
+    DEV_ASSERT(proxy_data != nullptr && "Cannot check flag on null proxy_data.");
+    
+    auto mask_it = flag_name_to_mask.find(flag_name);
+    if (mask_it == flag_name_to_mask.end()) return false;
+    
+    uint64_t flag_mask = mask_it->second;
+    
+    auto flags_it = data_flags.find(proxy_data);
+    if (flags_it == data_flags.end()) return false;
+    
+    return (flags_it->second & flag_mask) != 0;
 }
 
 TypedArray<ORC_ProxyData> ORC_ProxyRegistry::get_by_query_internal(const Ref<ORC_DataQuery>& query) {

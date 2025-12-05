@@ -64,6 +64,7 @@ protected:
 
 public:
     bool set_flag(const StringName& flag_name, bool value);
+    bool has_flag(const StringName& flag_name);
     const TypeKey& get_type_key() const { return type_key; }
 
 };

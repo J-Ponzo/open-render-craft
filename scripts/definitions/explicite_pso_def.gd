@@ -1,5 +1,5 @@
 extends ORC_PSODef
-class_name ORC_ExpicitPSODef
+class_name ORC_ExpicitPSODef    # TODO : rename ORC_ActualPSODef ?
 
 @export var vertex_format_def : ORC_VertexFormatDef
 @export var cull_mode : RenderingDevice.PolygonCullMode
