@@ -7,6 +7,7 @@ using namespace godot;
 
 static const char* ERR_INVALID_PROXY_DATA = "[ORC] Invalid proxy_data reference";
 static const char* ERR_CREATE_PSO_NOT_IMPLEMENTED = "[ORC] ORC_PSOFactory::create_pso_from_data_impl() not implemented";
+static const char* ERR_PSO_CREATION_FAILED = "[ORC] Failed to create PSO from proxy_data";
 
 ORC_PSOFactory::ORC_PSOFactory() {
 }
@@ -35,20 +36,26 @@ Ref<ORC_PSO> ORC_PSOFactory::get_or_create_pso_from_data(const Ref<ORC_ProxyData
     
     auto it = mask_lookup.find(instance_id);
     if (it == mask_lookup.end()) {
-        Ref<ORC_PSO> pso = create_pso_from_data(proxy_data);
-        if (pso.is_valid()) {
-            int64_t mask = instance_id;
-            mask_lookup[instance_id] = mask;
-            pso_lookup[mask] = pso;
-        }
+        TypedArray<StringName> flags = proxy_data->get_flags();
+        
+        ORC_ShaderPreprocessor* preprocessor = ORC_ShaderPreprocessor::get_singleton();
+        String vertex_src = preprocessor->preprocess(String(), uber_vertex_shader_src, flags);
+        String fragment_src = preprocessor->preprocess(String(), uber_fragment_shader_src, flags);
+        
+        Ref<ORC_PSO> pso = create_pso_from_data(proxy_data, vertex_src, fragment_src);
+        if (!pso.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_PSO>(), ERR_PSO_CREATION_FAILED);
+        
+        int64_t mask = instance_id;
+        mask_lookup[instance_id] = mask;
+        pso_lookup[mask] = pso;
     }
     
     int64_t mask = mask_lookup[instance_id];
     return pso_lookup[mask];
 }
 
-DEFINE_GD_OVERRIDABLE_METHOD_1_ARGS(ORC_PSOFactory, Ref<ORC_PSO>, create_pso_from_data, const Ref<ORC_ProxyData>&, proxy_data)
-Ref<ORC_PSO> ORC_PSOFactory::create_pso_from_data_impl(const Ref<ORC_ProxyData>& proxy_data) {
+DEFINE_GD_OVERRIDABLE_METHOD_3_ARGS(ORC_PSOFactory, Ref<ORC_PSO>, create_pso_from_data, const Ref<ORC_ProxyData>&, proxy_data, const String&, vertex_src, const String&, fragment_src)
+Ref<ORC_PSO> ORC_PSOFactory::create_pso_from_data_impl(const Ref<ORC_ProxyData>& proxy_data, const String& vertex_src, const String& fragment_src) {
     ERR_FAIL_V_MSG(Ref<ORC_PSO>(), ERR_CREATE_PSO_NOT_IMPLEMENTED);
 }
 

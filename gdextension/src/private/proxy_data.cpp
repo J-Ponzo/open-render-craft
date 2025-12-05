@@ -9,6 +9,7 @@ using namespace godot;
 void ORC_ProxyData::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_flag", "flag_name", "value"), &ORC_ProxyData::set_flag);
     ClassDB::bind_method(D_METHOD("has_flag", "flag_name"), &ORC_ProxyData::has_flag);
+    ClassDB::bind_method(D_METHOD("get_flags"), &ORC_ProxyData::get_flags);
 }
 
 bool ORC_ProxyData::set_flag(const StringName& flag_name, bool value) {
@@ -19,4 +20,9 @@ bool ORC_ProxyData::set_flag(const StringName& flag_name, bool value) {
 bool ORC_ProxyData::has_flag(const StringName& flag_name) {
     DEV_ASSERT(registry != nullptr && "No registry associated with this ProxyData.");
     return registry->has_flag_internal(this, flag_name);
+}
+
+TypedArray<StringName> ORC_ProxyData::get_flags() const {
+    DEV_ASSERT(registry != nullptr && "No registry associated with this ProxyData.");
+    return registry->get_flags_internal(const_cast<ORC_ProxyData*>(this));
 }

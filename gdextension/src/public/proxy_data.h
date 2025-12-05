@@ -10,6 +10,7 @@
 #include <godot_cpp/classes/gd_script.hpp>
 #include <godot_cpp/variant/string_name.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
+#include <godot_cpp/variant/typed_array.hpp>
 #include "macros.h"
 
 namespace godot {
@@ -65,6 +66,7 @@ protected:
 public:
     bool set_flag(const StringName& flag_name, bool value);
     bool has_flag(const StringName& flag_name);
+    TypedArray<StringName> get_flags() const;
     const TypeKey& get_type_key() const { return type_key; }
 
 };

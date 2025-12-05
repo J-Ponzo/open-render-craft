@@ -7,6 +7,7 @@
 #include <pso.h>
 #include <proxy_data.h>
 #include <rd_helper.h>
+#include <shader_preprocessor.h>
 
 namespace godot {
 
@@ -34,7 +35,7 @@ public:
     void set_uber_fragment_shader_src(const String& src) { uber_fragment_shader_src = src; }
 
     Ref<ORC_PSO> get_or_create_pso_from_data(const Ref<ORC_ProxyData>& proxy_data);
-    DECLARE_GD_OVERRIDABLE_METHOD(Ref<ORC_PSO>, create_pso_from_data, const Ref<ORC_ProxyData>&)
+    DECLARE_GD_OVERRIDABLE_METHOD(Ref<ORC_PSO>, create_pso_from_data, const Ref<ORC_ProxyData>&, const String&, const String&)
     void cleanup();
 };
 

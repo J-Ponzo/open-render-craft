@@ -64,6 +64,8 @@ public:
     bool decrement_refcount(int64_t unique_id);
     void clear();
     Ref<ORC_ProxyRegistryDump> dump_registry() const;
+    
+    TypedArray<StringName> get_flags_internal(ORC_ProxyData* proxy_data) const;
 };
 
 }
