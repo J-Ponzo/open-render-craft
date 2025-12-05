@@ -37,10 +37,10 @@ bool ORC_ProxyRegistry::register_data(const Ref<ORC_ProxyData>& proxy_data, int6
     proxy_data->registry = this;
 
     if (unique_id != -1) {
-        id_registry[unique_id] = std::make_tuple(proxy_data, 1);
+        id_lookup[unique_id] = std::make_tuple(proxy_data, 1);
     }
 
-    all_data.push_back(proxy_data);
+    data_pool.push_back(proxy_data);
 
     uint64_t flags = 0;
     auto flags_it = data_flags.find(proxy_data);
@@ -68,32 +68,32 @@ bool ORC_ProxyRegistry::unregister_data(const Ref<ORC_ProxyData>& proxy_data) {
     remove_from_query_cache(proxy_data);
     data_flags.erase(proxy_data);
     
-    all_data.erase(std::remove(all_data.begin(), all_data.end(), proxy_data), all_data.end());
+    data_pool.erase(std::remove(data_pool.begin(), data_pool.end(), proxy_data), data_pool.end());
 
     return true;
 }
 
 Ref<ORC_ProxyData> ORC_ProxyRegistry::get_by_unique_id(int64_t unique_id) const {
-    auto it = id_registry.find(unique_id);
-    return (it != id_registry.end()) ? std::get<0>(it->second) : Ref<ORC_ProxyData>();
+    auto it = id_lookup.find(unique_id);
+    return (it != id_lookup.end()) ? std::get<0>(it->second) : Ref<ORC_ProxyData>();
 }
 
 bool ORC_ProxyRegistry::increment_refcount(int64_t unique_id) {
-    auto it = id_registry.find(unique_id);
-    if (it == id_registry.end()) ERR_FAIL_V_MSG(false, ERR_PR_UNIQUE_ID_NOT_FOUND);
+    auto it = id_lookup.find(unique_id);
+    if (it == id_lookup.end()) ERR_FAIL_V_MSG(false, ERR_PR_UNIQUE_ID_NOT_FOUND);
     
     std::get<1>(it->second)++;
     return true;
 }
 
 bool ORC_ProxyRegistry::decrement_refcount(int64_t unique_id) {
-    auto it = id_registry.find(unique_id);
-    if (it == id_registry.end()) ERR_FAIL_V_MSG(false, ERR_PR_UNIQUE_ID_NOT_FOUND);
+    auto it = id_lookup.find(unique_id);
+    if (it == id_lookup.end()) ERR_FAIL_V_MSG(false, ERR_PR_UNIQUE_ID_NOT_FOUND);
     
     std::get<1>(it->second)--;
     if (std::get<1>(it->second) == 0) {
         unregister_data(std::get<0>(it->second));
-        id_registry.erase(it);
+        id_lookup.erase(it);
     }
     return true;
 }
@@ -144,7 +144,7 @@ bool ORC_ProxyRegistry::add_query_to_cache(const Ref<ORC_DataQuery>& query) {
     
     std::vector<Ref<ORC_ProxyData>> matching_data;
     
-    for (const auto& proxy_data : all_data) {
+    for (const auto& proxy_data : data_pool) {
         if (!proxy_data.is_valid()) continue;
         
         uint64_t flags = 0;
@@ -163,16 +163,16 @@ bool ORC_ProxyRegistry::add_query_to_cache(const Ref<ORC_DataQuery>& query) {
 }
 
 uint64_t ORC_ProxyRegistry::get_or_create_flag_mask(const StringName& flag_name) {
-    auto it = flag_name_to_mask.find(flag_name);
+    auto it = flag_mask_lookup.find(flag_name);
     
-    if (it != flag_name_to_mask.end()) {
+    if (it != flag_mask_lookup.end()) {
         return it->second;
     }
     
     if (next_available_bit >= 64) ERR_FAIL_V_MSG(0, vformat(ERR_PR_MAX_FLAGS_REACHED, String(flag_name)));
     
     uint64_t flag_mask = 1ULL << next_available_bit;
-    flag_name_to_mask[flag_name] = flag_mask;
+    flag_mask_lookup[flag_name] = flag_mask;
     next_available_bit++;
     
     return flag_mask;
@@ -200,8 +200,8 @@ bool ORC_ProxyRegistry::set_flag_internal(ORC_ProxyData* proxy_data, const Strin
 bool ORC_ProxyRegistry::has_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name) {
     DEV_ASSERT(proxy_data != nullptr && "Cannot check flag on null proxy_data.");
     
-    auto mask_it = flag_name_to_mask.find(flag_name);
-    if (mask_it == flag_name_to_mask.end()) return false;
+    auto mask_it = flag_mask_lookup.find(flag_name);
+    if (mask_it == flag_mask_lookup.end()) return false;
     
     uint64_t flag_mask = mask_it->second;
     
@@ -267,11 +267,11 @@ Ref<ORC_DataQuery> ORC_ProxyRegistry::create_query_internal(const TypeKey& type_
 }
 
 void ORC_ProxyRegistry::clear() {
-	id_registry.clear();
-	all_data.clear();
+	id_lookup.clear();
+	data_pool.clear();
 	data_flags.clear();
 	query_cache.clear();
-	flag_name_to_mask.clear();
+	flag_mask_lookup.clear();
 	next_available_bit = 0;
 }
 
@@ -279,9 +279,9 @@ Ref<ORC_ProxyRegistryDump> ORC_ProxyRegistry::dump_registry() const {
     Ref<ORC_ProxyRegistryDump> dump;
     dump.instantiate();
     
-    dump->id_registry = id_registry;
-    dump->all_data = all_data;
-    dump->flag_name_to_mask = flag_name_to_mask;
+    dump->id_lookup = id_lookup;
+    dump->data_pool = data_pool;
+    dump->flag_mask_lookup = flag_mask_lookup;
     dump->next_available_bit = next_available_bit;
     dump->data_flags = data_flags;
     dump->query_cache = query_cache;

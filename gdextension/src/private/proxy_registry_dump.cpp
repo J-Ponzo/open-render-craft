@@ -97,10 +97,10 @@ String ORC_ProxyRegistryDump::to_string() const {
     };
     
     output += "\n--- Flag Names ---\n";
-    output += "Total flags: " + String::num_int64(flag_name_to_mask.size()) + "\n";
+    output += "Total flags: " + String::num_int64(flag_mask_lookup.size()) + "\n";
     
     std::unordered_map<uint8_t, StringName> bit_to_flag;
-    for (const auto& pair : flag_name_to_mask) {
+    for (const auto& pair : flag_mask_lookup) {
         uint64_t mask = pair.second;
         for (uint8_t bit = 0; bit < 64; bit++) {
             if (mask == (1ULL << bit)) {
@@ -161,8 +161,8 @@ String ORC_ProxyRegistryDump::to_string() const {
     }
     
     output += "\n--- ID Registry ---\n";
-    output += "Total unique IDs: " + String::num_int64(id_registry.size()) + "\n";
-    for (const auto& pair : id_registry) {
+    output += "Total unique IDs: " + String::num_int64(id_lookup.size()) + "\n";
+    for (const auto& pair : id_lookup) {
         output += "  ID: " + String::num_int64(pair.first) + 
                  " -> refcount: " + String::num_int64(std::get<1>(pair.second));
         const auto& data = std::get<0>(pair.second);
