@@ -14,6 +14,10 @@ void ORC_RenderPassBase::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_direct_psos", "direct_psos"), &ORC_RenderPassBase::set_direct_psos);
     ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "direct_psos"), "set_direct_psos", "get_direct_psos");
 
+    ClassDB::bind_method(D_METHOD("get_pso_factories"), &ORC_RenderPassBase::get_pso_factories);
+    ClassDB::bind_method(D_METHOD("set_pso_factories", "pso_factories"), &ORC_RenderPassBase::set_pso_factories);
+    ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "pso_factories"), "set_pso_factories", "get_pso_factories");
+
     ClassDB::bind_method(D_METHOD("get_framebuffer_format"), &ORC_RenderPassBase::get_framebuffer_format);
     ClassDB::bind_method(D_METHOD("set_framebuffer_format", "framebuffer_format"), &ORC_RenderPassBase::set_framebuffer_format);
     ADD_PROPERTY(PropertyInfo(Variant::INT, "framebuffer_format"), "set_framebuffer_format", "get_framebuffer_format");

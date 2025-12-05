@@ -15,12 +15,20 @@ ORC_PSOFactory::~ORC_PSOFactory() {
 }
 
 void ORC_PSOFactory::_bind_methods() {
+    ClassDB::bind_method(D_METHOD("get_uber_vertex_shader_src"), &ORC_PSOFactory::get_uber_vertex_shader_src);
+    ClassDB::bind_method(D_METHOD("set_uber_vertex_shader_src", "src"), &ORC_PSOFactory::set_uber_vertex_shader_src);
+    ADD_PROPERTY(PropertyInfo(Variant::STRING, "uber_vertex_shader_src"), "set_uber_vertex_shader_src", "get_uber_vertex_shader_src");
+
+    ClassDB::bind_method(D_METHOD("get_uber_fragment_shader_src"), &ORC_PSOFactory::get_uber_fragment_shader_src);
+    ClassDB::bind_method(D_METHOD("set_uber_fragment_shader_src", "src"), &ORC_PSOFactory::set_uber_fragment_shader_src);
+    ADD_PROPERTY(PropertyInfo(Variant::STRING, "uber_fragment_shader_src"), "set_uber_fragment_shader_src", "get_uber_fragment_shader_src");
+
     ClassDB::bind_method(D_METHOD("cleanup"), &ORC_PSOFactory::cleanup);
-    ClassDB::bind_method(D_METHOD("get_or_create_pso_from_object", "proxy_data"), &ORC_PSOFactory::get_or_create_pso_from_object);
+    ClassDB::bind_method(D_METHOD("get_or_create_pso_from_data", "proxy_data"), &ORC_PSOFactory::get_or_create_pso_from_data);
     BIND_GD_OVERRIDABLE_METHOD(ORC_PSOFactory, create_pso_from_data)
 }
 
-Ref<ORC_PSO> ORC_PSOFactory::get_or_create_pso_from_object(const Ref<ORC_ProxyData>& proxy_data) {
+Ref<ORC_PSO> ORC_PSOFactory::get_or_create_pso_from_data(const Ref<ORC_ProxyData>& proxy_data) {
     if (!proxy_data.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_PSO>(), ERR_INVALID_PROXY_DATA);
     
     uint64_t instance_id = proxy_data->get_instance_id();
