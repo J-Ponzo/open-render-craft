@@ -79,8 +79,8 @@ static func create_render_pass(renderer_inst : ORC_RendererBase, render_pass_def
 		named_attachments.append(renderer_inst.get_attachment(name))
 	render_pass_inst.framebuffer = ORC_RDHelper.get_rd().framebuffer_create(named_attachments, render_pass_inst.framebuffer_format)
 
-	for key : StringName in render_pass_def.explicite_pso_defs.keys():
-		render_pass_inst.explicits_pso[key] = create_pso(render_pass_def.explicite_pso_defs[key], render_pass_inst.framebuffer_format)
+	for key : StringName in render_pass_def.direct_pso_defs.keys():
+		render_pass_inst.direct_psos[key] = create_pso(render_pass_def.direct_pso_defs[key], render_pass_inst.framebuffer_format)
 
 	return render_pass_inst
 
@@ -100,7 +100,7 @@ static func create_framebuffer_format_from_def(fb_format_def : ORC_FramebufferFo
 
 	return ORC_RDHelper.get_rd().framebuffer_format_create(attachment_formats)
 
-static func create_pso(pso_def : ORC_ExpicitPSODef, framebuffer_format : int) -> ORC_PSO:
+static func create_pso(pso_def : ORC_DirectPSODef, framebuffer_format : int) -> ORC_PSO:
 	var instance = ORC_PSO.new()
 
 	var path : String = pso_def.vertex_shader_path

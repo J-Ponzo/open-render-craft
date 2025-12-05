@@ -23,9 +23,9 @@ public:
     void set_renderer(const Ref<ORC_RendererBase>& renderer) { this->renderer = renderer; }
 
     // Use unordered_map instead
-    Dictionary explicits_pso;
-    Dictionary get_explicits_pso() const { return explicits_pso; }
-    void set_explicits_pso(const Dictionary& explicits_pso) { this->explicits_pso = explicits_pso; }
+    Dictionary direct_psos;
+    Dictionary get_direct_psos() const { return direct_psos; }
+    void set_direct_psos(const Dictionary& direct_psos) { this->direct_psos = direct_psos; }
 
     int64_t framebuffer_format = -1;
     int64_t get_framebuffer_format() const { return framebuffer_format; }

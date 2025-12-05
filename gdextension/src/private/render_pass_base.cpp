@@ -10,9 +10,9 @@ void ORC_RenderPassBase::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_renderer", "renderer"), &ORC_RenderPassBase::set_renderer);
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "renderer", PROPERTY_HINT_RESOURCE_TYPE, "ORC_RendererBase"), "set_renderer", "get_renderer");
 
-    ClassDB::bind_method(D_METHOD("get_explicits_pso"), &ORC_RenderPassBase::get_explicits_pso);
-    ClassDB::bind_method(D_METHOD("set_explicits_pso", "explicits_pso"), &ORC_RenderPassBase::set_explicits_pso);
-    ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "explicits_pso"), "set_explicits_pso", "get_explicits_pso");
+    ClassDB::bind_method(D_METHOD("get_direct_psos"), &ORC_RenderPassBase::get_direct_psos);
+    ClassDB::bind_method(D_METHOD("set_direct_psos", "direct_psos"), &ORC_RenderPassBase::set_direct_psos);
+    ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "direct_psos"), "set_direct_psos", "get_direct_psos");
 
     ClassDB::bind_method(D_METHOD("get_framebuffer_format"), &ORC_RenderPassBase::get_framebuffer_format);
     ClassDB::bind_method(D_METHOD("set_framebuffer_format", "framebuffer_format"), &ORC_RenderPassBase::set_framebuffer_format);
