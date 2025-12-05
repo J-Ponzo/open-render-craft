@@ -53,6 +53,7 @@ public:
     bool get_has_weights() const;
 };
 
+// TODO : singleton ?
 class ORC_RDHelper : public RefCounted {
     GDCLASS(ORC_RDHelper, RefCounted)
 
