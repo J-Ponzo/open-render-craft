@@ -43,8 +43,6 @@
 
 using namespace godot;
 
-static ORC_ShaderPreprocessor* shader_preprocessor_singleton = nullptr;
-
 void initialize_orc_module(ModuleInitializationLevel p_level) {
 	if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
 		return;
@@ -67,9 +65,6 @@ void initialize_orc_module(ModuleInitializationLevel p_level) {
 	GDREGISTER_RUNTIME_CLASS(ORC_VertexFormatInfo);
 	GDREGISTER_RUNTIME_CLASS(ORC_RDHelper);
 	GDREGISTER_RUNTIME_CLASS(ORC_ShaderPreprocessor);
-
-	shader_preprocessor_singleton = memnew(ORC_ShaderPreprocessor);
-	Engine::get_singleton()->register_singleton("ORC_ShaderPreprocessor", shader_preprocessor_singleton);
 
 #ifdef DEBUG_ENABLED
     UtilityFunctions::print("Registering test classes (DEBUG build)");
@@ -98,10 +93,6 @@ void uninitialize_orc_module(ModuleInitializationLevel p_level) {
 	if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
 		return;
 	}
-
-	Engine::get_singleton()->unregister_singleton("ORC_ShaderPreprocessor");
-	memdelete(shader_preprocessor_singleton);
-	shader_preprocessor_singleton = nullptr;
 
 	ORC_ImplRegistry::get_singleton().uninitialize_all(p_level);
 }

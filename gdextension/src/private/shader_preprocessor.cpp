@@ -8,23 +8,18 @@
 
 using namespace godot;
 
-ORC_ShaderPreprocessor* ORC_ShaderPreprocessor::singleton = nullptr;
 bool ORC_ShaderPreprocessor::use_filenames_in_line_directives = true;
 bool ORC_ShaderPreprocessor::is_debug = true;
 
 ORC_ShaderPreprocessor::ORC_ShaderPreprocessor() {
-    singleton = this;
 }
 
 ORC_ShaderPreprocessor::~ORC_ShaderPreprocessor() {
-    if (singleton == this) {
-        singleton = nullptr;
-    }
 }
 
 void ORC_ShaderPreprocessor::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("preprocess", "path", "raw_source", "defines"), &ORC_ShaderPreprocessor::preprocess);
-    ClassDB::bind_method(D_METHOD("generate_dummy_shader_for_partial_source", "partial_source_path", "raw_partial_source"), &ORC_ShaderPreprocessor::generate_dummy_shader_for_partial_source);
+    ClassDB::bind_static_method("ORC_ShaderPreprocessor", D_METHOD("preprocess", "path", "raw_source", "defines"), &ORC_ShaderPreprocessor::preprocess);
+    ClassDB::bind_static_method("ORC_ShaderPreprocessor", D_METHOD("generate_dummy_shader_for_partial_source", "partial_source_path", "raw_partial_source"), &ORC_ShaderPreprocessor::generate_dummy_shader_for_partial_source);
 }
 
 String ORC_ShaderPreprocessor::_inject_defines(const String& raw_source, const TypedArray<StringName>& defines) {

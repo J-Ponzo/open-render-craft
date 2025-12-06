@@ -38,9 +38,8 @@ Ref<ORC_PSO> ORC_PSOFactory::get_or_create_pso_from_data(const Ref<ORC_ProxyData
     if (it == mask_lookup.end()) {
         TypedArray<StringName> flags = proxy_data->get_flags();
         
-        ORC_ShaderPreprocessor* preprocessor = ORC_ShaderPreprocessor::get_singleton();
-        String vertex_src = preprocessor->preprocess(String(), uber_vertex_shader_src, flags);
-        String fragment_src = preprocessor->preprocess(String(), uber_fragment_shader_src, flags);
+        String vertex_src = ORC_ShaderPreprocessor::preprocess(String(), uber_vertex_shader_src, flags);
+        String fragment_src = ORC_ShaderPreprocessor::preprocess(String(), uber_fragment_shader_src, flags);
         
         Ref<ORC_PSO> pso = create_pso_from_data(proxy_data, vertex_src, fragment_src);
         if (!pso.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_PSO>(), ERR_PSO_CREATION_FAILED);

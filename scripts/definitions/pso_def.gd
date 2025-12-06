@@ -1,6 +1,7 @@
 extends Resource
 class_name ORC_PSODef
 
+# TODO extract from here ?
 enum ERenderMode {
 	Opaque,
 	Transparent_Mix,
