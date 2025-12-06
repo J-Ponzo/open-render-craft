@@ -85,6 +85,7 @@ bool ORC_VertexFormatInfo::get_has_weights() const { return has_weights; }
 void ORC_RDHelper::_bind_methods() {
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("get_rd"), &ORC_RDHelper::get_rd);
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("create_vertex_format", "vertex_format_def"), &ORC_RDHelper::create_vertex_format);
+    ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("proj_to_bytes", "proj"), &ORC_RDHelper::proj_to_bytes);
 }
 
 ORC_RDHelper::ORC_RDHelper() {
@@ -209,4 +210,25 @@ int64_t ORC_RDHelper::create_vertex_format(const Ref<ORC_VertexFormatInfo>& vf_i
     }
 
     return rd->vertex_format_create(attrs);
+}
+
+PackedByteArray ORC_RDHelper::proj_to_bytes(const Projection& proj) {
+    const int SIZEOF_MAT4 = 64;
+    PackedByteArray byte_array;
+    byte_array.resize(SIZEOF_MAT4);
+    
+    int offset = 0;
+    for (int i = 0; i < 4; i++) {
+        Vector4 column = proj.columns[i];
+        byte_array.encode_float(offset, column.x);
+        offset += 4;
+        byte_array.encode_float(offset, column.y);
+        offset += 4;
+        byte_array.encode_float(offset, column.z);
+        offset += 4;
+        byte_array.encode_float(offset, column.w);
+        offset += 4;
+    }
+    
+    return byte_array;
 }
