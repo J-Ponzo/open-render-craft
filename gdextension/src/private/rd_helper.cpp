@@ -213,22 +213,10 @@ int64_t ORC_RDHelper::create_vertex_format(const Ref<ORC_VertexFormatInfo>& vf_i
 }
 
 PackedByteArray ORC_RDHelper::proj_to_bytes(const Projection& proj) {
-    const int SIZEOF_MAT4 = 64;
     PackedByteArray byte_array;
-    byte_array.resize(SIZEOF_MAT4);
+    byte_array.resize(sizeof(Projection));
     
-    int offset = 0;
-    for (int i = 0; i < 4; i++) {
-        Vector4 column = proj.columns[i];
-        byte_array.encode_float(offset, column.x);
-        offset += 4;
-        byte_array.encode_float(offset, column.y);
-        offset += 4;
-        byte_array.encode_float(offset, column.z);
-        offset += 4;
-        byte_array.encode_float(offset, column.w);
-        offset += 4;
-    }
+    memcpy(byte_array.ptrw(), proj.columns, sizeof(Projection));
     
     return byte_array;
 }
