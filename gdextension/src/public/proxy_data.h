@@ -59,7 +59,7 @@ private:
     // TODO : use Ref<> ?
     ORC_ProxyRegistry* registry = nullptr;
     TypeKey type_key = TypeKey(std::type_index(typeid(void)));
-    bool shared = false;
+    bool shared = false;    // TODO Test this
 
 protected:
     static void _bind_methods();
