@@ -59,6 +59,7 @@ private:
     // TODO : use Ref<> ?
     ORC_ProxyRegistry* registry = nullptr;
     TypeKey type_key = TypeKey(std::type_index(typeid(void)));
+    bool shared = false;
 
 protected:
     static void _bind_methods();
@@ -68,6 +69,7 @@ public:
     bool has_flag(const StringName& flag_name);
     TypedArray<StringName> get_flags() const;
     const TypeKey& get_type_key() const { return type_key; }
+    bool is_shared() const { return shared; }
 
 };
 

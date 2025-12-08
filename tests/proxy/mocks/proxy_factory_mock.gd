@@ -57,8 +57,9 @@ func create_data_from_override(node : Node, registry : ORC_ProxyRegistry) -> ORC
 		primary_data = create_and_register_primary(ORCTEST_MeshData, registry)
 		primary_data.set_flag("IS_PRIMARY", true)
 		var topology_data = create_and_register_secondary(ORCTEST_TopologyData, registry, primary_data, node.mesh.get_rid().get_id())
-		topology_data.set_flag("IS_PRIMARY", false)
-		topology_data.mesh = node.mesh
+		if !topology_data.is_shared():
+			topology_data.set_flag("IS_PRIMARY", false)
+			topology_data.mesh = node.mesh
 		primary_data.topologyData = topology_data
 		
 	return primary_data;

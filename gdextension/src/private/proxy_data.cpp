@@ -10,6 +10,7 @@ void ORC_ProxyData::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_flag", "flag_name", "value"), &ORC_ProxyData::set_flag);
     ClassDB::bind_method(D_METHOD("has_flag", "flag_name"), &ORC_ProxyData::has_flag);
     ClassDB::bind_method(D_METHOD("get_flags"), &ORC_ProxyData::get_flags);
+    ClassDB::bind_method(D_METHOD("is_shared"), &ORC_ProxyData::is_shared);
 }
 
 bool ORC_ProxyData::set_flag(const StringName& flag_name, bool value) {

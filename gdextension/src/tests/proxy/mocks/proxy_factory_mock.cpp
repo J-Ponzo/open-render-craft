@@ -71,8 +71,10 @@ Ref<ORC_PrimaryData> ORCTEST_ProxyFactory_CPPMock::create_data_from_impl(Node* n
 		int64_t mesh_id = mesh.is_valid() ? mesh->get_rid().get_id() : -1;
 		
 		Ref<ORCTEST_TopologyData_CPP> topology_data = ORC_ProxyFactory::create_and_register_secondary<ORCTEST_TopologyData_CPP>(registry, mesh_data, mesh_id);
-		topology_data->set_flag("IS_PRIMARY", false);
-		topology_data->set_mesh(mesh);
+		if (!topology_data->is_shared()) {
+			topology_data->set_flag("IS_PRIMARY", false);
+			topology_data->set_mesh(mesh);
+		}
 		mesh_data->set_topology_data(topology_data);
 		
 		primary_data = mesh_data;
