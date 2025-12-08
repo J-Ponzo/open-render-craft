@@ -86,6 +86,7 @@ void ORC_RDHelper::_bind_methods() {
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("get_rd"), &ORC_RDHelper::get_rd);
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("create_vertex_format", "vertex_format_def"), &ORC_RDHelper::create_vertex_format);
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("proj_to_bytes", "proj"), &ORC_RDHelper::proj_to_bytes);
+    ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("create_sampler_state", "mag_filter", "min_filter", "repeat_u", "repeat_v"), &ORC_RDHelper::create_sampler_state, DEFVAL(RenderingDevice::SAMPLER_FILTER_LINEAR), DEFVAL(RenderingDevice::SAMPLER_FILTER_LINEAR), DEFVAL(RenderingDevice::SAMPLER_REPEAT_MODE_REPEAT), DEFVAL(RenderingDevice::SAMPLER_REPEAT_MODE_REPEAT));
 }
 
 ORC_RDHelper::ORC_RDHelper() {
@@ -219,4 +220,19 @@ PackedByteArray ORC_RDHelper::proj_to_bytes(const Projection& proj) {
     memcpy(byte_array.ptrw(), proj.columns, sizeof(Projection));
     
     return byte_array;
+}
+
+Ref<RDSamplerState> ORC_RDHelper::create_sampler_state(
+    RenderingDevice::SamplerFilter mag_filter,
+    RenderingDevice::SamplerFilter min_filter,
+    RenderingDevice::SamplerRepeatMode repeat_u,
+    RenderingDevice::SamplerRepeatMode repeat_v
+) {
+    Ref<RDSamplerState> sampler_state;
+    sampler_state.instantiate();
+    sampler_state->set_mag_filter(mag_filter);
+    sampler_state->set_min_filter(min_filter);
+    sampler_state->set_repeat_u(repeat_u);
+    sampler_state->set_repeat_v(repeat_v);
+    return sampler_state;
 }
