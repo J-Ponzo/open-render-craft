@@ -241,5 +241,5 @@ static func create_vertex_format_info(vertex_format_def : ORC_VertexFormatDef) -
 
 
 static func create_vertex_format(vertex_format_def : ORC_VertexFormatDef) -> int:
-	var vertex_format_info = create_vertex_format_info(vertex_format_def)
+	var vertex_format_info : ORC_VertexFormatInfo = create_vertex_format_info(vertex_format_def)
 	return ORC_RDHelper.create_vertex_format(vertex_format_info)
