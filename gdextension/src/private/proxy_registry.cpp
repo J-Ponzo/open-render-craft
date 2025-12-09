@@ -83,6 +83,7 @@ bool ORC_ProxyRegistry::increment_refcount(int64_t unique_id) {
     if (it == id_lookup.end()) ERR_FAIL_V_MSG(false, ERR_PR_UNIQUE_ID_NOT_FOUND);
     
     std::get<1>(it->second)++;
+    std::get<0>(it->second)->shared = true;
     return true;
 }
 
@@ -90,9 +91,13 @@ bool ORC_ProxyRegistry::decrement_refcount(int64_t unique_id) {
     auto it = id_lookup.find(unique_id);
     if (it == id_lookup.end()) ERR_FAIL_V_MSG(false, ERR_PR_UNIQUE_ID_NOT_FOUND);
     
-    std::get<1>(it->second)--;
-    if (std::get<1>(it->second) == 0) {
-        unregister_data(std::get<0>(it->second));
+    Ref<ORC_ProxyData>& proxy_data = std::get<0>(it->second);
+    int& refcount = std::get<1>(it->second);
+    refcount--;
+    
+    if (refcount == 1) proxy_data->shared = false;
+    else if (refcount == 0) {
+        unregister_data(proxy_data);
         id_lookup.erase(it);
     }
     return true;

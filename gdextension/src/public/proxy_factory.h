@@ -27,7 +27,6 @@ private:
         if (unique_id != -1) ref = registry->get_by_unique_id(unique_id);
         if (ref.is_valid()) {
             registry->increment_refcount(unique_id);
-            ref->shared = true;
             return ref;
         }
 
