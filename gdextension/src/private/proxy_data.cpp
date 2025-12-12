@@ -12,7 +12,7 @@ void ORC_ProxyData::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_flags"), &ORC_ProxyData::get_flags);
     ClassDB::bind_method(D_METHOD("is_shared"), &ORC_ProxyData::is_shared);
     ClassDB::bind_method(D_METHOD("register_flag_sources", "sources"), &ORC_ProxyData::register_flag_sources);
-    ClassDB::bind_method(D_METHOD("unregister_flag_sources"), &ORC_ProxyData::unregister_flag_sources);
+    ClassDB::bind_method(D_METHOD("unregister_flag_sources", "sources"), &ORC_ProxyData::unregister_flag_sources);
 }
 
 bool ORC_ProxyData::set_flag(const StringName& flag_name, bool value) {
@@ -35,7 +35,7 @@ void ORC_ProxyData::register_flag_sources(const TypedArray<ORC_ProxyData>& sourc
     registry->register_flag_sources_internal(this, sources);
 }
 
-void ORC_ProxyData::unregister_flag_sources() {
+void ORC_ProxyData::unregister_flag_sources(const TypedArray<ORC_ProxyData>& sources) {
     DEV_ASSERT(registry != nullptr && "No registry associated with this ProxyData.");
-    registry->unregister_flag_sources_internal(this);
+    registry->unregister_flag_sources_internal(this, sources);
 }

@@ -50,7 +50,7 @@ private:
     bool set_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name, bool value);
     bool has_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name);
     void register_flag_sources_internal(ORC_ProxyData* proxy_data, const TypedArray<ORC_ProxyData>& sources);
-    void unregister_flag_sources_internal(ORC_ProxyData* proxy_data);
+    void unregister_flag_sources_internal(ORC_ProxyData* proxy_data, const TypedArray<ORC_ProxyData>& sources);
     TypedArray<ORC_ProxyData> get_by_query_internal(const Ref<ORC_DataQuery>& query);
     Ref<ORC_DataQuery> create_query_internal(const TypeKey& type_key, const TypedArray<StringName>& flag_names = TypedArray<StringName>(), const TypedArray<bool>& flag_values = TypedArray<bool>());
 

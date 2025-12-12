@@ -1,3 +1,4 @@
+static const char* ERR_PR_UNREGISTER_FLAG_SOURCES_EMPTY = "[ORC] unregister_flag_sources_internal called with empty sources: explicit sources required";
 #include <proxy_registry.h>
 
 #include <godot_cpp/core/class_db.hpp>
@@ -15,6 +16,7 @@ static const char* ERR_PR_INVALID_QUERY = "[ORC] Query is not valid.";
 static const char* ERR_PR_FLAG_ARRAY_SIZE_MISMATCH = "[ORC] flag_names and flag_values arrays must have the same size.";
 static const char* ERR_PR_UNIQUE_ID_NOT_FOUND = "[ORC] Unique ID not found in registry.";
 static const char* ERR_PR_QUERY_ALREADY_CACHED = "[ORC] Query is already in cache.";
+static const char* ERR_PR_UNREGISTER_FLAG_SOURCES_PROXY_NOT_FOUND = "[ORC] unregister_flag_sources_internal: proxy_ref not found in cascade_sources";
 
 std::unordered_map<StringName, std::type_index>& ORC_ProxyRegistry::cpp_types() {
     static std::unordered_map<StringName, std::type_index> registry;
@@ -244,24 +246,31 @@ void ORC_ProxyRegistry::register_flag_sources_internal(ORC_ProxyData* proxy_data
     cascade_sources[proxy_ref] = sources_vec;
 }
 
-void ORC_ProxyRegistry::unregister_flag_sources_internal(ORC_ProxyData* proxy_data) {
+void ORC_ProxyRegistry::unregister_flag_sources_internal(ORC_ProxyData* proxy_data, const TypedArray<ORC_ProxyData>& sources) {
     DEV_ASSERT(proxy_data != nullptr && "Cannot unregister flag sources on null proxy_data.");
-    
+    if (sources.is_empty()) ERR_FAIL_MSG(ERR_PR_UNREGISTER_FLAG_SOURCES_EMPTY);
+
     Ref<ORC_ProxyData> proxy_ref;
     proxy_ref.reference_ptr(proxy_data);
-    
     auto sources_it = cascade_sources.find(proxy_ref);
-    if (sources_it == cascade_sources.end()) return;
-    
-    for (const auto& source : sources_it->second) {
+    if (sources_it == cascade_sources.end()) ERR_FAIL_MSG(ERR_PR_UNREGISTER_FLAG_SOURCES_PROXY_NOT_FOUND);
+
+    auto& current_sources = sources_it->second;
+    for (int i = 0; i < sources.size(); i++) {
+        Ref<ORC_ProxyData> source = sources[i];
+        DEV_ASSERT(source.is_valid() && "unregister_flag_sources_internal: invalid source in sources array");
+        if (!source.is_valid()) continue;
+
         auto targets_it = cascade_targets.find(source);
         if (targets_it != cascade_targets.end()) {
             auto& targets = targets_it->second;
             targets.erase(std::remove(targets.begin(), targets.end(), proxy_ref), targets.end());
             if (targets.empty()) cascade_targets.erase(targets_it);
         }
+
+        current_sources.erase(std::remove(current_sources.begin(), current_sources.end(), source), current_sources.end());
     }
-    cascade_sources.erase(sources_it);
+    if (current_sources.empty()) cascade_sources.erase(sources_it);
 }
 
 void ORC_ProxyRegistry::unregister_cascade_relations(const Ref<ORC_ProxyData>& proxy_data) {

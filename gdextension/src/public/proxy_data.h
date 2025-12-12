@@ -69,7 +69,7 @@ public:
     bool has_flag(const StringName& flag_name);
     TypedArray<StringName> get_flags() const;
     void register_flag_sources(const TypedArray<ORC_ProxyData>& sources);
-    void unregister_flag_sources();
+    void unregister_flag_sources(const TypedArray<ORC_ProxyData>& sources);
     const TypeKey& get_type_key() const { return type_key; }
     bool is_shared() const { return shared; }
 
