@@ -27,6 +27,8 @@ public:
     uint8_t next_available_bit;
     std::unordered_map<Ref<ORC_ProxyData>, uint64_t, ProxyDataHash> data_flags;
     std::unordered_map<Ref<ORC_DataQuery>, std::vector<Ref<ORC_ProxyData>>, DataQueryHash> query_cache;
+    std::unordered_map<Ref<ORC_ProxyData>, std::vector<Ref<ORC_ProxyData>>, ProxyDataHash> cascade_sources;
+    std::unordered_map<Ref<ORC_ProxyData>, std::vector<Ref<ORC_ProxyData>>, ProxyDataHash> cascade_targets;
 
     ORC_ProxyRegistryDump();
     ~ORC_ProxyRegistryDump();

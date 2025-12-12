@@ -34,16 +34,23 @@ private:
     uint8_t next_available_bit = 0;
     std::unordered_map<Ref<ORC_ProxyData>, uint64_t, ProxyDataHash> data_flags;
     std::unordered_map<Ref<ORC_DataQuery>, std::vector<Ref<ORC_ProxyData>>, DataQueryHash> query_cache;
+    std::unordered_map<Ref<ORC_ProxyData>, std::vector<Ref<ORC_ProxyData>>, ProxyDataHash> cascade_sources;
+    std::unordered_map<Ref<ORC_ProxyData>, std::vector<Ref<ORC_ProxyData>>, ProxyDataHash> cascade_targets;
     
     uint64_t get_or_create_flag_mask(const StringName& flag_name);
+    void propagate_flag_to_targets(ORC_ProxyData* proxy_data, const StringName& flag_name, bool value);
+    void unregister_cascade_relations(const Ref<ORC_ProxyData>& proxy_data);
     bool matches_query(const Ref<ORC_ProxyData>& proxy_data, uint64_t flags, const Ref<ORC_DataQuery>& query) const;
     bool update_query_cache_for_data(const Ref<ORC_ProxyData>& proxy_data, uint64_t old_flags, uint64_t new_flags);
     bool remove_from_query_cache(const Ref<ORC_ProxyData>& proxy_data);
     bool add_query_to_cache(const Ref<ORC_DataQuery>& query);
     bool fill_query_features(const Ref<ORC_DataQuery>& query, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
 
+    // TODO : test flags better
     bool set_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name, bool value);
     bool has_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name);
+    void register_flag_sources_internal(ORC_ProxyData* proxy_data, const TypedArray<ORC_ProxyData>& sources);
+    void unregister_flag_sources_internal(ORC_ProxyData* proxy_data);
     TypedArray<ORC_ProxyData> get_by_query_internal(const Ref<ORC_DataQuery>& query);
     Ref<ORC_DataQuery> create_query_internal(const TypeKey& type_key, const TypedArray<StringName>& flag_names = TypedArray<StringName>(), const TypedArray<bool>& flag_values = TypedArray<bool>());
 

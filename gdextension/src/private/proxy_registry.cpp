@@ -65,6 +65,7 @@ bool ORC_ProxyRegistry::unregister_data(const Ref<ORC_ProxyData>& proxy_data) {
 
     proxy_data->registry = nullptr;
 
+    unregister_cascade_relations(proxy_data);
     remove_from_query_cache(proxy_data);
     data_flags.erase(proxy_data);
     
@@ -199,7 +200,96 @@ bool ORC_ProxyRegistry::set_flag_internal(ORC_ProxyData* proxy_data, const Strin
     proxy_ref.reference_ptr(proxy_data);
     update_query_cache_for_data(proxy_ref, old_flags, new_flags);
     
+    propagate_flag_to_targets(proxy_data, flag_name, value);
+    
     return true;
+}
+
+void ORC_ProxyRegistry::propagate_flag_to_targets(ORC_ProxyData* proxy_data, const StringName& flag_name, bool value) {
+    Ref<ORC_ProxyData> proxy_ref;
+    proxy_ref.reference_ptr(proxy_data);
+    
+    auto it = cascade_targets.find(proxy_ref);
+    if (it == cascade_targets.end()) return;
+    
+    for (const auto& target : it->second) {
+        set_flag_internal(target.ptr(), flag_name, value);
+    }
+}
+
+void ORC_ProxyRegistry::register_flag_sources_internal(ORC_ProxyData* proxy_data, const TypedArray<ORC_ProxyData>& sources) {
+    DEV_ASSERT(proxy_data != nullptr && "Cannot register flag sources on null proxy_data.");
+    
+    Ref<ORC_ProxyData> proxy_ref;
+    proxy_ref.reference_ptr(proxy_data);
+    
+    std::vector<Ref<ORC_ProxyData>> sources_vec;
+    sources_vec.reserve(sources.size());
+    
+    for (int i = 0; i < sources.size(); i++) {
+        Ref<ORC_ProxyData> source = sources[i];
+        if (!source.is_valid()) continue;
+        
+        sources_vec.push_back(source);
+        cascade_targets[source].push_back(proxy_ref);
+        
+        uint64_t source_flags = data_flags[source];
+        for (const auto& pair : flag_mask_lookup) {
+            if ((source_flags & pair.second) != 0) {
+                set_flag_internal(proxy_data, pair.first, true);
+            }
+        }
+    }
+    
+    cascade_sources[proxy_ref] = sources_vec;
+}
+
+void ORC_ProxyRegistry::unregister_flag_sources_internal(ORC_ProxyData* proxy_data) {
+    DEV_ASSERT(proxy_data != nullptr && "Cannot unregister flag sources on null proxy_data.");
+    
+    Ref<ORC_ProxyData> proxy_ref;
+    proxy_ref.reference_ptr(proxy_data);
+    
+    auto sources_it = cascade_sources.find(proxy_ref);
+    if (sources_it == cascade_sources.end()) return;
+    
+    for (const auto& source : sources_it->second) {
+        auto targets_it = cascade_targets.find(source);
+        if (targets_it != cascade_targets.end()) {
+            auto& targets = targets_it->second;
+            targets.erase(std::remove(targets.begin(), targets.end(), proxy_ref), targets.end());
+            if (targets.empty()) cascade_targets.erase(targets_it);
+        }
+    }
+    cascade_sources.erase(sources_it);
+}
+
+void ORC_ProxyRegistry::unregister_cascade_relations(const Ref<ORC_ProxyData>& proxy_data) {
+    auto sources_it = cascade_sources.find(proxy_data);
+    if (sources_it != cascade_sources.end()) {
+        for (const auto& source : sources_it->second) {
+            auto targets_it = cascade_targets.find(source);
+            if (targets_it != cascade_targets.end()) {
+                auto& targets = targets_it->second;
+                targets.erase(std::remove(targets.begin(), targets.end(), proxy_data), targets.end());
+                if (targets.empty()) cascade_targets.erase(targets_it);
+            }
+        }
+        cascade_sources.erase(sources_it);
+    }
+    
+    auto targets_it = cascade_targets.find(proxy_data);
+    if (targets_it != cascade_targets.end()) {
+        for (const auto& target : targets_it->second) {
+            auto sources_it2 = cascade_sources.find(target);
+            if (sources_it2 != cascade_sources.end()) {
+                auto& sources = sources_it2->second;
+                sources.erase(std::remove(sources.begin(), sources.end(), proxy_data), sources.end());
+                if (sources.empty()) cascade_sources.erase(sources_it2);
+            }
+        }
+        cascade_targets.erase(targets_it);
+    }
 }
 
 bool ORC_ProxyRegistry::has_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name) {
@@ -277,6 +367,8 @@ void ORC_ProxyRegistry::clear() {
 	data_flags.clear();
 	query_cache.clear();
 	flag_mask_lookup.clear();
+	cascade_sources.clear();
+	cascade_targets.clear();
 	next_available_bit = 0;
 }
 
@@ -290,6 +382,8 @@ Ref<ORC_ProxyRegistryDump> ORC_ProxyRegistry::dump_registry() const {
     dump->next_available_bit = next_available_bit;
     dump->data_flags = data_flags;
     dump->query_cache = query_cache;
+    dump->cascade_sources = cascade_sources;
+    dump->cascade_targets = cascade_targets;
     
     return dump;
 }

@@ -174,6 +174,32 @@ String ORC_ProxyRegistryDump::to_string() const {
         output += "\n";
     }
     
+    output += "\n--- Cascade Sources ---\n";
+    output += "Total entries: " + String::num_int64(cascade_sources.size()) + "\n";
+    for (const auto& pair : cascade_sources) {
+        const Ref<ORC_ProxyData>& target = pair.first;
+        const std::vector<Ref<ORC_ProxyData>>& sources = pair.second;
+        output += "  " + get_type_and_address(target) + " <- [";
+        for (size_t i = 0; i < sources.size(); i++) {
+            if (i > 0) output += ", ";
+            output += get_type_and_address(sources[i]);
+        }
+        output += "]\n";
+    }
+    
+    output += "\n--- Cascade Targets ---\n";
+    output += "Total entries: " + String::num_int64(cascade_targets.size()) + "\n";
+    for (const auto& pair : cascade_targets) {
+        const Ref<ORC_ProxyData>& source = pair.first;
+        const std::vector<Ref<ORC_ProxyData>>& targets = pair.second;
+        output += "  " + get_type_and_address(source) + " -> [";
+        for (size_t i = 0; i < targets.size(); i++) {
+            if (i > 0) output += ", ";
+            output += get_type_and_address(targets[i]);
+        }
+        output += "]\n";
+    }
+    
     output += "\n=========================\n";
     return output;
 }
