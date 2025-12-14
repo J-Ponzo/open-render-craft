@@ -39,6 +39,7 @@
 #include "../tests/proxy/mocks/spot_light_proxy.h"
 #include "../tests/proxy/mocks/directional_light_proxy.h"
 #include "../tests/proxy/mocks/proxy_factory_mock.h"
+#include "../tests/test_utils.h"
 #endif
 
 using namespace godot;
@@ -69,6 +70,7 @@ void initialize_orc_module(ModuleInitializationLevel p_level) {
 #ifdef DEBUG_ENABLED
     UtilityFunctions::print("Registering test classes (DEBUG build)");
 	GDREGISTER_RUNTIME_CLASS(ORCTEST_GDOverridableMacro_Mock);
+    GDREGISTER_RUNTIME_CLASS(ORC_TestUtils);
     
     ORC_REGISTER_PROXY_DATA_TYPE(ORCTEST_CameraData_CPP);
     ORC_REGISTER_PROXY_DATA_TYPE(ORCTEST_MeshData_CPP);

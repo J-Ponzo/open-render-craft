@@ -18,11 +18,12 @@ var root_vp_rid : RID
 var scene : Node
 
 func _is_running_test() -> bool:
-	return FileAccess.file_exists("res://.gdunit_is_running_test")
+	return ORC_TestUtils.is_running_test() # TODO protect in SHIPPING build
 
 var was_running_test_on_enter_tree: bool = false
 
 func _enter_tree() -> void:
+	
 	was_running_test_on_enter_tree = _is_running_test()
 	if was_running_test_on_enter_tree:
 		return
