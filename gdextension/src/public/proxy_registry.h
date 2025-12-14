@@ -4,6 +4,7 @@
 #include <typeindex>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
 #include <variant>
 
@@ -40,6 +41,9 @@ private:
     uint64_t get_or_create_flag_mask(const StringName& flag_name);
     void propagate_flag_to_targets(ORC_ProxyData* proxy_data, const StringName& flag_name, bool value);
     void unregister_cascade_relations(const Ref<ORC_ProxyData>& proxy_data);
+#ifdef DEBUG_ENABLED
+    void collect_types_in_cascade_graph(const Ref<ORC_ProxyData>& start, std::unordered_set<TypeKey, TypeKeyHash>& types, std::unordered_map<TypeKey, Ref<ORC_ProxyData>, TypeKeyHash>& type_to_instance) const;
+#endif
     bool matches_query(const Ref<ORC_ProxyData>& proxy_data, uint64_t flags, const Ref<ORC_DataQuery>& query) const;
     bool update_query_cache_for_data(const Ref<ORC_ProxyData>& proxy_data, uint64_t old_flags, uint64_t new_flags);
     bool remove_from_query_cache(const Ref<ORC_ProxyData>& proxy_data);

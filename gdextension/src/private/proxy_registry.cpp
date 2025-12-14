@@ -224,6 +224,29 @@ void ORC_ProxyRegistry::register_flag_sources_internal(ORC_ProxyData* proxy_data
     
     Ref<ORC_ProxyData> proxy_ref;
     proxy_ref.reference_ptr(proxy_data);
+
+#ifdef DEBUG_ENABLED
+    std::unordered_set<TypeKey, TypeKeyHash> existing_types;
+    std::unordered_map<TypeKey, Ref<ORC_ProxyData>, TypeKeyHash> type_to_instance;
+    collect_types_in_cascade_graph(proxy_ref, existing_types, type_to_instance);
+    
+    for (int i = 0; i < sources.size(); i++) {
+        Ref<ORC_ProxyData> source = sources[i];
+        if (!source.is_valid()) continue;
+        
+        TypeKey source_type = source->get_type_key();
+        
+        if (existing_types.count(source_type) > 0) {
+            Ref<ORC_ProxyData> existing_instance = type_to_instance[source_type];
+            if (existing_instance.ptr() == source.ptr()) continue;
+            
+            if (existing_instance.ptr() != proxy_data) throw std::runtime_error("Type already exists in cascade graph (self-reference detected)");
+            else throw std::runtime_error("Type already exists in cascade graph");
+            // DEV_ASSERT(existing_instance.ptr() != proxy_data && "Type already exists in cascade graph (self-reference detected)");
+            // DEV_ASSERT(false && "Type already exists in cascade graph");
+        }
+    }
+#endif
     
     std::vector<Ref<ORC_ProxyData>> sources_vec;
     sources_vec.reserve(sources.size());
@@ -272,6 +295,47 @@ void ORC_ProxyRegistry::unregister_flag_sources_internal(ORC_ProxyData* proxy_da
     }
     if (current_sources.empty()) cascade_sources.erase(sources_it);
 }
+
+#ifdef DEBUG_ENABLED
+void ORC_ProxyRegistry::collect_types_in_cascade_graph(const Ref<ORC_ProxyData>& start, std::unordered_set<TypeKey, TypeKeyHash>& types, std::unordered_map<TypeKey, Ref<ORC_ProxyData>, TypeKeyHash>& type_to_instance) const {
+    std::vector<Ref<ORC_ProxyData>> to_visit;
+    std::unordered_set<const ORC_ProxyData*, std::hash<const ORC_ProxyData*>> visited;
+    
+    to_visit.push_back(start);
+    
+    while (!to_visit.empty()) {
+        Ref<ORC_ProxyData> current = to_visit.back();
+        to_visit.pop_back();
+        
+        if (!current.is_valid()) continue;
+        if (visited.count(current.ptr()) > 0) continue;
+        
+        visited.insert(current.ptr());
+        
+        TypeKey current_type = current->get_type_key();
+        types.insert(current_type);
+        type_to_instance[current_type] = current;
+        
+        auto sources_it = cascade_sources.find(current);
+        if (sources_it != cascade_sources.end()) {
+            for (const auto& source : sources_it->second) {
+                if (source.is_valid() && visited.count(source.ptr()) == 0) {
+                    to_visit.push_back(source);
+                }
+            }
+        }
+        
+        auto targets_it = cascade_targets.find(current);
+        if (targets_it != cascade_targets.end()) {
+            for (const auto& target : targets_it->second) {
+                if (target.is_valid() && visited.count(target.ptr()) == 0) {
+                    to_visit.push_back(target);
+                }
+            }
+        }
+    }
+}
+#endif
 
 void ORC_ProxyRegistry::unregister_cascade_relations(const Ref<ORC_ProxyData>& proxy_data) {
     auto sources_it = cascade_sources.find(proxy_data);
