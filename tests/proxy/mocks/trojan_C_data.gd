@@ -1,0 +1,2 @@
+extends ORC_PrimaryData
+class_name ORCTEST_Trojan_C_Data

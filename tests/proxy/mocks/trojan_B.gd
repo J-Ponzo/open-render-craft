@@ -1,0 +1,2 @@
+extends ORCTEST_Trojan
+class_name ORCTEST_Trojan_B

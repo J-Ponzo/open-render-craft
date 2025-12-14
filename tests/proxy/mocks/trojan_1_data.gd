@@ -1,0 +1,2 @@
+extends ORC_SecondaryData
+class_name ORCTEST_Trojan_1_Data

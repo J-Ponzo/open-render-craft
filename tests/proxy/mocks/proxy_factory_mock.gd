@@ -61,6 +61,11 @@ func create_data_from_override(node : Node, registry : ORC_ProxyRegistry) -> ORC
 			topology_data.set_flag("IS_PRIMARY", false)
 			topology_data.mesh = node.mesh
 		primary_data.topologyData = topology_data
+		# TODO remove this dev stub
+		# primary_data.register_flag_sources([topology_data, topology_data])
+		# primary_data.register_flag_sources([primary_data, primary_data])
+		# primary_data.register_flag_sources([topology_data])
+		# primary_data.register_flag_sources([primary_data])
 		
 	return primary_data;
 
