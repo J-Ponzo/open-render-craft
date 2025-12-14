@@ -1,4 +1,4 @@
-extends ORCTEST_ScnProxyFeatureFlags
+extends ORCTEST_ScnProxySimpleQueues
 
 func before() -> void:
 	super.common_before()

@@ -1,5 +1,5 @@
 extends GdUnitTestSuite
-class_name ORCTEST_ScnProxyFeatureFlags
+class_name ORCTEST_ScnProxySimpleQueues
 
 var scn_proxy : ORC_SceneProxyBase
 var scn_instance : Node
