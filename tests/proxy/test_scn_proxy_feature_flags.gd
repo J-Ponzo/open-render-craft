@@ -35,7 +35,7 @@ class ORCTEST_MyProxyFactory extends ORC_ProxyFactory:
 			secondary_data = create_and_register_secondary(ORCTEST_Trojan_2_Data, registry, primary_data)
 			secondary_data.set_flag("TROJAN_2_INIT", true)
 		elif node is ORCTEST_Trojan_C:
-			primary_data = create_and_register_primary(ORCTEST_Trojan_A_Data, registry)
+			primary_data = create_and_register_primary(ORCTEST_Trojan_C_Data, registry)
 			primary_data.set_flag("TROJAN_C_INIT", true)
 			secondary_data = create_and_register_secondary(ORCTEST_Trojan_3_Data, registry, primary_data)
 			secondary_data.set_flag("TROJAN_3_INIT", true)
@@ -270,7 +270,7 @@ func test_long_cascade():
 	var trojan_3c_1_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[0] as ORCTEST_Trojan_3_Data
 	var trojan_3c_2_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[1] as ORCTEST_Trojan_3_Data
 	var cumuled_flag_tests : bool = true
-
+	
 	trojan_1b_data.register_flag_sources([trojan_2b_data])
 	trojan_2b_data.register_flag_sources([trojan_b_data])
 	trojan_b_data.register_flag_sources([trojan_c_data])
@@ -303,6 +303,6 @@ func test_long_cascade():
 
 	cumuled_flag_tests = cumuled_flag_tests && trojan_3c_1_data.has_flag("TROJAN_3C_1")
 
-	cumuled_flag_tests = cumuled_flag_tests && trojan_3c_1_data.has_flag("TROJAN_3C_2")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_3c_2_data.has_flag("TROJAN_3C_2")
 
 	assert_bool(cumuled_flag_tests).is_equal(true)
