@@ -306,3 +306,48 @@ func test_long_cascade():
 	cumuled_flag_tests = cumuled_flag_tests && trojan_3c_2_data.has_flag("TROJAN_3C_2")
 
 	assert_bool(cumuled_flag_tests).is_equal(true)
+
+func test_diamond_cascade():
+	var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
+	scn_instance.add_child(trojan_a)
+
+	var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
+	scn_instance.add_child(trojan_b)
+
+	var trojan_a_data : ORCTEST_Trojan_A_Data = trojan_a.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
+	var trojan_1a_data : ORCTEST_Trojan_1_Data = trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+	var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
+	var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+	var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
+	var cumuled_flag_tests : bool = true
+
+	trojan_b_data.register_flag_sources([trojan_1b_data, trojan_2b_data])
+	trojan_1b_data.register_flag_sources([trojan_a_data])
+	trojan_2b_data.register_flag_sources([trojan_a_data])
+
+	trojan_1b_data.register_flag_sources([trojan_2b_data])
+	trojan_a_data.register_flag_sources([trojan_b_data])
+	trojan_1b_data.register_flag_sources([trojan_b_data])
+
+	trojan_a_data.set_flag("TROJAN_A", true)
+	trojan_1a_data.set_flag("TROJAN_1A", true)
+	trojan_b_data.set_flag("TROJAN_B", true)
+	trojan_1b_data.set_flag("TROJAN_1B", true)
+	trojan_2b_data.set_flag("TROJAN_2B", true)
+
+	cumuled_flag_tests = cumuled_flag_tests && trojan_b_data.has_flag("TROJAN_B")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_b_data.has_flag("TROJAN_1B")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_b_data.has_flag("TROJAN_2B")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_b_data.has_flag("TROJAN_A")
+
+	cumuled_flag_tests = cumuled_flag_tests && trojan_1b_data.has_flag("TROJAN_1B")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_1b_data.has_flag("TROJAN_A")
+
+	cumuled_flag_tests = cumuled_flag_tests && trojan_2b_data.has_flag("TROJAN_2B")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_2b_data.has_flag("TROJAN_A")
+
+	cumuled_flag_tests = cumuled_flag_tests && trojan_a_data.has_flag("TROJAN_A")
+
+	cumuled_flag_tests = cumuled_flag_tests && trojan_1a_data.has_flag("TROJAN_1A")
+
+	assert_bool(cumuled_flag_tests).is_equal(true)
