@@ -351,3 +351,33 @@ func test_diamond_cascade():
 	cumuled_flag_tests = cumuled_flag_tests && trojan_1a_data.has_flag("TROJAN_1A")
 
 	assert_bool(cumuled_flag_tests).is_equal(true)
+
+# func test_break_exclusive_flags_rule():
+# 	assert_error(func() :
+# 		var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
+# 		scn_instance.add_child(trojan_a)
+
+# 		var trojan_a_data : ORCTEST_Trojan_A_Data = trojan_a.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
+# 		var trojan_1_data : ORCTEST_Trojan_1_Data = trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+
+# 		trojan_a_data.set_flag("FLAG", true)
+# 		trojan_1_data.set_flag("FLAG", true)
+# 	).is_runtime_error("Bla bla")
+
+func test_break_type_unicity_in_cascade():
+	assert_error(func() :
+		var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
+		scn_instance.add_child(trojan_a)
+
+		var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
+		scn_instance.add_child(trojan_b)
+
+		var trojan_a_data : ORCTEST_Trojan_A_Data = trojan_a.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
+		var trojan_1a_data : ORCTEST_Trojan_1_Data = trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+		var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
+		var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+		var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
+
+		trojan_a_data.register_flag_sources([trojan_1a_data])
+		trojan_a_data.register_flag_sources([trojan_1b_data])
+	).is_runtime_error("Type already exists in cascade graph")
