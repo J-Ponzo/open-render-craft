@@ -140,3 +140,130 @@ func test_unset_flags():
 	cumuled_has_flag = cumuled_has_flag && !trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[0].has_flag("TROJAN_3_INIT")
 	cumuled_has_flag = cumuled_has_flag && !trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[1].has_flag("TROJAN_3_INIT")
 	assert_bool(cumuled_has_flag).is_equal(true)
+
+func test_simple_pre_cascade():
+	var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
+	scn_instance.add_child(trojan_a)
+
+	var trojan_a_data : ORCTEST_Trojan_A_Data = trojan_a.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
+	var trojan_1_data : ORCTEST_Trojan_1_Data = trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+	var cumuled_flag_tests : bool = true
+
+	# Check no flags at start
+	cumuled_flag_tests = cumuled_flag_tests && !trojan_a_data.has_flag("TROJAN_A_TRG")
+	cumuled_flag_tests = cumuled_flag_tests && !trojan_1_data.has_flag("TROJAN_1_SRC")
+
+	# Check cascad pre set flags
+	trojan_a_data.set_flag("TROJAN_A_TRG", true)
+	trojan_1_data.set_flag("TROJAN_1_SRC", true)
+
+	trojan_a_data.register_flag_sources([trojan_1_data])
+
+	cumuled_flag_tests = cumuled_flag_tests && trojan_a_data.has_flag("TROJAN_A_TRG")
+	cumuled_flag_tests = cumuled_flag_tests && !trojan_1_data.has_flag("TROJAN_A_TRG")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_a_data.has_flag("TROJAN_1_SRC")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_1_data.has_flag("TROJAN_1_SRC")
+
+	# Check cascade post unset flags
+	trojan_a_data.set_flag("TROJAN_A_TRG", false)
+	trojan_1_data.set_flag("TROJAN_1_SRC", false)
+
+	cumuled_flag_tests = cumuled_flag_tests && !trojan_a_data.has_flag("TROJAN_A_TRG")
+	cumuled_flag_tests = cumuled_flag_tests && !trojan_1_data.has_flag("TROJAN_A_TRG")
+	cumuled_flag_tests = cumuled_flag_tests && !trojan_a_data.has_flag("TROJAN_1_SRC")
+	cumuled_flag_tests = cumuled_flag_tests && !trojan_1_data.has_flag("TROJAN_1_SRC")
+
+	assert_bool(cumuled_flag_tests).is_equal(true)
+
+func test_simple_post_cascade():
+	var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
+	scn_instance.add_child(trojan_a)
+
+	var trojan_a_data : ORCTEST_Trojan_A_Data = trojan_a.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
+	var trojan_1_data : ORCTEST_Trojan_1_Data = trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+	var cumuled_flag_tests : bool = true
+
+	# Check no flags at start
+	cumuled_flag_tests = cumuled_flag_tests && !trojan_a_data.has_flag("TROJAN_A_TRG")
+	cumuled_flag_tests = cumuled_flag_tests && !trojan_1_data.has_flag("TROJAN_1_SRC")
+
+	# Check cascade post set flags
+	trojan_a_data.register_flag_sources([trojan_1_data])
+
+	trojan_a_data.set_flag("TROJAN_A_TRG", true)
+	trojan_1_data.set_flag("TROJAN_1_SRC", true)
+
+	cumuled_flag_tests = cumuled_flag_tests && trojan_a_data.has_flag("TROJAN_A_TRG")
+	cumuled_flag_tests = cumuled_flag_tests && !trojan_1_data.has_flag("TROJAN_A_TRG")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_a_data.has_flag("TROJAN_1_SRC")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_1_data.has_flag("TROJAN_1_SRC")
+
+	# Check cascade post unset flags
+	trojan_a_data.set_flag("TROJAN_A_TRG", false)
+	trojan_1_data.set_flag("TROJAN_1_SRC", false)
+
+	cumuled_flag_tests = cumuled_flag_tests && !trojan_a_data.has_flag("TROJAN_A_TRG")
+	cumuled_flag_tests = cumuled_flag_tests && !trojan_1_data.has_flag("TROJAN_A_TRG")
+	cumuled_flag_tests = cumuled_flag_tests && !trojan_a_data.has_flag("TROJAN_1_SRC")
+	cumuled_flag_tests = cumuled_flag_tests && !trojan_1_data.has_flag("TROJAN_1_SRC")
+
+	assert_bool(cumuled_flag_tests).is_equal(true)
+
+func test_multi_trg_cascade():
+	var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
+	scn_instance.add_child(trojan_a)
+
+	var trojan_b : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
+	scn_instance.add_child(trojan_b)
+
+	var trojan_a_data : ORCTEST_Trojan_A_Data = trojan_a.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
+	var trojan_1a_data : ORCTEST_Trojan_1_Data = trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+	var trojan_b_data : ORCTEST_Trojan_A_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
+	var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+	var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
+	var cumuled_flag_tests : bool = true
+
+	trojan_a_data.register_flag_sources([trojan_1a_data])
+	trojan_b_data.register_flag_sources([trojan_1b_data])
+	trojan_b_data.register_flag_sources([trojan_2b_data])
+	trojan_1b_data.register_flag_sources([trojan_2b_data])
+
+	trojan_a_data.set_flag("TROJAN_A", true)
+	trojan_1a_data.set_flag("TROJAN_1A", true)
+	trojan_b_data.set_flag("TROJAN_B", true)
+	trojan_1b_data.set_flag("TROJAN_1B", true)
+	trojan_2b_data.set_flag("TROJAN_2B", true)
+
+	cumuled_flag_tests = cumuled_flag_tests && trojan_a_data.has_flag("TROJAN_A")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_a_data.has_flag("TROJAN_1A")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_a_data.has_flag("TROJAN_1B")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_a_data.has_flag("TROJAN_2B")
+
+	cumuled_flag_tests = cumuled_flag_tests && trojan_1a_data.has_flag("TROJAN_1A")
+
+	cumuled_flag_tests = cumuled_flag_tests && trojan_b_data.has_flag("TROJAN_B")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_b_data.has_flag("TROJAN_2B")
+
+	cumuled_flag_tests = cumuled_flag_tests && trojan_1b_data.has_flag("TROJAN_1B")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_1b_data.has_flag("TROJAN_2B")
+
+	cumuled_flag_tests = cumuled_flag_tests && trojan_2b_data.has_flag("TROJAN_2B")
+
+	assert_bool(cumuled_flag_tests).is_equal(true)
+
+# func test_long_cascade():
+# 	var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
+# 	scn_instance.add_child(trojan_b)
+
+# 	var trojan_c : ORCTEST_Trojan_C = ORCTEST_Trojan_C.new()
+# 	scn_instance.add_child(trojan_c)
+	
+# 	var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
+# 	var trojan_1_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+# 	var trojan_2_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
+	
+# 	var trojan_c_data : ORCTEST_Trojan_A_Data = trojan_c.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
+# 	var trojan_3_data_1 : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[0] as ORCTEST_Trojan_3_Data
+# 	var trojan_3_data_2 : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[1] as ORCTEST_Trojan_3_Data
+	
+# 	var cumuled_flag_tests : bool = true
