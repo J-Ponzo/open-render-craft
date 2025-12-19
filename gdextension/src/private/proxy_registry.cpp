@@ -1,3 +1,4 @@
+#include <algorithm>
 static const char* ERR_PR_UNREGISTER_FLAG_SOURCES_EMPTY = "[ORC] unregister_flag_sources_internal called with empty sources: explicit sources required";
 #include <proxy_registry.h>
 
@@ -17,6 +18,9 @@ static const char* ERR_PR_FLAG_ARRAY_SIZE_MISMATCH = "[ORC] flag_names and flag_
 static const char* ERR_PR_UNIQUE_ID_NOT_FOUND = "[ORC] Unique ID not found in registry.";
 static const char* ERR_PR_QUERY_ALREADY_CACHED = "[ORC] Query is already in cache.";
 static const char* ERR_PR_UNREGISTER_FLAG_SOURCES_PROXY_NOT_FOUND = "[ORC] unregister_flag_sources_internal: proxy_ref not found in cascade_sources";
+static const char* ERR_PR_INVALID_FLAG_SRC = "[ORC] register_flag_sources_internal: invalid source in sources array";
+static const char* ERR_PR_FLAG_SRC_ALREADY_REGISTERED = "[ORC] register_flag_sources_internal: source already registered for this proxy data";
+static const char* ERR_PR_DUPLICATE_FLAG_SRC_IN_ARGS = "[ORC] register_flag_sources_internal: duplicate source in sources array";
 
 std::unordered_map<StringName, std::type_index>& ORC_ProxyRegistry::cpp_types() {
     static std::unordered_map<StringName, std::type_index> registry;
@@ -176,7 +180,7 @@ uint64_t ORC_ProxyRegistry::get_or_create_flag_mask(const StringName& flag_name)
     if (it != flag_mask_lookup.end()) {
         return it->second;
     }
-    
+
     if (next_available_bit >= 64) ERR_FAIL_V_MSG(0, vformat(ERR_PR_MAX_FLAGS_REACHED, String(flag_name)));
     
     uint64_t flag_mask = 1ULL << next_available_bit;
@@ -219,45 +223,48 @@ void ORC_ProxyRegistry::propagate_flag_to_targets(ORC_ProxyData* proxy_data, con
     }
 }
 
+// Warning: In Shipping builds, this function does not perform error detection.
 void ORC_ProxyRegistry::register_flag_sources_internal(ORC_ProxyData* proxy_data, const TypedArray<ORC_ProxyData>& sources) {
     DEV_ASSERT(proxy_data != nullptr && "Cannot register flag sources on null proxy_data.");
-    
-    Ref<ORC_ProxyData> proxy_ref;
-    proxy_ref.reference_ptr(proxy_data);
-
 #ifdef DEBUG_ENABLED
-    std::unordered_set<TypeKey, TypeKeyHash> existing_types;
-    std::unordered_map<TypeKey, Ref<ORC_ProxyData>, TypeKeyHash> type_to_instance;
-    collect_types_in_cascade_graph(proxy_ref, existing_types, type_to_instance);
-    
     for (int i = 0; i < sources.size(); i++) {
         Ref<ORC_ProxyData> source = sources[i];
-        if (!source.is_valid()) continue;
-        
-        TypeKey source_type = source->get_type_key();
-        
-        if (existing_types.count(source_type) > 0) {
-            Ref<ORC_ProxyData> existing_instance = type_to_instance[source_type];
-            if (existing_instance.ptr() == source.ptr()) continue;
-            
-            if (existing_instance.ptr() != proxy_data) throw std::runtime_error("Type already exists in cascade graph (self-reference detected)");
-            else throw std::runtime_error("Type already exists in cascade graph");
-            // DEV_ASSERT(existing_instance.ptr() != proxy_data && "Type already exists in cascade graph (self-reference detected)");
-            // DEV_ASSERT(false && "Type already exists in cascade graph");
-        }
+        if (!source.is_valid()) ERR_FAIL_MSG(ERR_PR_INVALID_FLAG_SRC);
+        if (std::find(cascade_sources[proxy_data].begin(), cascade_sources[proxy_data].end(), source) != cascade_sources[proxy_data].end()) ERR_FAIL_MSG(ERR_PR_FLAG_SRC_ALREADY_REGISTERED);
+        if (sources.count(source) > 1) ERR_FAIL_MSG(ERR_PR_DUPLICATE_FLAG_SRC_IN_ARGS);
     }
 #endif
-    
-    std::vector<Ref<ORC_ProxyData>> sources_vec;
-    sources_vec.reserve(sources.size());
+
+    Ref<ORC_ProxyData> proxy_ref;
+    proxy_ref.reference_ptr(proxy_data);
     
     for (int i = 0; i < sources.size(); i++) {
         Ref<ORC_ProxyData> source = sources[i];
-        if (!source.is_valid()) continue;
-        
-        sources_vec.push_back(source);
         cascade_targets[source].push_back(proxy_ref);
-        
+        cascade_sources[proxy_ref].push_back(source);
+    }
+
+#ifdef DEBUG_ENABLED
+    for (int i = 0; i < sources.size(); i++) {
+        Ref<ORC_ProxyData> source = sources[i];
+        std::unordered_set<const ORC_ProxyData*> visited;
+        if (has_cycle_to_target(source, proxy_ref, visited)) {
+            ERR_FAIL_MSG("Inconsistent flag cascade: No cycles rule is broken");
+        }
+    }
+
+    std::vector<Ref<ORC_ProxyData>> graph_instances = gather_cascade_graph_instances(proxy_ref);
+    std::unordered_map<TypeKey, Ref<ORC_ProxyData>, TypeKeyHash> type_to_instance;
+    for (const auto& instance : graph_instances) {
+        TypeKey instance_type = instance->get_type_key();
+        auto it = type_to_instance.find(instance_type);
+        if (it != type_to_instance.end() && it->second.ptr() != instance.ptr()) ERR_FAIL_MSG("Inconsistent flag cascade: Type unicity rule is broken");
+        type_to_instance[instance_type] = instance;
+    }
+#endif
+
+    for (int i = 0; i < sources.size(); i++) {
+        Ref<ORC_ProxyData> source = sources[i];
         uint64_t source_flags = data_flags[source];
         for (const auto& pair : flag_mask_lookup) {
             if ((source_flags & pair.second) != 0) {
@@ -265,8 +272,6 @@ void ORC_ProxyRegistry::register_flag_sources_internal(ORC_ProxyData* proxy_data
             }
         }
     }
-    
-    cascade_sources[proxy_ref] = sources_vec;
 }
 
 void ORC_ProxyRegistry::unregister_flag_sources_internal(ORC_ProxyData* proxy_data, const TypedArray<ORC_ProxyData>& sources) {
@@ -295,47 +300,6 @@ void ORC_ProxyRegistry::unregister_flag_sources_internal(ORC_ProxyData* proxy_da
     }
     if (current_sources.empty()) cascade_sources.erase(sources_it);
 }
-
-#ifdef DEBUG_ENABLED
-void ORC_ProxyRegistry::collect_types_in_cascade_graph(const Ref<ORC_ProxyData>& start, std::unordered_set<TypeKey, TypeKeyHash>& types, std::unordered_map<TypeKey, Ref<ORC_ProxyData>, TypeKeyHash>& type_to_instance) const {
-    std::vector<Ref<ORC_ProxyData>> to_visit;
-    std::unordered_set<const ORC_ProxyData*, std::hash<const ORC_ProxyData*>> visited;
-    
-    to_visit.push_back(start);
-    
-    while (!to_visit.empty()) {
-        Ref<ORC_ProxyData> current = to_visit.back();
-        to_visit.pop_back();
-        
-        if (!current.is_valid()) continue;
-        if (visited.count(current.ptr()) > 0) continue;
-        
-        visited.insert(current.ptr());
-        
-        TypeKey current_type = current->get_type_key();
-        types.insert(current_type);
-        type_to_instance[current_type] = current;
-        
-        auto sources_it = cascade_sources.find(current);
-        if (sources_it != cascade_sources.end()) {
-            for (const auto& source : sources_it->second) {
-                if (source.is_valid() && visited.count(source.ptr()) == 0) {
-                    to_visit.push_back(source);
-                }
-            }
-        }
-        
-        auto targets_it = cascade_targets.find(current);
-        if (targets_it != cascade_targets.end()) {
-            for (const auto& target : targets_it->second) {
-                if (target.is_valid() && visited.count(target.ptr()) == 0) {
-                    to_visit.push_back(target);
-                }
-            }
-        }
-    }
-}
-#endif
 
 void ORC_ProxyRegistry::unregister_cascade_relations(const Ref<ORC_ProxyData>& proxy_data) {
     auto sources_it = cascade_sources.find(proxy_data);
@@ -479,5 +443,65 @@ TypedArray<StringName> ORC_ProxyRegistry::get_flags_internal(ORC_ProxyData* prox
     
     return result;
 }
+
+#ifdef DEBUG_ENABLED
+bool ORC_ProxyRegistry::has_cycle_to_target(const Ref<ORC_ProxyData>& start, const Ref<ORC_ProxyData>& target, std::unordered_set<const ORC_ProxyData*>& visited) const {
+    if (!start.is_valid()) return false;
+    if (start.ptr() == target.ptr()) return true;
+    if (visited.count(start.ptr()) > 0) return false;
+    
+    visited.insert(start.ptr());
+    
+    auto sources_it = cascade_sources.find(start);
+    if (sources_it != cascade_sources.end()) {
+        for (const auto& source : sources_it->second) {
+            if (has_cycle_to_target(source, target, visited)) {
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
+
+std::vector<Ref<ORC_ProxyData>> ORC_ProxyRegistry::gather_cascade_graph_instances(const Ref<ORC_ProxyData>& start) const {
+    std::vector<Ref<ORC_ProxyData>> result;
+    std::vector<Ref<ORC_ProxyData>> to_visit;
+    std::unordered_set<const ORC_ProxyData*> visited;
+    
+    to_visit.push_back(start);
+    
+    while (!to_visit.empty()) {
+        Ref<ORC_ProxyData> current = to_visit.back();
+        to_visit.pop_back();
+        
+        if (!current.is_valid()) continue;
+        if (visited.count(current.ptr()) > 0) continue;
+        
+        visited.insert(current.ptr());
+        result.push_back(current);
+        
+        auto sources_it = cascade_sources.find(current);
+        if (sources_it != cascade_sources.end()) {
+            for (const auto& source : sources_it->second) {
+                if (source.is_valid() && visited.count(source.ptr()) == 0) {
+                    to_visit.push_back(source);
+                }
+            }
+        }
+        
+        auto targets_it = cascade_targets.find(current);
+        if (targets_it != cascade_targets.end()) {
+            for (const auto& target : targets_it->second) {
+                if (target.is_valid() && visited.count(target.ptr()) == 0) {
+                    to_visit.push_back(target);
+                }
+            }
+        }
+    }
+    
+    return result;
+}
+#endif
 
 } // namespace godot

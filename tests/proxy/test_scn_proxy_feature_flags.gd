@@ -352,20 +352,20 @@ func test_diamond_cascade():
 
 	assert_bool(cumuled_flag_tests).is_equal(true)
 
-# func test_break_exclusive_flags_rule():
-# 	assert_error(func() :
-# 		var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
-# 		scn_instance.add_child(trojan_a)
+func test_break_exclusive_flags_rule():
+	await assert_error(func() :
+		var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
+		scn_instance.add_child(trojan_a)
 
-# 		var trojan_a_data : ORCTEST_Trojan_A_Data = trojan_a.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
-# 		var trojan_1_data : ORCTEST_Trojan_1_Data = trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+		var trojan_a_data : ORCTEST_Trojan_A_Data = trojan_a.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
+		var trojan_1_data : ORCTEST_Trojan_1_Data = trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
 
-# 		trojan_a_data.set_flag("FLAG", true)
-# 		trojan_1_data.set_flag("FLAG", true)
-# 	).is_runtime_error("Bla bla")
+		trojan_a_data.set_flag("FLAG", true)
+		trojan_1_data.set_flag("FLAG", true)
+	).is_push_error("Bla bla")
 
-func test_break_type_unicity_in_cascade():
-	assert_error(func() :
+func test_break_type_unicity_in_cascade_sibling():
+	await assert_error(func() :
 		var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
 		scn_instance.add_child(trojan_a)
 
@@ -380,4 +380,108 @@ func test_break_type_unicity_in_cascade():
 
 		trojan_a_data.register_flag_sources([trojan_1a_data])
 		trojan_a_data.register_flag_sources([trojan_1b_data])
-	).is_runtime_error("Type already exists in cascade graph")
+	).is_push_error("Inconsistent flag cascade: Type unicity rule is broken")
+
+func test_break_type_unicity_in_cascade_child():
+	await assert_error(func() :
+		var trojan_c : ORCTEST_Trojan_C = ORCTEST_Trojan_C.new()
+		scn_instance.add_child(trojan_c)
+
+		var trojan_c_data : ORCTEST_Trojan_C_Data = trojan_c.trojan_proxy.get_primary_data() as ORCTEST_Trojan_C_Data
+		var trojan_3c_1_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[0] as ORCTEST_Trojan_3_Data
+		var trojan_3c_2_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[1] as ORCTEST_Trojan_3_Data
+		
+		trojan_3c_1_data.register_flag_sources([trojan_3c_2_data])
+	).is_push_error("Inconsistent flag cascade: Type unicity rule is broken")
+
+func test_break_type_unicity_in_cascade_grand_child():
+	await assert_error(func() :
+		var trojan_c : ORCTEST_Trojan_C = ORCTEST_Trojan_C.new()
+		scn_instance.add_child(trojan_c)
+
+		var trojan_c_data : ORCTEST_Trojan_C_Data = trojan_c.trojan_proxy.get_primary_data() as ORCTEST_Trojan_C_Data
+		var trojan_3c_1_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[0] as ORCTEST_Trojan_3_Data
+		var trojan_3c_2_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[1] as ORCTEST_Trojan_3_Data
+		
+		trojan_3c_1_data.register_flag_sources([trojan_c_data])
+		trojan_c_data.register_flag_sources([trojan_3c_2_data])
+	).is_push_error("Inconsistent flag cascade: Type unicity rule is broken")
+
+func test_break_type_unicity_in_cascade_grand_child_inverted():
+	await assert_error(func() :
+		var trojan_c : ORCTEST_Trojan_C = ORCTEST_Trojan_C.new()
+		scn_instance.add_child(trojan_c)
+
+		var trojan_c_data : ORCTEST_Trojan_C_Data = trojan_c.trojan_proxy.get_primary_data() as ORCTEST_Trojan_C_Data
+		var trojan_3c_1_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[0] as ORCTEST_Trojan_3_Data
+		var trojan_3c_2_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[1] as ORCTEST_Trojan_3_Data
+		
+		trojan_c_data.register_flag_sources([trojan_3c_2_data])
+		trojan_3c_1_data.register_flag_sources([trojan_c_data])
+	).is_push_error("Inconsistent flag cascade: Type unicity rule is broken")
+
+func test_break_no_cycles_in_cascade_1():
+	await assert_error(func() :
+		var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
+		scn_instance.add_child(trojan_b)
+
+		var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
+		var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+		var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
+
+		trojan_b_data.register_flag_sources([trojan_b_data])
+	).is_push_error("Inconsistent flag cascade: No cycles rule is broken")
+
+func test_break_no_cycles_in_cascade_2():
+	await assert_error(func() :
+		var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
+		scn_instance.add_child(trojan_b)
+
+		var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
+		var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+		var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
+
+		trojan_1b_data.register_flag_sources([trojan_b_data])
+		trojan_b_data.register_flag_sources([trojan_1b_data])
+	).is_push_error("Inconsistent flag cascade: No cycles rule is broken")
+
+func test_break_no_cycles_in_cascade_2_invert():
+	await assert_error(func() :
+		var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
+		scn_instance.add_child(trojan_b)
+
+		var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
+		var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+		var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
+
+		trojan_b_data.register_flag_sources([trojan_1b_data])
+		trojan_1b_data.register_flag_sources([trojan_b_data])
+	).is_push_error("Inconsistent flag cascade: No cycles rule is broken")
+
+func test_break_no_cycles_in_cascade_3():
+	await assert_error(func() :
+		var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
+		scn_instance.add_child(trojan_b)
+
+		var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
+		var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+		var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
+
+		trojan_b_data.register_flag_sources([trojan_1b_data])
+		trojan_1b_data.register_flag_sources([trojan_2b_data])
+		trojan_2b_data.register_flag_sources([trojan_b_data])
+	).is_push_error("Inconsistent flag cascade: No cycles rule is broken")
+
+func test_break_no_cycles_in_cascade_3_invert():
+	await assert_error(func() :
+		var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
+		scn_instance.add_child(trojan_b)
+
+		var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
+		var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+		var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
+
+		trojan_2b_data.register_flag_sources([trojan_b_data])
+		trojan_1b_data.register_flag_sources([trojan_2b_data])
+		trojan_b_data.register_flag_sources([trojan_1b_data])
+	).is_push_error("Inconsistent flag cascade: No cycles rule is broken")
