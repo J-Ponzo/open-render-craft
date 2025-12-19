@@ -245,13 +245,8 @@ void ORC_ProxyRegistry::register_flag_sources_internal(ORC_ProxyData* proxy_data
     }
 
 #ifdef DEBUG_ENABLED
-    for (int i = 0; i < sources.size(); i++) {
-        Ref<ORC_ProxyData> source = sources[i];
-        std::unordered_set<const ORC_ProxyData*> visited;
-        if (has_cycle_to_target(source, proxy_ref, visited)) {
-            ERR_FAIL_MSG("Inconsistent flag cascade: No cycles rule is broken");
-        }
-    }
+    std::unordered_set<const ORC_ProxyData*> in_path;
+    if (has_cycle(proxy_ref, in_path)) ERR_FAIL_MSG("Inconsistent flag cascade: No cycles rule is broken");
 
     std::vector<Ref<ORC_ProxyData>> graph_instances = gather_cascade_graph_instances(proxy_ref);
     std::unordered_map<TypeKey, Ref<ORC_ProxyData>, TypeKeyHash> type_to_instance;
@@ -445,22 +440,20 @@ TypedArray<StringName> ORC_ProxyRegistry::get_flags_internal(ORC_ProxyData* prox
 }
 
 #ifdef DEBUG_ENABLED
-bool ORC_ProxyRegistry::has_cycle_to_target(const Ref<ORC_ProxyData>& start, const Ref<ORC_ProxyData>& target, std::unordered_set<const ORC_ProxyData*>& visited) const {
-    if (!start.is_valid()) return false;
-    if (start.ptr() == target.ptr()) return true;
-    if (visited.count(start.ptr()) > 0) return false;
+bool ORC_ProxyRegistry::has_cycle(const Ref<ORC_ProxyData>& node, std::unordered_set<const ORC_ProxyData*>& in_path) const {
+    if (!node.is_valid()) return false;
+    if (in_path.count(node.ptr()) > 0) return true;
     
-    visited.insert(start.ptr());
+    in_path.insert(node.ptr());
     
-    auto sources_it = cascade_sources.find(start);
+    auto sources_it = cascade_sources.find(node);
     if (sources_it != cascade_sources.end()) {
         for (const auto& source : sources_it->second) {
-            if (has_cycle_to_target(source, target, visited)) {
-                return true;
-            }
+            if (has_cycle(source, in_path)) return true;
         }
     }
     
+    in_path.erase(node.ptr());
     return false;
 }
 
