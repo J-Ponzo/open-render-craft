@@ -380,7 +380,7 @@ func test_break_type_unicity_in_cascade_sibling():
 
 		trojan_a_data.register_flag_sources([trojan_1a_data])
 		trojan_a_data.register_flag_sources([trojan_1b_data])
-	).is_push_error("Inconsistent flag cascade: Type unicity rule is broken")
+	).is_push_error("[ORC] Inconsistent flag cascade: Type unicity rule is broken")
 
 func test_break_type_unicity_in_cascade_child():
 	await assert_error(func() :
@@ -392,7 +392,7 @@ func test_break_type_unicity_in_cascade_child():
 		var trojan_3c_2_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[1] as ORCTEST_Trojan_3_Data
 		
 		trojan_3c_1_data.register_flag_sources([trojan_3c_2_data])
-	).is_push_error("Inconsistent flag cascade: Type unicity rule is broken")
+	).is_push_error("[ORC] Inconsistent flag cascade: Type unicity rule is broken")
 
 func test_break_type_unicity_in_cascade_grand_child():
 	await assert_error(func() :
@@ -405,7 +405,7 @@ func test_break_type_unicity_in_cascade_grand_child():
 		
 		trojan_3c_1_data.register_flag_sources([trojan_c_data])
 		trojan_c_data.register_flag_sources([trojan_3c_2_data])
-	).is_push_error("Inconsistent flag cascade: Type unicity rule is broken")
+	).is_push_error("[ORC] Inconsistent flag cascade: Type unicity rule is broken")
 
 func test_break_type_unicity_in_cascade_grand_child_inverted():
 	await assert_error(func() :
@@ -418,7 +418,7 @@ func test_break_type_unicity_in_cascade_grand_child_inverted():
 		
 		trojan_c_data.register_flag_sources([trojan_3c_2_data])
 		trojan_3c_1_data.register_flag_sources([trojan_c_data])
-	).is_push_error("Inconsistent flag cascade: Type unicity rule is broken")
+	).is_push_error("[ORC] Inconsistent flag cascade: Type unicity rule is broken")
 
 func test_break_no_cycles_in_cascade_1():
 	await assert_error(func() :
@@ -430,7 +430,7 @@ func test_break_no_cycles_in_cascade_1():
 		var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
 
 		trojan_b_data.register_flag_sources([trojan_b_data])
-	).is_push_error("Inconsistent flag cascade: No cycles rule is broken")
+	).is_push_error("[ORC] Inconsistent flag cascade: No cycles rule is broken")
 
 func test_break_no_cycles_in_cascade_2():
 	await assert_error(func() :
@@ -443,7 +443,7 @@ func test_break_no_cycles_in_cascade_2():
 
 		trojan_1b_data.register_flag_sources([trojan_b_data])
 		trojan_b_data.register_flag_sources([trojan_1b_data])
-	).is_push_error("Inconsistent flag cascade: No cycles rule is broken")
+	).is_push_error("[ORC] Inconsistent flag cascade: No cycles rule is broken")
 
 func test_break_no_cycles_in_cascade_2_invert():
 	await assert_error(func() :
@@ -456,7 +456,7 @@ func test_break_no_cycles_in_cascade_2_invert():
 
 		trojan_b_data.register_flag_sources([trojan_1b_data])
 		trojan_1b_data.register_flag_sources([trojan_b_data])
-	).is_push_error("Inconsistent flag cascade: No cycles rule is broken")
+	).is_push_error("[ORC] Inconsistent flag cascade: No cycles rule is broken")
 
 func test_break_no_cycles_in_cascade_3():
 	await assert_error(func() :
@@ -470,7 +470,7 @@ func test_break_no_cycles_in_cascade_3():
 		trojan_b_data.register_flag_sources([trojan_1b_data])
 		trojan_1b_data.register_flag_sources([trojan_2b_data])
 		trojan_2b_data.register_flag_sources([trojan_b_data])
-	).is_push_error("Inconsistent flag cascade: No cycles rule is broken")
+	).is_push_error("[ORC] Inconsistent flag cascade: No cycles rule is broken")
 
 func test_break_no_cycles_in_cascade_3_invert():
 	await assert_error(func() :
@@ -484,4 +484,4 @@ func test_break_no_cycles_in_cascade_3_invert():
 		trojan_2b_data.register_flag_sources([trojan_b_data])
 		trojan_1b_data.register_flag_sources([trojan_2b_data])
 		trojan_b_data.register_flag_sources([trojan_1b_data])
-	).is_push_error("Inconsistent flag cascade: No cycles rule is broken")
+	).is_push_error("[ORC] Inconsistent flag cascade: No cycles rule is broken")

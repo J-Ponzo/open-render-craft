@@ -21,6 +21,8 @@ static const char* ERR_PR_UNREGISTER_FLAG_SOURCES_PROXY_NOT_FOUND = "[ORC] unreg
 static const char* ERR_PR_INVALID_FLAG_SRC = "[ORC] register_flag_sources_internal: invalid source in sources array";
 static const char* ERR_PR_FLAG_SRC_ALREADY_REGISTERED = "[ORC] register_flag_sources_internal: source already registered for this proxy data";
 static const char* ERR_PR_DUPLICATE_FLAG_SRC_IN_ARGS = "[ORC] register_flag_sources_internal: duplicate source in sources array";
+static const char* ERR_PR_NO_CYCLES_RULE_BROKEN = "[ORC] Inconsistent flag cascade: No cycles rule is broken";
+static const char* ERR_PR_TYPE_UNICITY_RULE_BROKEN = "[ORC] Inconsistent flag cascade: Type unicity rule is broken";
 
 std::unordered_map<StringName, std::type_index>& ORC_ProxyRegistry::cpp_types() {
     static std::unordered_map<StringName, std::type_index> registry;
@@ -246,16 +248,8 @@ void ORC_ProxyRegistry::register_flag_sources_internal(ORC_ProxyData* proxy_data
 
 #ifdef DEBUG_ENABLED
     std::unordered_set<const ORC_ProxyData*> in_path;
-    if (has_cycle(proxy_ref, in_path)) ERR_FAIL_MSG("Inconsistent flag cascade: No cycles rule is broken");
-
-    std::vector<Ref<ORC_ProxyData>> graph_instances = gather_cascade_graph_instances(proxy_ref);
-    std::unordered_map<TypeKey, Ref<ORC_ProxyData>, TypeKeyHash> type_to_instance;
-    for (const auto& instance : graph_instances) {
-        TypeKey instance_type = instance->get_type_key();
-        auto it = type_to_instance.find(instance_type);
-        if (it != type_to_instance.end() && it->second.ptr() != instance.ptr()) ERR_FAIL_MSG("Inconsistent flag cascade: Type unicity rule is broken");
-        type_to_instance[instance_type] = instance;
-    }
+    if (has_cycle(proxy_ref, in_path)) ERR_FAIL_MSG(ERR_PR_NO_CYCLES_RULE_BROKEN);
+    if (has_type_duplicate(proxy_ref)) ERR_FAIL_MSG(ERR_PR_TYPE_UNICITY_RULE_BROKEN);
 #endif
 
     for (int i = 0; i < sources.size(); i++) {
@@ -454,6 +448,20 @@ bool ORC_ProxyRegistry::has_cycle(const Ref<ORC_ProxyData>& node, std::unordered
     }
     
     in_path.erase(node.ptr());
+    return false;
+}
+
+bool ORC_ProxyRegistry::has_type_duplicate(const Ref<ORC_ProxyData>& node) const {
+    std::vector<Ref<ORC_ProxyData>> graph_instances = gather_cascade_graph_instances(node);
+    std::unordered_map<TypeKey, Ref<ORC_ProxyData>, TypeKeyHash> type_to_instance;
+    
+    for (const auto& instance : graph_instances) {
+        TypeKey instance_type = instance->get_type_key();
+        auto it = type_to_instance.find(instance_type);
+        if (it != type_to_instance.end() && it->second.ptr() != instance.ptr()) return true;
+        type_to_instance[instance_type] = instance;
+    }
+    
     return false;
 }
 
