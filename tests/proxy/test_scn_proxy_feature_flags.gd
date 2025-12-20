@@ -485,3 +485,26 @@ func test_break_no_cycles_in_cascade_3_invert():
 		trojan_1b_data.register_flag_sources([trojan_2b_data])
 		trojan_b_data.register_flag_sources([trojan_1b_data])
 	).is_push_error("[ORC] Inconsistent flag cascade: No cycles rule is broken")
+
+func test_break_already_registered_in_cascade():
+	await assert_error(func() :
+		var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
+		scn_instance.add_child(trojan_a)
+
+		var trojan_a_data : ORCTEST_Trojan_A_Data = trojan_a.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
+		var trojan_1_data : ORCTEST_Trojan_1_Data = trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+
+		trojan_a_data.register_flag_sources([trojan_1_data])
+		trojan_a_data.register_flag_sources([trojan_1_data])
+	).is_push_error("[ORC] register_flag_sources_internal: source already registered for this proxy data")
+
+func test_break_duplicate_sources_in_args():
+	await assert_error(func() :
+		var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
+		scn_instance.add_child(trojan_a)
+
+		var trojan_a_data : ORCTEST_Trojan_A_Data = trojan_a.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
+		var trojan_1_data : ORCTEST_Trojan_1_Data = trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+
+		trojan_a_data.register_flag_sources([trojan_1_data, trojan_1_data])
+	).is_push_error("[ORC] register_flag_sources_internal: duplicate source in sources array")
