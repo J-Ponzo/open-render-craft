@@ -21,6 +21,7 @@ class ORC_ProxyData;
 struct TypeKey {
     std::variant<std::type_index, std::string> key;
     
+    TypeKey() : key(std::type_index(typeid(void))) {}
     TypeKey(std::type_index ti) : key(ti) {}
     TypeKey(const std::string& s) : key(s) {}
     TypeKey(const Ref<GDScript>& script) : key(script.is_valid() ? (String(script->get_global_name())).utf8().get_data() : "") {
@@ -30,6 +31,9 @@ struct TypeKey {
     
     bool operator==(const TypeKey& other) const {
         return key == other.key;
+    }
+    bool operator!=(const TypeKey& other) const {
+        return !(*this == other);
     }
 };
 

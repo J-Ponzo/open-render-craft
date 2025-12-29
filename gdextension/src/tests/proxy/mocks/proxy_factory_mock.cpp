@@ -50,29 +50,20 @@ Ref<ORC_PrimaryData> ORCTEST_ProxyFactory_CPPMock::create_data_from_impl(Node* n
 	
 	if (Object::cast_to<Camera3D>(node)) {
 		primary_data = ORC_ProxyFactory::create_and_register_primary<ORCTEST_CameraData_CPP>(registry);
-		primary_data->set_flag("IS_PRIMARY", true);
 	} else if (Object::cast_to<OmniLight3D>(node)) {
 		primary_data = ORC_ProxyFactory::create_and_register_primary<ORCTEST_OmniLightData_CPP>(registry);
-		primary_data->set_flag("IS_PRIMARY", true);
-		primary_data->set_flag("IS_LIGHT", true);
 	} else if (Object::cast_to<SpotLight3D>(node)) {
 		primary_data = ORC_ProxyFactory::create_and_register_primary<ORCTEST_SpotLightData_CPP>(registry);
-		primary_data->set_flag("IS_PRIMARY", true);
-		primary_data->set_flag("IS_LIGHT", true);
 	} else if (Object::cast_to<DirectionalLight3D>(node)) {
 		primary_data = ORC_ProxyFactory::create_and_register_primary<ORCTEST_DirectionalLightData_CPP>(registry);
-		primary_data->set_flag("IS_PRIMARY", true);
-		primary_data->set_flag("IS_LIGHT", true);
 	} else if (MeshInstance3D* mesh_instance = Object::cast_to<MeshInstance3D>(node)) {
 		Ref<ORCTEST_MeshData_CPP> mesh_data = ORC_ProxyFactory::create_and_register_primary<ORCTEST_MeshData_CPP>(registry);
-		mesh_data->set_flag("IS_PRIMARY", true);
 		
 		Ref<Mesh> mesh = mesh_instance->get_mesh();
 		int64_t mesh_id = mesh.is_valid() ? mesh->get_rid().get_id() : -1;
 		
 		Ref<ORCTEST_TopologyData_CPP> topology_data = ORC_ProxyFactory::create_and_register_secondary<ORCTEST_TopologyData_CPP>(registry, mesh_data, mesh_id);
 		if (!topology_data->is_shared()) {
-			topology_data->set_flag("IS_PRIMARY", false);
 			topology_data->set_mesh(mesh);
 		}
 		mesh_data->set_topology_data(topology_data);

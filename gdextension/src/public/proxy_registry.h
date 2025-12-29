@@ -47,8 +47,7 @@ private:
     bool add_query_to_cache(const Ref<ORC_DataQuery>& query);
     bool fill_query_features(const Ref<ORC_DataQuery>& query, const TypedArray<StringName>& flag_names, const TypedArray<bool>& flag_values);
 
-    // TODO : test flags better
-    bool set_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name, bool value);
+    bool set_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name, bool value, bool is_propagation);
     bool has_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name);
     void register_flag_sources_internal(ORC_ProxyData* proxy_data, const TypedArray<ORC_ProxyData>& sources);
     void unregister_flag_sources_internal(ORC_ProxyData* proxy_data, const TypedArray<ORC_ProxyData>& sources);

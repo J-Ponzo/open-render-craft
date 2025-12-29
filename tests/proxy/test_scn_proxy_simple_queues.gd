@@ -18,22 +18,22 @@ func create_proxy_factory() -> ORC_ProxyFactory:
 func reset_proxy_update_counters() -> void:
 	pass
 
-func create_camera_query(flag_names : Array, flag_values : Array) -> ORC_DataQuery:
+func create_camera_query(flag_names : Array = [], flag_values : Array = []) -> ORC_DataQuery:
 	return null
 
-func create_mesh_query(flag_names : Array, flag_values : Array) -> ORC_DataQuery:
+func create_mesh_query(flag_names : Array = [], flag_values : Array = []) -> ORC_DataQuery:
 	return null
 
-func create_omni_query(flag_names : Array, flag_values : Array) -> ORC_DataQuery:
+func create_omni_query(flag_names : Array = [], flag_values : Array = []) -> ORC_DataQuery:
 	return null
 
-func create_spot_query(flag_names : Array, flag_values : Array) -> ORC_DataQuery:
+func create_spot_query(flag_names : Array = [], flag_values : Array = []) -> ORC_DataQuery:
 	return null
 
-func create_directional_query(flag_names : Array, flag_values : Array) -> ORC_DataQuery:
+func create_directional_query(flag_names : Array = [], flag_values : Array = []) -> ORC_DataQuery:
 	return null
 
-func create_topology_query(flag_names : Array, flag_values : Array) -> ORC_DataQuery:
+func create_topology_query(flag_names : Array = [], flag_values : Array = []) -> ORC_DataQuery:
 	return null
 
 func common_before() -> void:
@@ -54,7 +54,7 @@ func common_after() -> void:
 func common_camera_is_primary():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
-	var query : ORC_DataQuery = create_camera_query(["IS_PRIMARY"], [true])
+	var query : ORC_DataQuery = create_camera_query()
 	scn_proxy.create_queue("queue_test_camera_is_primary", query)
 	scn_proxy.pre_render()
 
@@ -65,7 +65,7 @@ func common_camera_is_primary():
 func common_mesh_is_primary():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
-	var query : ORC_DataQuery = create_mesh_query(["IS_PRIMARY"], [true])
+	var query : ORC_DataQuery = create_mesh_query()
 	scn_proxy.create_queue("queue_test_mesh_is_primary", query)
 	scn_proxy.pre_render()
 
@@ -76,7 +76,7 @@ func common_mesh_is_primary():
 func common_omni_is_primary():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
-	var query : ORC_DataQuery = create_omni_query(["IS_PRIMARY"], [true])
+	var query : ORC_DataQuery = create_omni_query()
 	scn_proxy.create_queue("queue_test_omni_is_primary", query)
 	scn_proxy.pre_render()
 
@@ -87,7 +87,7 @@ func common_omni_is_primary():
 func common_spot_is_primary():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
-	var query : ORC_DataQuery = create_spot_query(["IS_PRIMARY"], [true])
+	var query : ORC_DataQuery = create_spot_query()
 	scn_proxy.create_queue("queue_test_spot_is_primary", query)
 	scn_proxy.pre_render()
 
@@ -98,7 +98,7 @@ func common_spot_is_primary():
 func common_directional_is_primary():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
-	var query : ORC_DataQuery = create_directional_query(["IS_PRIMARY"], [true])
+	var query : ORC_DataQuery = create_directional_query()
 	scn_proxy.create_queue("queue_test_directional_is_primary", query)
 	scn_proxy.pre_render()
 
@@ -109,7 +109,7 @@ func common_directional_is_primary():
 func common_is_secondary():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
-	var query : ORC_DataQuery = create_topology_query(["IS_PRIMARY"], [false])
+	var query : ORC_DataQuery = create_topology_query()
 	scn_proxy.create_queue("queue_test_is_secondary", query)
 	scn_proxy.pre_render()
 
@@ -120,13 +120,13 @@ func common_is_secondary():
 func common_is_light():
 	await ORCTEST_ScnProxyTestsCommon.wait_for_stabilisation(get_tree())
 	
-	var query_omni : ORC_DataQuery = create_omni_query(["IS_LIGHT"], [true])
+	var query_omni : ORC_DataQuery = create_omni_query()
 	scn_proxy.create_queue("queue_omni_test_is_light", query_omni)
 
-	var query_spot : ORC_DataQuery = create_spot_query(["IS_LIGHT"], [true])
+	var query_spot : ORC_DataQuery = create_spot_query()
 	scn_proxy.create_queue("queue_spot_test_is_light", query_spot)
 
-	var query_directional : ORC_DataQuery = create_directional_query(["IS_LIGHT"], [true])
+	var query_directional : ORC_DataQuery = create_directional_query()
 	scn_proxy.create_queue("queue_directional_test_is_light", query_directional)
 
 	scn_proxy.pre_render()

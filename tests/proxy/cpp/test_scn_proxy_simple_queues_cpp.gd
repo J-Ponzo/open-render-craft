@@ -12,22 +12,22 @@ func create_proxy_factory() -> ORC_ProxyFactory:
 func reset_proxy_update_counters() -> void:
 	ORCTEST_ScnProxyTestsCommon.reset_proxy_update_counters_cpp()
 
-func create_camera_query(flag_names : Array, flag_values : Array) -> ORC_DataQuery:
+func create_camera_query(flag_names : Array = [], flag_values : Array = []) -> ORC_DataQuery:
 	return scn_proxy.create_query_cpp("ORCTEST_CameraData_CPP", flag_names, flag_values)
 
-func create_mesh_query(flag_names : Array, flag_values : Array) -> ORC_DataQuery:
+func create_mesh_query(flag_names : Array = [], flag_values : Array = []) -> ORC_DataQuery:
 	return scn_proxy.create_query_cpp("ORCTEST_MeshData_CPP", flag_names, flag_values)
 
-func create_omni_query(flag_names : Array, flag_values : Array) -> ORC_DataQuery:
+func create_omni_query(flag_names : Array = [], flag_values : Array = []) -> ORC_DataQuery:
 	return scn_proxy.create_query_cpp("ORCTEST_OmniLightData_CPP", flag_names, flag_values)
 
-func create_spot_query(flag_names : Array, flag_values : Array) -> ORC_DataQuery:
+func create_spot_query(flag_names : Array = [], flag_values : Array = []) -> ORC_DataQuery:
 	return scn_proxy.create_query_cpp("ORCTEST_SpotLightData_CPP", flag_names, flag_values)
 
-func create_directional_query(flag_names : Array, flag_values : Array) -> ORC_DataQuery:
+func create_directional_query(flag_names : Array = [], flag_values : Array = []) -> ORC_DataQuery:
 	return scn_proxy.create_query_cpp("ORCTEST_DirectionalLightData_CPP", flag_names, flag_values)
 
-func create_topology_query(flag_names : Array, flag_values : Array) -> ORC_DataQuery:
+func create_topology_query(flag_names : Array = [], flag_values : Array = []) -> ORC_DataQuery:
 	return scn_proxy.create_query_cpp("ORCTEST_TopologyData_CPP", flag_names, flag_values)
 
 func test_camera_is_primary():

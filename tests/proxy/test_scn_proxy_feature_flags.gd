@@ -362,7 +362,7 @@ func test_break_exclusive_flags_rule():
 
 		trojan_a_data.set_flag("FLAG", true)
 		trojan_1_data.set_flag("FLAG", true)
-	).is_push_error("Bla bla")
+	).is_push_error("[ORC] Inconsistent flag type: The flag type exclusivity rule is broken")
 
 func test_break_type_unicity_in_cascade_sibling():
 	await assert_error(func() :

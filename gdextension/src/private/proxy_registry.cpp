@@ -23,6 +23,7 @@ static const char* ERR_PR_FLAG_SRC_ALREADY_REGISTERED = "[ORC] register_flag_sou
 static const char* ERR_PR_DUPLICATE_FLAG_SRC_IN_ARGS = "[ORC] register_flag_sources_internal: duplicate source in sources array";
 static const char* ERR_PR_NO_CYCLES_RULE_BROKEN = "[ORC] Inconsistent flag cascade: No cycles rule is broken";
 static const char* ERR_PR_TYPE_UNICITY_RULE_BROKEN = "[ORC] Inconsistent flag cascade: Type unicity rule is broken";
+static const char* ERR_PR_TYPE_EXCLUSIVE_FLAG_RULE_BROKEN = "[ORC] Inconsistent flag type: The flag type exclusivity rule is broken";
 
 std::unordered_map<StringName, std::type_index>& ORC_ProxyRegistry::cpp_types() {
     static std::unordered_map<StringName, std::type_index> registry;
@@ -178,7 +179,6 @@ bool ORC_ProxyRegistry::add_query_to_cache(const Ref<ORC_DataQuery>& query) {
 
 uint64_t ORC_ProxyRegistry::get_or_create_flag_mask(const StringName& flag_name) {
     auto it = flag_mask_lookup.find(flag_name);
-    
     if (it != flag_mask_lookup.end()) {
         return it->second;
     }
@@ -192,9 +192,23 @@ uint64_t ORC_ProxyRegistry::get_or_create_flag_mask(const StringName& flag_name)
     return flag_mask;
 }
 
-bool ORC_ProxyRegistry::set_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name, bool value) {
+bool ORC_ProxyRegistry::set_flag_internal(ORC_ProxyData* proxy_data, const StringName& flag_name, bool value, bool is_propagation) {
     DEV_ASSERT(proxy_data != nullptr && "Cannot set flag on null proxy_data.");
     
+#ifdef DEBUG_ENABLED
+    if (!is_propagation) {
+        auto it = flag_type_lookup.find(flag_name);
+        if (it != flag_type_lookup.end()) {
+            TypeKey existing_type = it->second;
+            if (existing_type != proxy_data->get_type_key()) {
+                ERR_FAIL_V_MSG(false,ERR_PR_TYPE_EXCLUSIVE_FLAG_RULE_BROKEN);
+            }
+        } else {
+            flag_type_lookup[flag_name] = proxy_data->get_type_key();
+        }
+    }   
+#endif
+
     uint64_t flag_mask = get_or_create_flag_mask(flag_name);
     
     uint64_t old_flags = data_flags[proxy_data];
@@ -221,7 +235,7 @@ void ORC_ProxyRegistry::propagate_flag_to_targets(ORC_ProxyData* proxy_data, con
     if (it == cascade_targets.end()) return;
     
     for (const auto& target : it->second) {
-        set_flag_internal(target.ptr(), flag_name, value);
+        set_flag_internal(target.ptr(), flag_name, value, true);
     }
 }
 
@@ -257,7 +271,7 @@ void ORC_ProxyRegistry::register_flag_sources_internal(ORC_ProxyData* proxy_data
         uint64_t source_flags = data_flags[source];
         for (const auto& pair : flag_mask_lookup) {
             if ((source_flags & pair.second) != 0) {
-                set_flag_internal(proxy_data, pair.first, true);
+                set_flag_internal(proxy_data, pair.first, true, true);
             }
         }
     }

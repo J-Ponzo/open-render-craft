@@ -40,32 +40,18 @@ func create_data_from_override(node : Node, registry : ORC_ProxyRegistry) -> ORC
 	var primary_data : ORC_PrimaryData = null
 	if node is Camera3D:
 		primary_data = create_and_register_primary(ORCTEST_CameraData, registry)
-		primary_data.set_flag("IS_PRIMARY", true)
 	elif node is OmniLight3D:
 		primary_data = create_and_register_primary(ORCTEST_OmniLightData, registry)
-		primary_data.set_flag("IS_PRIMARY", true)
-		primary_data.set_flag("IS_LIGHT", true)
 	elif node is SpotLight3D:
 		primary_data = create_and_register_primary(ORCTEST_SpotLightData, registry)
-		primary_data.set_flag("IS_PRIMARY", true)
-		primary_data.set_flag("IS_LIGHT", true)
 	elif node is DirectionalLight3D:
 		primary_data = create_and_register_primary(ORCTEST_DirectionalLightData, registry)
-		primary_data.set_flag("IS_PRIMARY", true)
-		primary_data.set_flag("IS_LIGHT", true)
 	elif node is MeshInstance3D:
 		primary_data = create_and_register_primary(ORCTEST_MeshData, registry)
-		primary_data.set_flag("IS_PRIMARY", true)
 		var topology_data = create_and_register_secondary(ORCTEST_TopologyData, registry, primary_data, node.mesh.get_rid().get_id())
 		if !topology_data.is_shared():
-			topology_data.set_flag("IS_PRIMARY", false)
 			topology_data.mesh = node.mesh
 		primary_data.topologyData = topology_data
-		# TODO remove this dev stub
-		# primary_data.register_flag_sources([topology_data, topology_data])
-		# primary_data.register_flag_sources([primary_data, primary_data])
-		# primary_data.register_flag_sources([topology_data])
-		# primary_data.register_flag_sources([primary_data])
 		
 	return primary_data;
 
