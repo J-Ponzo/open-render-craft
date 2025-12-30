@@ -82,18 +82,24 @@ func test_init_flags():
 func test_set_flags():
 	var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
 	scn_instance.add_child(trojan_a)
-	trojan_a.trojan_proxy.get_primary_data().set_flag("TROJAN_A_SET", true)
+	await assert_error(func() -> void:
+		trojan_a.trojan_proxy.get_primary_data().set_flag("TROJAN_A_SET", true)
+	).is_success()
 	trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0].set_flag("TROJAN_1_SET", true)
 
 	var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
 	scn_instance.add_child(trojan_b)
-	trojan_b.trojan_proxy.get_primary_data().set_flag("TROJAN_B_SET", true)
+	await assert_error(func() -> void:
+		trojan_b.trojan_proxy.get_primary_data().set_flag("TROJAN_B_SET", true)
+	).is_success()
 	trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0].set_flag("TROJAN_1_SET", true)
 	trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0].set_flag("TROJAN_2_SET", true)
 
 	var trojan_c : ORCTEST_Trojan_C = ORCTEST_Trojan_C.new()
 	scn_instance.add_child(trojan_c)
-	trojan_c.trojan_proxy.get_primary_data().set_flag("TROJAN_C_SET", true)
+	await assert_error(func() -> void:
+		trojan_c.trojan_proxy.get_primary_data().set_flag("TROJAN_C_SET", true)
+	).is_success()
 	trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[0].set_flag("TROJAN_3_SET", true)
 	trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[1].set_flag("TROJAN_3_SET", true)
 
@@ -112,18 +118,24 @@ func test_set_flags():
 func test_unset_flags():
 	var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
 	scn_instance.add_child(trojan_a)
-	trojan_a.trojan_proxy.get_primary_data().set_flag("TROJAN_A_INIT", false)
+	await assert_error(func() -> void:
+		trojan_a.trojan_proxy.get_primary_data().set_flag("TROJAN_A_INIT", false)
+	).is_success()
 	trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0].set_flag("TROJAN_1_INIT", false)
 
 	var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
 	scn_instance.add_child(trojan_b)
-	trojan_b.trojan_proxy.get_primary_data().set_flag("TROJAN_B_INIT", false)
+	await assert_error(func() -> void:
+		trojan_b.trojan_proxy.get_primary_data().set_flag("TROJAN_B_INIT", false)
+	).is_success()
 	trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0].set_flag("TROJAN_1_INIT", false)
 	trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0].set_flag("TROJAN_2_INIT", false)
 
 	var trojan_c : ORCTEST_Trojan_C = ORCTEST_Trojan_C.new()
 	scn_instance.add_child(trojan_c)
-	trojan_c.trojan_proxy.get_primary_data().set_flag("TROJAN_C_INIT", false)
+	await assert_error(func() -> void:
+		trojan_c.trojan_proxy.get_primary_data().set_flag("TROJAN_C_INIT", false)
+	).is_success()
 	trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[0].set_flag("TROJAN_3_INIT", false)
 	trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[1].set_flag("TROJAN_3_INIT", false)
 
@@ -154,8 +166,10 @@ func test_simple_pre_cascade():
 	cumuled_flag_tests = cumuled_flag_tests && !trojan_1_data.has_flag("TROJAN_1_SRC")
 
 	# Check cascad pre set flags
-	trojan_a_data.set_flag("TROJAN_A_TRG", true)
-	trojan_1_data.set_flag("TROJAN_1_SRC", true)
+	await assert_error(func() -> void:
+		trojan_a_data.set_flag("TROJAN_A_TRG", true)
+		trojan_1_data.set_flag("TROJAN_1_SRC", true)
+	).is_success()
 
 	trojan_a_data.register_flag_sources([trojan_1_data])
 
@@ -165,8 +179,10 @@ func test_simple_pre_cascade():
 	cumuled_flag_tests = cumuled_flag_tests && trojan_1_data.has_flag("TROJAN_1_SRC")
 
 	# Check cascade post unset flags
-	trojan_a_data.set_flag("TROJAN_A_TRG", false)
-	trojan_1_data.set_flag("TROJAN_1_SRC", false)
+	await assert_error(func() -> void:
+		trojan_a_data.set_flag("TROJAN_A_TRG", false)
+		trojan_1_data.set_flag("TROJAN_1_SRC", false)
+	).is_success()
 
 	cumuled_flag_tests = cumuled_flag_tests && !trojan_a_data.has_flag("TROJAN_A_TRG")
 	cumuled_flag_tests = cumuled_flag_tests && !trojan_1_data.has_flag("TROJAN_A_TRG")
@@ -188,10 +204,12 @@ func test_simple_post_cascade():
 	cumuled_flag_tests = cumuled_flag_tests && !trojan_1_data.has_flag("TROJAN_1_SRC")
 
 	# Check cascade post set flags
-	trojan_a_data.register_flag_sources([trojan_1_data])
+	await assert_error(func() -> void:
+		trojan_a_data.register_flag_sources([trojan_1_data])
 
-	trojan_a_data.set_flag("TROJAN_A_TRG", true)
-	trojan_1_data.set_flag("TROJAN_1_SRC", true)
+		trojan_a_data.set_flag("TROJAN_A_TRG", true)
+		trojan_1_data.set_flag("TROJAN_1_SRC", true)
+	).is_success()
 
 	cumuled_flag_tests = cumuled_flag_tests && trojan_a_data.has_flag("TROJAN_A_TRG")
 	cumuled_flag_tests = cumuled_flag_tests && !trojan_1_data.has_flag("TROJAN_A_TRG")
@@ -199,8 +217,10 @@ func test_simple_post_cascade():
 	cumuled_flag_tests = cumuled_flag_tests && trojan_1_data.has_flag("TROJAN_1_SRC")
 
 	# Check cascade post unset flags
-	trojan_a_data.set_flag("TROJAN_A_TRG", false)
-	trojan_1_data.set_flag("TROJAN_1_SRC", false)
+	await assert_error(func() -> void:
+		trojan_a_data.set_flag("TROJAN_A_TRG", false)
+		trojan_1_data.set_flag("TROJAN_1_SRC", false)
+	).is_success()
 
 	cumuled_flag_tests = cumuled_flag_tests && !trojan_a_data.has_flag("TROJAN_A_TRG")
 	cumuled_flag_tests = cumuled_flag_tests && !trojan_1_data.has_flag("TROJAN_A_TRG")
@@ -223,18 +243,20 @@ func test_multi_trg_cascade():
 	var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
 	var cumuled_flag_tests : bool = true
 
-	trojan_a_data.register_flag_sources([trojan_1a_data])
-	trojan_b_data.register_flag_sources([trojan_1a_data])
-	trojan_b_data.register_flag_sources([trojan_2b_data])
-	trojan_1b_data.register_flag_sources([trojan_2b_data])
-	trojan_a_data.register_flag_sources([trojan_b_data])
-	trojan_1b_data.register_flag_sources([trojan_b_data])
+	await assert_error(func() -> void:
+		trojan_a_data.register_flag_sources([trojan_1a_data])
+		trojan_b_data.register_flag_sources([trojan_1a_data])
+		trojan_b_data.register_flag_sources([trojan_2b_data])
+		trojan_1b_data.register_flag_sources([trojan_2b_data])
+		trojan_a_data.register_flag_sources([trojan_b_data])
+		trojan_1b_data.register_flag_sources([trojan_b_data])
 
-	trojan_a_data.set_flag("TROJAN_A", true)
-	trojan_1a_data.set_flag("TROJAN_1A", true)
-	trojan_b_data.set_flag("TROJAN_B", true)
-	trojan_1b_data.set_flag("TROJAN_1B", true)
-	trojan_2b_data.set_flag("TROJAN_2B", true)
+		trojan_a_data.set_flag("TROJAN_A", true)
+		trojan_1a_data.set_flag("TROJAN_1A", true)
+		trojan_b_data.set_flag("TROJAN_B", true)
+		trojan_1b_data.set_flag("TROJAN_1B", true)
+		trojan_2b_data.set_flag("TROJAN_2B", true)
+	).is_success()
 
 	cumuled_flag_tests = cumuled_flag_tests && trojan_a_data.has_flag("TROJAN_A")
 	cumuled_flag_tests = cumuled_flag_tests && trojan_a_data.has_flag("TROJAN_1A")
@@ -256,6 +278,56 @@ func test_multi_trg_cascade():
 
 	assert_bool(cumuled_flag_tests).is_equal(true)
 
+func test_shared_src_cascade():
+	var trojan_a_1 : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
+	scn_instance.add_child(trojan_a_1)
+
+	var trojan_a_2 : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
+	scn_instance.add_child(trojan_a_2)
+
+	var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
+	scn_instance.add_child(trojan_b)
+
+	var trojan_a_1_data : ORCTEST_Trojan_A_Data = trojan_a_1.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
+	var trojan_1a_1_data : ORCTEST_Trojan_1_Data = trojan_a_1.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+	var trojan_a_2_data : ORCTEST_Trojan_A_Data = trojan_a_2.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
+	var trojan_1a_2_data : ORCTEST_Trojan_1_Data = trojan_a_2.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+	var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
+	var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+	var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
+	var cumuled_flag_tests : bool = true
+
+	await assert_error(func() -> void:
+		trojan_a_1_data.register_flag_sources([trojan_b_data])
+		trojan_a_2_data.register_flag_sources([trojan_b_data])
+
+		trojan_a_1_data.set_flag("TROJAN_A", true)
+		trojan_1a_1_data.set_flag("TROJAN_1A", true)
+		trojan_a_2_data.set_flag("TROJAN_A", true)
+		trojan_1a_2_data.set_flag("TROJAN_1A", true)
+		trojan_b_data.set_flag("TROJAN_B", true)
+		trojan_1b_data.set_flag("TROJAN_1B", true)
+		trojan_2b_data.set_flag("TROJAN_2B", true)
+	).is_success()
+
+	cumuled_flag_tests = cumuled_flag_tests && trojan_a_1_data.has_flag("TROJAN_A")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_a_1_data.has_flag("TROJAN_B")
+
+	cumuled_flag_tests = cumuled_flag_tests && trojan_1a_1_data.has_flag("TROJAN_1A")
+	
+	cumuled_flag_tests = cumuled_flag_tests && trojan_a_2_data.has_flag("TROJAN_A")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_a_2_data.has_flag("TROJAN_B")
+
+	cumuled_flag_tests = cumuled_flag_tests && trojan_1a_2_data.has_flag("TROJAN_1A")
+
+	cumuled_flag_tests = cumuled_flag_tests && trojan_b_data.has_flag("TROJAN_B")
+
+	cumuled_flag_tests = cumuled_flag_tests && trojan_1b_data.has_flag("TROJAN_1B")
+
+	cumuled_flag_tests = cumuled_flag_tests && trojan_2b_data.has_flag("TROJAN_2B")
+
+	assert_bool(cumuled_flag_tests).is_equal(true)
+
 func test_wide_cascade():
 	var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
 	scn_instance.add_child(trojan_b)
@@ -271,14 +343,16 @@ func test_wide_cascade():
 	var trojan_3c_2_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[1] as ORCTEST_Trojan_3_Data
 	var cumuled_flag_tests : bool = true
 
-	trojan_c_data.register_flag_sources([trojan_b_data, trojan_1b_data, trojan_2b_data, trojan_3c_1_data])
+	await assert_error(func() -> void:
+		trojan_c_data.register_flag_sources([trojan_b_data, trojan_1b_data, trojan_2b_data, trojan_3c_1_data])
 
-	trojan_b_data.set_flag("TROJAN_B", true)
-	trojan_1b_data.set_flag("TROJAN_1B", true)
-	trojan_2b_data.set_flag("TROJAN_2B", true)
-	trojan_c_data.set_flag("TROJAN_C", true)
-	trojan_3c_1_data.set_flag("TROJAN_3C_1", true)
-	trojan_3c_2_data.set_flag("TROJAN_3C_2", true)
+		trojan_b_data.set_flag("TROJAN_B", true)
+		trojan_1b_data.set_flag("TROJAN_1B", true)
+		trojan_2b_data.set_flag("TROJAN_2B", true)
+		trojan_c_data.set_flag("TROJAN_C", true)
+		trojan_3c_1_data.set_flag("TROJAN_3C_1", true)
+		trojan_3c_2_data.set_flag("TROJAN_3C_2", true)
+	).is_success()
 
 	cumuled_flag_tests = cumuled_flag_tests && trojan_b_data.has_flag("TROJAN_B")
 
@@ -313,17 +387,19 @@ func test_long_cascade():
 	var trojan_3c_2_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[1] as ORCTEST_Trojan_3_Data
 	var cumuled_flag_tests : bool = true
 	
-	trojan_1b_data.register_flag_sources([trojan_2b_data])
-	trojan_2b_data.register_flag_sources([trojan_b_data])
-	trojan_b_data.register_flag_sources([trojan_c_data])
-	trojan_c_data.register_flag_sources([trojan_3c_2_data])
+	await assert_error(func() -> void:
+		trojan_1b_data.register_flag_sources([trojan_2b_data])
+		trojan_2b_data.register_flag_sources([trojan_b_data])
+		trojan_b_data.register_flag_sources([trojan_c_data])
+		trojan_c_data.register_flag_sources([trojan_3c_2_data])
 
-	trojan_b_data.set_flag("TROJAN_B", true)
-	trojan_1b_data.set_flag("TROJAN_1B", true)
-	trojan_2b_data.set_flag("TROJAN_2B", true)
-	trojan_c_data.set_flag("TROJAN_C", true)
-	trojan_3c_1_data.set_flag("TROJAN_3C_1", true)
-	trojan_3c_2_data.set_flag("TROJAN_3C_2", true)
+		trojan_b_data.set_flag("TROJAN_B", true)
+		trojan_1b_data.set_flag("TROJAN_1B", true)
+		trojan_2b_data.set_flag("TROJAN_2B", true)
+		trojan_c_data.set_flag("TROJAN_C", true)
+		trojan_3c_1_data.set_flag("TROJAN_3C_1", true)
+		trojan_3c_2_data.set_flag("TROJAN_3C_2", true)
+	).is_success()
 
 	cumuled_flag_tests = cumuled_flag_tests && trojan_1b_data.has_flag("TROJAN_1B")
 	cumuled_flag_tests = cumuled_flag_tests && trojan_1b_data.has_flag("TROJAN_2B")
@@ -363,19 +439,21 @@ func test_diamond_cascade():
 	var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
 	var cumuled_flag_tests : bool = true
 
-	trojan_b_data.register_flag_sources([trojan_1b_data, trojan_2b_data])
-	trojan_1b_data.register_flag_sources([trojan_a_data])
-	trojan_2b_data.register_flag_sources([trojan_a_data])
+	await assert_error(func() -> void:
+		trojan_b_data.register_flag_sources([trojan_1b_data, trojan_2b_data])
+		trojan_1b_data.register_flag_sources([trojan_a_data])
+		trojan_2b_data.register_flag_sources([trojan_a_data])
 
-	trojan_1b_data.register_flag_sources([trojan_2b_data])
-	trojan_a_data.register_flag_sources([trojan_b_data])
-	trojan_1b_data.register_flag_sources([trojan_b_data])
+		trojan_1b_data.register_flag_sources([trojan_2b_data])
+		trojan_a_data.register_flag_sources([trojan_b_data])
+		trojan_1b_data.register_flag_sources([trojan_b_data])
 
-	trojan_a_data.set_flag("TROJAN_A", true)
-	trojan_1a_data.set_flag("TROJAN_1A", true)
-	trojan_b_data.set_flag("TROJAN_B", true)
-	trojan_1b_data.set_flag("TROJAN_1B", true)
-	trojan_2b_data.set_flag("TROJAN_2B", true)
+		trojan_a_data.set_flag("TROJAN_A", true)
+		trojan_1a_data.set_flag("TROJAN_1A", true)
+		trojan_b_data.set_flag("TROJAN_B", true)
+		trojan_1b_data.set_flag("TROJAN_1B", true)
+		trojan_2b_data.set_flag("TROJAN_2B", true)
+	).is_success()
 
 	cumuled_flag_tests = cumuled_flag_tests && trojan_b_data.has_flag("TROJAN_B")
 	cumuled_flag_tests = cumuled_flag_tests && trojan_b_data.has_flag("TROJAN_1B")
@@ -395,158 +473,178 @@ func test_diamond_cascade():
 	assert_bool(cumuled_flag_tests).is_equal(true)
 
 func test_break_exclusive_flags_rule():
-	await assert_error(func() :
-		var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
-		scn_instance.add_child(trojan_a)
+	var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
+	scn_instance.add_child(trojan_a)
 
-		var trojan_a_data : ORCTEST_Trojan_A_Data = trojan_a.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
-		var trojan_1_data : ORCTEST_Trojan_1_Data = trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
-
+	var trojan_a_data : ORCTEST_Trojan_A_Data = trojan_a.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
+	var trojan_1_data : ORCTEST_Trojan_1_Data = trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+	
+	await assert_error(func() -> void:
 		trojan_a_data.set_flag("FLAG", true)
+	).is_success()	
+	await assert_error(func() -> void:
 		trojan_1_data.set_flag("FLAG", true)
 	).is_push_error("[ORC] Inconsistent flag type: The flag type exclusivity rule is broken")
 
 func test_break_type_unicity_in_cascade_sibling():
-	await assert_error(func() :
-		var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
-		scn_instance.add_child(trojan_a)
+	
+	var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
+	scn_instance.add_child(trojan_a)
 
-		var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
-		scn_instance.add_child(trojan_b)
+	var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
+	scn_instance.add_child(trojan_b)
 
-		var trojan_a_data : ORCTEST_Trojan_A_Data = trojan_a.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
-		var trojan_1a_data : ORCTEST_Trojan_1_Data = trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
-		var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
-		var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
-		var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
-
+	var trojan_a_data : ORCTEST_Trojan_A_Data = trojan_a.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
+	var trojan_1a_data : ORCTEST_Trojan_1_Data = trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+	var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
+	var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+	var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
+	
+	await assert_error(func() -> void:
 		trojan_a_data.register_flag_sources([trojan_1a_data])
+	).is_success()		
+	await assert_error(func() -> void:
 		trojan_a_data.register_flag_sources([trojan_1b_data])
 	).is_push_error("[ORC] Inconsistent flag cascade: Type unicity rule is broken")
 
 func test_break_type_unicity_in_cascade_child():
-	await assert_error(func() :
-		var trojan_c : ORCTEST_Trojan_C = ORCTEST_Trojan_C.new()
-		scn_instance.add_child(trojan_c)
+	var trojan_c : ORCTEST_Trojan_C = ORCTEST_Trojan_C.new()
+	scn_instance.add_child(trojan_c)
 
-		var trojan_c_data : ORCTEST_Trojan_C_Data = trojan_c.trojan_proxy.get_primary_data() as ORCTEST_Trojan_C_Data
-		var trojan_3c_1_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[0] as ORCTEST_Trojan_3_Data
-		var trojan_3c_2_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[1] as ORCTEST_Trojan_3_Data
-		
+	var trojan_c_data : ORCTEST_Trojan_C_Data = trojan_c.trojan_proxy.get_primary_data() as ORCTEST_Trojan_C_Data
+	var trojan_3c_1_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[0] as ORCTEST_Trojan_3_Data
+	var trojan_3c_2_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[1] as ORCTEST_Trojan_3_Data
+	
+	await assert_error(func() -> void:
 		trojan_3c_1_data.register_flag_sources([trojan_3c_2_data])
 	).is_push_error("[ORC] Inconsistent flag cascade: Type unicity rule is broken")
 
 func test_break_type_unicity_in_cascade_grand_child():
-	await assert_error(func() :
-		var trojan_c : ORCTEST_Trojan_C = ORCTEST_Trojan_C.new()
-		scn_instance.add_child(trojan_c)
+	var trojan_c : ORCTEST_Trojan_C = ORCTEST_Trojan_C.new()
+	scn_instance.add_child(trojan_c)
 
-		var trojan_c_data : ORCTEST_Trojan_C_Data = trojan_c.trojan_proxy.get_primary_data() as ORCTEST_Trojan_C_Data
-		var trojan_3c_1_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[0] as ORCTEST_Trojan_3_Data
-		var trojan_3c_2_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[1] as ORCTEST_Trojan_3_Data
-		
+	var trojan_c_data : ORCTEST_Trojan_C_Data = trojan_c.trojan_proxy.get_primary_data() as ORCTEST_Trojan_C_Data
+	var trojan_3c_1_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[0] as ORCTEST_Trojan_3_Data
+	var trojan_3c_2_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[1] as ORCTEST_Trojan_3_Data
+	
+	await assert_error(func() -> void:
 		trojan_3c_1_data.register_flag_sources([trojan_c_data])
+	).is_success()
+	await assert_error(func() -> void:
 		trojan_c_data.register_flag_sources([trojan_3c_2_data])
 	).is_push_error("[ORC] Inconsistent flag cascade: Type unicity rule is broken")
 
 func test_break_type_unicity_in_cascade_grand_child_inverted():
-	await assert_error(func() :
-		var trojan_c : ORCTEST_Trojan_C = ORCTEST_Trojan_C.new()
-		scn_instance.add_child(trojan_c)
+	var trojan_c : ORCTEST_Trojan_C = ORCTEST_Trojan_C.new()
+	scn_instance.add_child(trojan_c)
 
-		var trojan_c_data : ORCTEST_Trojan_C_Data = trojan_c.trojan_proxy.get_primary_data() as ORCTEST_Trojan_C_Data
-		var trojan_3c_1_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[0] as ORCTEST_Trojan_3_Data
-		var trojan_3c_2_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[1] as ORCTEST_Trojan_3_Data
-		
+	var trojan_c_data : ORCTEST_Trojan_C_Data = trojan_c.trojan_proxy.get_primary_data() as ORCTEST_Trojan_C_Data
+	var trojan_3c_1_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[0] as ORCTEST_Trojan_3_Data
+	var trojan_3c_2_data : ORCTEST_Trojan_3_Data = trojan_c.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_3_Data_CLASS)[1] as ORCTEST_Trojan_3_Data
+	
+	await assert_error(func() -> void:
 		trojan_c_data.register_flag_sources([trojan_3c_2_data])
+	).is_success()
+	await assert_error(func() -> void:
 		trojan_3c_1_data.register_flag_sources([trojan_c_data])
 	).is_push_error("[ORC] Inconsistent flag cascade: Type unicity rule is broken")
 
 func test_break_no_cycles_in_cascade_1():
-	await assert_error(func() :
-		var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
-		scn_instance.add_child(trojan_b)
+	var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
+	scn_instance.add_child(trojan_b)
 
-		var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
-		var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
-		var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
+	var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
+	var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+	var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
 
+	await assert_error(func() -> void:
 		trojan_b_data.register_flag_sources([trojan_b_data])
 	).is_push_error("[ORC] Inconsistent flag cascade: No cycles rule is broken")
 
 func test_break_no_cycles_in_cascade_2():
-	await assert_error(func() :
-		var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
-		scn_instance.add_child(trojan_b)
+	
+	var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
+	scn_instance.add_child(trojan_b)
 
-		var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
-		var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
-		var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
+	var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
+	var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+	var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
 
+	await assert_error(func() -> void:
 		trojan_1b_data.register_flag_sources([trojan_b_data])
+	).is_success()
+	await assert_error(func() -> void:
 		trojan_b_data.register_flag_sources([trojan_1b_data])
 	).is_push_error("[ORC] Inconsistent flag cascade: No cycles rule is broken")
 
 func test_break_no_cycles_in_cascade_2_invert():
-	await assert_error(func() :
-		var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
-		scn_instance.add_child(trojan_b)
+	var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
+	scn_instance.add_child(trojan_b)
 
-		var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
-		var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
-		var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
+	var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
+	var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+	var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
 
+	await assert_error(func() -> void:
 		trojan_b_data.register_flag_sources([trojan_1b_data])
+	).is_success()
+	await assert_error(func() -> void:
 		trojan_1b_data.register_flag_sources([trojan_b_data])
 	).is_push_error("[ORC] Inconsistent flag cascade: No cycles rule is broken")
 
 func test_break_no_cycles_in_cascade_3():
-	await assert_error(func() :
-		var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
-		scn_instance.add_child(trojan_b)
+	var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
+	scn_instance.add_child(trojan_b)
 
-		var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
-		var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
-		var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
+	var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
+	var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+	var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
 
+	await assert_error(func() -> void:
 		trojan_b_data.register_flag_sources([trojan_1b_data])
 		trojan_1b_data.register_flag_sources([trojan_2b_data])
+	).is_success()
+	await assert_error(func() -> void:
 		trojan_2b_data.register_flag_sources([trojan_b_data])
 	).is_push_error("[ORC] Inconsistent flag cascade: No cycles rule is broken")
 
 func test_break_no_cycles_in_cascade_3_invert():
-	await assert_error(func() :
-		var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
-		scn_instance.add_child(trojan_b)
+	var trojan_b : ORCTEST_Trojan_B = ORCTEST_Trojan_B.new()
+	scn_instance.add_child(trojan_b)
 
-		var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
-		var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
-		var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
+	var trojan_b_data : ORCTEST_Trojan_B_Data = trojan_b.trojan_proxy.get_primary_data() as ORCTEST_Trojan_B_Data
+	var trojan_1b_data : ORCTEST_Trojan_1_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+	var trojan_2b_data : ORCTEST_Trojan_2_Data = trojan_b.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_2_Data_CLASS)[0] as ORCTEST_Trojan_2_Data
 
+	await assert_error(func() -> void:
 		trojan_2b_data.register_flag_sources([trojan_b_data])
 		trojan_1b_data.register_flag_sources([trojan_2b_data])
+	).is_success()
+	await assert_error(func() -> void:
 		trojan_b_data.register_flag_sources([trojan_1b_data])
 	).is_push_error("[ORC] Inconsistent flag cascade: No cycles rule is broken")
 
 func test_break_already_registered_in_cascade():
-	await assert_error(func() :
-		var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
-		scn_instance.add_child(trojan_a)
+	var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
+	scn_instance.add_child(trojan_a)
 
-		var trojan_a_data : ORCTEST_Trojan_A_Data = trojan_a.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
-		var trojan_1_data : ORCTEST_Trojan_1_Data = trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+	var trojan_a_data : ORCTEST_Trojan_A_Data = trojan_a.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
+	var trojan_1_data : ORCTEST_Trojan_1_Data = trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
 
+	await assert_error(func() -> void:
 		trojan_a_data.register_flag_sources([trojan_1_data])
+	).is_success()
+	await assert_error(func() -> void:
 		trojan_a_data.register_flag_sources([trojan_1_data])
 	).is_push_error("[ORC] register_flag_sources_internal: source already registered for this proxy data")
 
 func test_break_duplicate_sources_in_args():
-	await assert_error(func() :
-		var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
-		scn_instance.add_child(trojan_a)
+	var trojan_a : ORCTEST_Trojan_A = ORCTEST_Trojan_A.new()
+	scn_instance.add_child(trojan_a)
 
-		var trojan_a_data : ORCTEST_Trojan_A_Data = trojan_a.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
-		var trojan_1_data : ORCTEST_Trojan_1_Data = trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
+	var trojan_a_data : ORCTEST_Trojan_A_Data = trojan_a.trojan_proxy.get_primary_data() as ORCTEST_Trojan_A_Data
+	var trojan_1_data : ORCTEST_Trojan_1_Data = trojan_a.trojan_proxy.get_all_secondary_data_of_type(ORCTEST_Trojan_1_Data_CLASS)[0] as ORCTEST_Trojan_1_Data
 
+	await assert_error(func() -> void:
 		trojan_a_data.register_flag_sources([trojan_1_data, trojan_1_data])
 	).is_push_error("[ORC] register_flag_sources_internal: duplicate source in sources array")
