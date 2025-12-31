@@ -244,12 +244,10 @@ func test_multi_trg_cascade():
 	var cumuled_flag_tests : bool = true
 
 	await assert_error(func() -> void:
-		trojan_a_data.register_flag_sources([trojan_1a_data])
-		trojan_b_data.register_flag_sources([trojan_1a_data])
-		trojan_b_data.register_flag_sources([trojan_2b_data])
-		trojan_1b_data.register_flag_sources([trojan_2b_data])
-		trojan_a_data.register_flag_sources([trojan_b_data])
-		trojan_1b_data.register_flag_sources([trojan_b_data])
+		trojan_1b_data.register_flag_sources([trojan_a_data])
+		trojan_2b_data.register_flag_sources([trojan_a_data])
+		trojan_1a_data.register_flag_sources([trojan_b_data])
+		trojan_2b_data.register_flag_sources([trojan_b_data])
 
 		trojan_a_data.set_flag("TROJAN_A", true)
 		trojan_1a_data.set_flag("TROJAN_1A", true)
@@ -259,22 +257,18 @@ func test_multi_trg_cascade():
 	).is_success()
 
 	cumuled_flag_tests = cumuled_flag_tests && trojan_a_data.has_flag("TROJAN_A")
-	cumuled_flag_tests = cumuled_flag_tests && trojan_a_data.has_flag("TROJAN_1A")
-	cumuled_flag_tests = cumuled_flag_tests && trojan_a_data.has_flag("TROJAN_B")
-	cumuled_flag_tests = cumuled_flag_tests && trojan_a_data.has_flag("TROJAN_2B")
 
 	cumuled_flag_tests = cumuled_flag_tests && trojan_b_data.has_flag("TROJAN_B")
-	cumuled_flag_tests = cumuled_flag_tests && trojan_b_data.has_flag("TROJAN_1A")
-	cumuled_flag_tests = cumuled_flag_tests && trojan_b_data.has_flag("TROJAN_2B")
 
 	cumuled_flag_tests = cumuled_flag_tests && trojan_1a_data.has_flag("TROJAN_1A")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_1a_data.has_flag("TROJAN_B")
 
 	cumuled_flag_tests = cumuled_flag_tests && trojan_1b_data.has_flag("TROJAN_1B")
-	cumuled_flag_tests = cumuled_flag_tests && trojan_1b_data.has_flag("TROJAN_2B")
-	cumuled_flag_tests = cumuled_flag_tests && trojan_1b_data.has_flag("TROJAN_B")
-	cumuled_flag_tests = cumuled_flag_tests && trojan_1b_data.has_flag("TROJAN_1A")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_1b_data.has_flag("TROJAN_A")
 
 	cumuled_flag_tests = cumuled_flag_tests && trojan_2b_data.has_flag("TROJAN_2B")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_2b_data.has_flag("TROJAN_A")
+	cumuled_flag_tests = cumuled_flag_tests && trojan_2b_data.has_flag("TROJAN_B")
 
 	assert_bool(cumuled_flag_tests).is_equal(true)
 
@@ -443,10 +437,6 @@ func test_diamond_cascade():
 		trojan_b_data.register_flag_sources([trojan_1b_data, trojan_2b_data])
 		trojan_1b_data.register_flag_sources([trojan_a_data])
 		trojan_2b_data.register_flag_sources([trojan_a_data])
-
-		trojan_1b_data.register_flag_sources([trojan_2b_data])
-		trojan_a_data.register_flag_sources([trojan_b_data])
-		trojan_1b_data.register_flag_sources([trojan_b_data])
 
 		trojan_a_data.set_flag("TROJAN_A", true)
 		trojan_1a_data.set_flag("TROJAN_1A", true)
