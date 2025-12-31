@@ -466,23 +466,33 @@ bool ORC_ProxyRegistry::has_cycle(const Ref<ORC_ProxyData>& node, std::unordered
 }
 
 bool ORC_ProxyRegistry::has_type_duplicate(const Ref<ORC_ProxyData>& node) const {
-    std::vector<Ref<ORC_ProxyData>> graph_instances = gather_cascade_graph_instances(node);
+    std::vector<Ref<ORC_ProxyData>> all_targets = gather_cascade_instances(node, false);
     std::unordered_map<TypeKey, Ref<ORC_ProxyData>, TypeKeyHash> type_to_instance;
     
-    for (const auto& instance : graph_instances) {
-        TypeKey instance_type = instance->get_type_key();
-        auto it = type_to_instance.find(instance_type);
-        if (it != type_to_instance.end() && it->second.ptr() != instance.ptr()) return true;
-        type_to_instance[instance_type] = instance;
+    for (const auto& target : all_targets) {
+        std::vector<Ref<ORC_ProxyData>> upstream = gather_cascade_instances(target, true);
+        
+        type_to_instance.clear();
+        
+        for (const auto& instance : upstream) {
+            if (!instance.is_valid()) continue;
+            
+            TypeKey instance_type = instance->get_type_key();
+            auto it = type_to_instance.find(instance_type);
+            if (it != type_to_instance.end() && it->second.ptr() != instance.ptr()) return true;
+            type_to_instance[instance_type] = instance;
+        }
     }
     
     return false;
 }
 
-std::vector<Ref<ORC_ProxyData>> ORC_ProxyRegistry::gather_cascade_graph_instances(const Ref<ORC_ProxyData>& start) const {
+std::vector<Ref<ORC_ProxyData>> ORC_ProxyRegistry::gather_cascade_instances(const Ref<ORC_ProxyData>& start, bool upstream) const {
     std::vector<Ref<ORC_ProxyData>> result;
     std::vector<Ref<ORC_ProxyData>> to_visit;
     std::unordered_set<const ORC_ProxyData*> visited;
+    
+    const auto& lookup = upstream ? cascade_sources : cascade_targets;
     
     to_visit.push_back(start);
     
@@ -496,20 +506,11 @@ std::vector<Ref<ORC_ProxyData>> ORC_ProxyRegistry::gather_cascade_graph_instance
         visited.insert(current.ptr());
         result.push_back(current);
         
-        auto sources_it = cascade_sources.find(current);
-        if (sources_it != cascade_sources.end()) {
-            for (const auto& source : sources_it->second) {
-                if (source.is_valid() && visited.count(source.ptr()) == 0) {
-                    to_visit.push_back(source);
-                }
-            }
-        }
-        
-        auto targets_it = cascade_targets.find(current);
-        if (targets_it != cascade_targets.end()) {
-            for (const auto& target : targets_it->second) {
-                if (target.is_valid() && visited.count(target.ptr()) == 0) {
-                    to_visit.push_back(target);
+        auto it = lookup.find(current);
+        if (it != lookup.end()) {
+            for (const auto& neighbor : it->second) {
+                if (neighbor.is_valid() && visited.count(neighbor.ptr()) == 0) {
+                    to_visit.push_back(neighbor);
                 }
             }
         }

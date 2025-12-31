@@ -78,7 +78,7 @@ public:
 private:
     std::unordered_map<StringName, TypeKey> flag_type_lookup;
 
-    std::vector<Ref<ORC_ProxyData>> gather_cascade_graph_instances(const Ref<ORC_ProxyData>& start) const;
+    std::vector<Ref<ORC_ProxyData>> gather_cascade_instances(const Ref<ORC_ProxyData>& start, bool upstream) const;
     bool has_cycle(const Ref<ORC_ProxyData>& node, std::unordered_set<const ORC_ProxyData*>& visited) const;    
     bool has_type_duplicate(const Ref<ORC_ProxyData>& node) const;
 #endif
