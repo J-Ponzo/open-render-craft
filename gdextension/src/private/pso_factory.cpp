@@ -16,6 +16,10 @@ ORC_PSOFactory::~ORC_PSOFactory() {
 }
 
 void ORC_PSOFactory::_bind_methods() {
+    ClassDB::bind_method(D_METHOD("get_render_pass"), &ORC_PSOFactory::get_render_pass);
+    ClassDB::bind_method(D_METHOD("set_render_pass", "render_pass"), &ORC_PSOFactory::set_render_pass);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "render_pass", PROPERTY_HINT_RESOURCE_TYPE, "ORC_RenderPassBase"), "set_render_pass", "get_render_pass");
+
     ClassDB::bind_method(D_METHOD("get_uber_vertex_shader_src"), &ORC_PSOFactory::get_uber_vertex_shader_src);
     ClassDB::bind_method(D_METHOD("set_uber_vertex_shader_src", "src"), &ORC_PSOFactory::set_uber_vertex_shader_src);
     ADD_PROPERTY(PropertyInfo(Variant::STRING, "uber_vertex_shader_src"), "set_uber_vertex_shader_src", "get_uber_vertex_shader_src");
@@ -33,7 +37,7 @@ Ref<ORC_PSO> ORC_PSOFactory::get_or_create_pso_from_data(const Ref<ORC_ProxyData
     if (!proxy_data.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_PSO>(), ERR_INVALID_PROXY_DATA);
     
     uint64_t instance_id = proxy_data->get_instance_id();
-    
+
     auto it = mask_lookup.find(instance_id);
     if (it == mask_lookup.end()) {
         TypedArray<StringName> flags = proxy_data->get_flags();

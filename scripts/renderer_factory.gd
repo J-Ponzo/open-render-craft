@@ -83,11 +83,11 @@ static func create_render_pass(renderer_inst : ORC_RendererBase, render_pass_def
 		render_pass_inst.direct_psos[key] = create_pso(render_pass_def.direct_pso_defs[key], render_pass_inst.framebuffer_format)
 
 	for key : StringName in render_pass_def.pso_factory_defs.keys():
-		render_pass_inst.pso_factories[key] = create_pso_factory(render_pass_def.pso_factory_defs[key])
+		render_pass_inst.pso_factories[key] = create_pso_factory(render_pass_inst, render_pass_def.pso_factory_defs[key])
 
 	return render_pass_inst
 
-static func create_pso_factory(pso_factory_def : ORC_PSOFactoryDef) -> ORC_PSOFactory:
+static func create_pso_factory(render_pass_inst : ORC_RenderPassBase, pso_factory_def : ORC_PSOFactoryDef) -> ORC_PSOFactory:
 	var factory = ORC_ImplFactory.create_impl(pso_factory_def.factory_impl) as ORC_PSOFactory
 	if factory != null: # TODO : mayby use this everywhere?
 		var vertex_file = FileAccess.open(pso_factory_def.uber_vertex_shader_path, FileAccess.READ)
@@ -101,6 +101,9 @@ static func create_pso_factory(pso_factory_def : ORC_PSOFactoryDef) -> ORC_PSOFa
 			factory.uber_fragment_shader_src = fragment_file.get_as_text()
 		else:
 			push_error("Failed to open uber fragment shader file: %s" % pso_factory_def.uber_fragment_shader_path)
+	
+		factory.render_pass = render_pass_inst
+
 	return factory
 
 static func create_framebuffer_format_from_def(fb_format_def : ORC_FramebufferFormat_Def, attachment_format_defs : Array[ORC_AttachmentFormat_Def]) -> int:
