@@ -428,23 +428,15 @@ Ref<ORC_ProxyRegistryDump> ORC_ProxyRegistry::dump_registry() const {
     return dump;
 }
 
-TypedArray<StringName> ORC_ProxyRegistry::get_flags_internal(ORC_ProxyData* proxy_data) const {
+int64_t ORC_ProxyRegistry::get_flags_mask_internal(ORC_ProxyData* proxy_data) const {
     DEV_ASSERT(proxy_data != nullptr && "Cannot get flags from null proxy_data.");
     
     TypedArray<StringName> result;
     
     auto flags_it = data_flags.find(proxy_data);
-    if (flags_it == data_flags.end()) return result;
+    if (flags_it == data_flags.end()) return 0;
     
-    uint64_t flags = flags_it->second;
-    
-    for (const auto& pair : flag_mask_lookup) {
-        if ((flags & pair.second) != 0) {
-            result.push_back(pair.first);
-        }
-    }
-    
-    return result;
+    return flags_it->second;
 }
 
 #ifdef DEBUG_ENABLED

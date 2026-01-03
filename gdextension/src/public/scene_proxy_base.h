@@ -60,6 +60,8 @@ public:
 	void create_queue(const StringName& queue_name, const Ref<ORC_DataQuery>& init_query, const TypedArray<ORC_QueueProcessor>& processors = TypedArray<ORC_QueueProcessor>());
 	TypedArray<ORC_ProxyData> fetch_queue_data(const StringName& queue_name) const;
 	
+	TypedArray<StringName> get_flags_from_mask(int64_t mask) const;
+
 	Ref<ORC_ProxyRegistryDump> dump_registry() const;
 };
 

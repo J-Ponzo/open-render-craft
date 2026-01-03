@@ -19,8 +19,6 @@ protected:
     static void _bind_methods();
 
 private:
-// TODO : we realy need both lookups ?
-    std::unordered_map<uint64_t, int64_t> mask_lookup; 
     std::unordered_map<int64_t, Ref<ORC_PSO>> pso_lookup;
 
 public:

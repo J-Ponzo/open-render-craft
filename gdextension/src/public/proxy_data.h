@@ -71,7 +71,7 @@ protected:
 public:
     bool set_flag(const StringName& flag_name, bool value);
     bool has_flag(const StringName& flag_name);
-    TypedArray<StringName> get_flags() const;
+    int64_t get_flags_mask() const;
     void register_flag_sources(const TypedArray<ORC_ProxyData>& sources);
     void unregister_flag_sources(const TypedArray<ORC_ProxyData>& sources);
     const TypeKey& get_type_key() const { return type_key; }

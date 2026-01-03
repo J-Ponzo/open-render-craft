@@ -36,11 +36,11 @@ void ORC_PSOFactory::_bind_methods() {
 Ref<ORC_PSO> ORC_PSOFactory::get_or_create_pso_from_data(const Ref<ORC_ProxyData>& proxy_data) {
     if (!proxy_data.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_PSO>(), ERR_INVALID_PROXY_DATA);
     
-    uint64_t instance_id = proxy_data->get_instance_id();
+    uint64_t flags_mask = proxy_data->get_flags_mask();
 
-    auto it = mask_lookup.find(instance_id);
-    if (it == mask_lookup.end()) {
-        TypedArray<StringName> flags = proxy_data->get_flags();
+    auto it = pso_lookup.find(flags_mask);
+    if (it == pso_lookup.end()) {
+        TypedArray<StringName> flags = render_pass->renderer->scene_proxy->get_flags_from_mask(flags_mask);
         
         String vertex_src = ORC_ShaderPreprocessor::preprocess(String(), uber_vertex_shader_src, flags);
         String fragment_src = ORC_ShaderPreprocessor::preprocess(String(), uber_fragment_shader_src, flags);
@@ -48,13 +48,10 @@ Ref<ORC_PSO> ORC_PSOFactory::get_or_create_pso_from_data(const Ref<ORC_ProxyData
         Ref<ORC_PSO> pso = create_pso_from_data(proxy_data, vertex_src, fragment_src);
         if (!pso.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_PSO>(), ERR_PSO_CREATION_FAILED);
         
-        int64_t mask = instance_id;
-        mask_lookup[instance_id] = mask;
-        pso_lookup[mask] = pso;
+        pso_lookup[flags_mask] = pso;
     }
     
-    int64_t mask = mask_lookup[instance_id];
-    return pso_lookup[mask];
+    return pso_lookup[flags_mask];
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_3_ARGS(ORC_PSOFactory, Ref<ORC_PSO>, create_pso_from_data, const Ref<ORC_ProxyData>&, proxy_data, const String&, vertex_src, const String&, fragment_src)
@@ -71,5 +68,4 @@ void ORC_PSOFactory::cleanup() {
         }
     }
     pso_lookup.clear();
-    mask_lookup.clear();
 }

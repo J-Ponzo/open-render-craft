@@ -163,6 +163,18 @@ TypedArray<ORC_ProxyData> ORC_SceneProxyBase::fetch_queue_data(const StringName&
 	return queue->get_cached_data();
 }
 
+TypedArray<StringName> ORC_SceneProxyBase::get_flags_from_mask(int64_t mask) const {
+	TypedArray<StringName> result;
+    
+    for (const auto& pair : proxy_registry->flag_mask_lookup) {
+        if ((mask & pair.second) != 0) {
+            result.push_back(pair.first);
+        }
+    }
+    
+    return result;
+}
+
 Ref<ORC_ProxyRegistryDump> ORC_SceneProxyBase::dump_registry() const {
 	if (!proxy_registry.is_valid()) {
 		Ref<ORC_ProxyRegistryDump> empty_dump;

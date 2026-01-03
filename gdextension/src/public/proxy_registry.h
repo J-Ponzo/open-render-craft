@@ -72,7 +72,7 @@ public:
     void clear();
     Ref<ORC_ProxyRegistryDump> dump_registry() const;
     
-    TypedArray<StringName> get_flags_internal(ORC_ProxyData* proxy_data) const;
+    int64_t get_flags_mask_internal(ORC_ProxyData* proxy_data) const;
 
 #ifdef DEBUG_ENABLED
 private:
