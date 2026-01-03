@@ -119,28 +119,21 @@ static func create_framebuffer_format_from_def(fb_format_def : ORC_FramebufferFo
 
 	return ORC_RDHelper.get_rd().framebuffer_format_create(attachment_formats)
 
+#TODO move to C++ so C++ impl can use it too
 static func create_pso(pso_def : ORC_PSODef, framebuffer_format : int) -> ORC_PSO:
+	if pso_def.vertex_shader_raw_src == "" or pso_def.fragment_shader_raw_src == "":
+		push_error("[ORC] create_pso() : PSO Definition is missing shader source code.")
+		return null
+	
 	var instance = ORC_PSO.new()
 
 	var path : String = pso_def.vertex_shader_path
-	var file_path = path
-	var file = FileAccess.open(file_path, FileAccess.READ)
-	if file == null:
-		push_error("Failed to open vertex shader file: %s" % file_path)
-		return null
-
-	var raw_source : String = file.get_as_text()
+	var raw_source : String = pso_def.vertex_shader_raw_src
 	var preprocessed_source : String = ORC_ShaderPreprocessor.preprocess(path, raw_source, pso_def.defines)
 	var vertex_shader_src : String = preprocessed_source
 
 	path = pso_def.fragment_shader_path
-	file_path = path
-	file = FileAccess.open(file_path, FileAccess.READ)
-	if file == null:
-		push_error("Failed to open fragment shader file: %s" % file_path)
-		return null
-
-	raw_source = file.get_as_text()
+	raw_source = pso_def.fragment_shader_raw_src
 	preprocessed_source = ORC_ShaderPreprocessor.preprocess(path, raw_source, pso_def.defines)
 	var fragment_shader_src : String = preprocessed_source
 
