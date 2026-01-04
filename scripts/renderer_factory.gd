@@ -128,7 +128,7 @@ static func create_pso(pso_def : ORC_PSODef, framebuffer_format : int) -> ORC_PS
 		push_error("[ORC] create_pso() : PSO Definition is missing shader source code.")
 		return null
 	
-	var instance = ORC_PSO.new()
+	var instance : ORC_PSO = ORC_PSO.new()
 
 	var path : String = pso_def.vertex_shader_path
 	var raw_source : String = pso_def.vertex_shader_raw_src
@@ -143,7 +143,7 @@ static func create_pso(pso_def : ORC_PSODef, framebuffer_format : int) -> ORC_PS
 	instance.shader_program = compile_shader(vertex_shader_src, fragment_shader_src)
 
 	var vf_def : ORC_VertexFormatDef = pso_def.vertex_format_def
-	var vertex_format_info = create_vertex_format_info(vf_def)
+	var vertex_format_info : ORC_VertexFormatInfo = create_vertex_format_info(vf_def)
 	instance.vertex_format = ORC_RDHelper.create_vertex_format(vertex_format_info)
 
 	var rasterizationState = RDPipelineRasterizationState.new()
