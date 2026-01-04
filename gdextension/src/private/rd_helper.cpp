@@ -1,6 +1,10 @@
 #include <rd_helper.h>
+#include <pso.h>
+#include <pso_info.h>
 #include <godot_cpp/classes/rd_vertex_attribute.hpp>
 #include <godot_cpp/variant/typed_array.hpp>
+#include <godot_cpp/classes/rd_shader_source.hpp>
+#include <godot_cpp/classes/rd_shader_spirv.hpp>
 
 #define SIZEOF_FLOAT 4
 #define SIZEOF_INT 4
@@ -87,6 +91,8 @@ void ORC_RDHelper::_bind_methods() {
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("create_vertex_format", "vertex_format_def"), &ORC_RDHelper::create_vertex_format);
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("proj_to_bytes", "proj"), &ORC_RDHelper::proj_to_bytes);
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("create_sampler_state", "mag_filter", "min_filter", "repeat_u", "repeat_v"), &ORC_RDHelper::create_sampler_state, DEFVAL(RenderingDevice::SAMPLER_FILTER_LINEAR), DEFVAL(RenderingDevice::SAMPLER_FILTER_LINEAR), DEFVAL(RenderingDevice::SAMPLER_REPEAT_MODE_REPEAT), DEFVAL(RenderingDevice::SAMPLER_REPEAT_MODE_REPEAT));
+    ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("create_pso", "pso_info", "framebuffer_format"), &ORC_RDHelper::create_pso);
+    ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("compile_shader", "vertex_src", "fragment_src"), &ORC_RDHelper::compile_shader);
 }
 
 ORC_RDHelper::ORC_RDHelper() {
@@ -102,7 +108,6 @@ RenderingDevice* ORC_RDHelper::get_rd() {
 int64_t ORC_RDHelper::create_vertex_format(const Ref<ORC_VertexFormatInfo>& vf_info) {
     if (!vf_info.is_valid()) ERR_FAIL_V_MSG(-1, ERR_RDH_INVALID_VERTEX_FORMAT_INFO);
 
-    RenderingDevice* rd = RenderingServer::get_singleton()->get_rendering_device();
     TypedArray<RDVertexAttribute> attrs;
 
     // Position attribute
@@ -210,7 +215,7 @@ int64_t ORC_RDHelper::create_vertex_format(const Ref<ORC_VertexFormatInfo>& vf_i
         attrs.append(weights_attr);
     }
 
-    return rd->vertex_format_create(attrs);
+    return get_rd()->vertex_format_create(attrs);
 }
 
 PackedByteArray ORC_RDHelper::proj_to_bytes(const Projection& proj) {
@@ -227,7 +232,8 @@ Ref<RDSamplerState> ORC_RDHelper::create_sampler_state(
     RenderingDevice::SamplerFilter min_filter,
     RenderingDevice::SamplerRepeatMode repeat_u,
     RenderingDevice::SamplerRepeatMode repeat_v
-) {
+) 
+{
     Ref<RDSamplerState> sampler_state;
     sampler_state.instantiate();
     sampler_state->set_mag_filter(mag_filter);
@@ -235,4 +241,35 @@ Ref<RDSamplerState> ORC_RDHelper::create_sampler_state(
     sampler_state->set_repeat_u(repeat_u);
     sampler_state->set_repeat_v(repeat_v);
     return sampler_state;
+}
+
+Ref<ORC_PSO> ORC_RDHelper::create_pso(const Ref<ORC_PSOInfo>& pso_info, int64_t framebuffer_format) {
+    Ref<ORC_PSO> pso;
+    pso.instantiate();
+
+    pso->shader_program = compile_shader(pso_info->vertex_shader_src, pso_info->fragment_shader_src);
+    pso->vertex_format = pso_info->vertex_format;
+    pso->pipeline = get_rd()->render_pipeline_create(
+        pso->shader_program,
+        framebuffer_format,
+        pso_info->vertex_format,
+        RenderingDevice::RENDER_PRIMITIVE_TRIANGLES,
+        pso_info->rasterization_state,
+        pso_info->multisample_state,
+        pso_info->depth_stencil_state,
+        pso_info->color_blend_state
+    );
+
+    return pso;
+}
+
+RID ORC_RDHelper::compile_shader(const String& vertex_src, const String& fragment_src) {
+    Ref<RDShaderSource> shader_source;
+    shader_source.instantiate();
+    shader_source->set_language(RenderingDevice::SHADER_LANGUAGE_GLSL);
+    shader_source->set_stage_source(RenderingDevice::SHADER_STAGE_VERTEX, vertex_src);
+    shader_source->set_stage_source(RenderingDevice::SHADER_STAGE_FRAGMENT, fragment_src);
+
+    Ref<RDShaderSPIRV> spirv = ORC_RDHelper::get_rd()->shader_compile_spirv_from_source(shader_source);
+    return ORC_RDHelper::get_rd()->shader_create_from_spirv(spirv);
 }

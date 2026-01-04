@@ -15,6 +15,7 @@ enum ERenderMode {
 }
 
 # TODO this system is not enough because it does not support auto updating when the shader source files change on disk.
+# TODO check what we can do now ther is ORC_PSOInfo
 func _get_shader_raw_src(path : String) -> String:
 	var file = FileAccess.open(path, FileAccess.READ)
 	if file == null:

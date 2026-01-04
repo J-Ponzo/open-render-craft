@@ -80,7 +80,7 @@ static func create_render_pass(renderer_inst : ORC_RendererBase, render_pass_def
 	render_pass_inst.framebuffer = ORC_RDHelper.get_rd().framebuffer_create(named_attachments, render_pass_inst.framebuffer_format)
 
 	for key : StringName in render_pass_def.direct_pso_defs.keys():
-		render_pass_inst.direct_psos[key] = create_pso(render_pass_def.direct_pso_defs[key], render_pass_inst.framebuffer_format)
+		render_pass_inst.direct_psos[key] = create_pso_from_def(render_pass_def.direct_pso_defs[key], render_pass_inst.framebuffer_format)
 
 	for key : StringName in render_pass_def.pso_factory_defs.keys():
 		render_pass_inst.pso_factories[key] = create_pso_factory(render_pass_inst, render_pass_def.pso_factory_defs[key])
@@ -123,12 +123,10 @@ static func create_framebuffer_format_from_def(fb_format_def : ORC_FramebufferFo
 	return ORC_RDHelper.get_rd().framebuffer_format_create(attachment_formats)
 
 #TODO move to C++ so C++ impl can use it too
-static func create_pso(pso_def : ORC_PSODef, framebuffer_format : int) -> ORC_PSO:
+static func create_pso_from_def(pso_def : ORC_PSODef, framebuffer_format : int) -> ORC_PSO:
 	if pso_def.vertex_shader_raw_src == "" or pso_def.fragment_shader_raw_src == "":
-		push_error("[ORC] create_pso() : PSO Definition is missing shader source code.")
+		push_error("[ORC] create_pso_from_def() : PSO Definition is missing shader source code.")
 		return null
-	
-	var instance : ORC_PSO = ORC_PSO.new()
 
 	var path : String = pso_def.vertex_shader_path
 	var raw_source : String = pso_def.vertex_shader_raw_src
@@ -140,11 +138,13 @@ static func create_pso(pso_def : ORC_PSODef, framebuffer_format : int) -> ORC_PS
 	preprocessed_source = ORC_ShaderPreprocessor.preprocess(path, raw_source, pso_def.defines)
 	var fragment_shader_src : String = preprocessed_source
 
-	instance.shader_program = compile_shader(vertex_shader_src, fragment_shader_src)
+	var pso_info : ORC_PSOInfo = ORC_PSOInfo.new()
+	pso_info.vertex_shader_src = vertex_shader_src
+	pso_info.fragment_shader_src = fragment_shader_src
 
 	var vf_def : ORC_VertexFormatDef = pso_def.vertex_format_def
 	var vertex_format_info : ORC_VertexFormatInfo = create_vertex_format_info(vf_def)
-	instance.vertex_format = ORC_RDHelper.create_vertex_format(vertex_format_info)
+	pso_info.vertex_format = ORC_RDHelper.create_vertex_format(vertex_format_info)
 
 	var rasterizationState = RDPipelineRasterizationState.new()
 	rasterizationState.cull_mode = pso_def.rasterization_state.cull_mode
@@ -158,6 +158,7 @@ static func create_pso(pso_def : ORC_PSODef, framebuffer_format : int) -> ORC_PS
 	rasterizationState.line_width = pso_def.rasterization_state.line_width
 	rasterizationState.patch_control_points = pso_def.rasterization_state.patch_control_points
 	rasterizationState.wireframe = pso_def.rasterization_state.wireframe
+	pso_info.rasterization_state = rasterizationState
 
 	var multisampleState = RDPipelineMultisampleState.new()
 	multisampleState.enable_alpha_to_coverage = pso_def.multisample_state.enable_alpha_to_coverage
@@ -166,6 +167,7 @@ static func create_pso(pso_def : ORC_PSODef, framebuffer_format : int) -> ORC_PS
 	multisampleState.min_sample_shading = pso_def.multisample_state.min_sample_shading
 	multisampleState.sample_count = pso_def.multisample_state.sample_count
 	multisampleState.sample_masks = pso_def.multisample_state.sample_masks
+	pso_info.multisample_state = multisampleState
 
 	var depthStencilState = RDPipelineDepthStencilState.new()
 	depthStencilState.back_op_compare = pso_def.depth_stencil_state.back_op_compare
@@ -189,6 +191,7 @@ static func create_pso(pso_def : ORC_PSODef, framebuffer_format : int) -> ORC_PS
 	depthStencilState.front_op_pass = pso_def.depth_stencil_state.front_op_pass
 	depthStencilState.front_op_reference = pso_def.depth_stencil_state.front_op_reference
 	depthStencilState.front_op_write_mask = pso_def.depth_stencil_state.front_op_write_mask
+	pso_info.depth_stencil_state = depthStencilState
 
 	var colorBlendState = RDPipelineColorBlendState.new()
 	for color_blend_attachment_def : ORC_PSOColorBlendAttachmentDef in pso_def.blend_attachments:
@@ -205,14 +208,12 @@ static func create_pso(pso_def : ORC_PSODef, framebuffer_format : int) -> ORC_PS
 		colorBlendStateAttachment.write_g = color_blend_attachment_def.write_g
 		colorBlendStateAttachment.write_r = color_blend_attachment_def.write_r
 		colorBlendState.attachments.append(colorBlendStateAttachment)
-
 	colorBlendState.blend_constant = pso_def.blend_constant
 	colorBlendState.enable_logic_op = pso_def.enable_logic_op
 	colorBlendState.logic_op = pso_def.logic_op
+	pso_info.color_blend_state = colorBlendState
 
-	instance.pipeline = ORC_RDHelper.get_rd().render_pipeline_create(instance.shader_program, framebuffer_format, instance.vertex_format, RenderingDevice.RENDER_PRIMITIVE_TRIANGLES, rasterizationState, multisampleState, depthStencilState, colorBlendState)
-
-	return instance
+	return ORC_RDHelper.create_pso(pso_info, framebuffer_format)
 
 static func compile_shader(vertex_src : String, fragment_src : String) -> RID:
 	var shader_source = RDShaderSource.new()

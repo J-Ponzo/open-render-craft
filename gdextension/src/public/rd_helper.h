@@ -6,6 +6,8 @@
 #include <godot_cpp/classes/rendering_device.hpp>
 #include <godot_cpp/classes/resource.hpp>
 #include <godot_cpp/classes/rd_sampler_state.hpp>
+#include <pso.h>
+#include <pso_info.h>
 
 namespace godot {
 
@@ -66,17 +68,16 @@ public:
     ~ORC_RDHelper();
 
     static RenderingDevice* get_rd();
-    
     static int64_t create_vertex_format(const Ref<ORC_VertexFormatInfo>& vertex_format_def);
-
     static PackedByteArray proj_to_bytes(const Projection& proj);
-
     static Ref<RDSamplerState> create_sampler_state(
         RenderingDevice::SamplerFilter mag_filter = RenderingDevice::SAMPLER_FILTER_LINEAR,
         RenderingDevice::SamplerFilter min_filter = RenderingDevice::SAMPLER_FILTER_LINEAR,
         RenderingDevice::SamplerRepeatMode repeat_u = RenderingDevice::SAMPLER_REPEAT_MODE_REPEAT,
         RenderingDevice::SamplerRepeatMode repeat_v = RenderingDevice::SAMPLER_REPEAT_MODE_REPEAT
     );
+    static Ref<ORC_PSO> create_pso(const Ref<ORC_PSOInfo>& pso_info, int64_t framebuffer_format);
+    static RID compile_shader(const String& vertex_src, const String& fragment_src);
 };
 
 }
