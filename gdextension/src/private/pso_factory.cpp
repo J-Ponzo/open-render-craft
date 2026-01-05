@@ -29,15 +29,11 @@ void ORC_PSOFactory::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::STRING, "uber_fragment_shader_src"), "set_uber_fragment_shader_src", "get_uber_fragment_shader_src");
 
     ClassDB::bind_method(D_METHOD("cleanup"), &ORC_PSOFactory::cleanup);
-    ClassDB::bind_method(D_METHOD("get_or_create_pso_from_data", "proxy_data"), &ORC_PSOFactory::get_or_create_pso_from_data);
-    BIND_GD_OVERRIDABLE_METHOD(ORC_PSOFactory, create_pso_from_data)
+    ClassDB::bind_method(D_METHOD("get_or_create_pso", "flags_mask", "vertex_format"), &ORC_PSOFactory::get_or_create_pso);
+    BIND_GD_OVERRIDABLE_METHOD(ORC_PSOFactory, create_pso)
 }
 
-Ref<ORC_PSO> ORC_PSOFactory::get_or_create_pso_from_data(const Ref<ORC_ProxyData>& proxy_data) {
-    if (!proxy_data.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_PSO>(), ERR_INVALID_PROXY_DATA);
-    
-    uint64_t flags_mask = proxy_data->get_flags_mask();
-
+Ref<ORC_PSO> ORC_PSOFactory::get_or_create_pso(const int64_t flags_mask,  const int64_t vertex_format) {
     auto it = pso_lookup.find(flags_mask);
     if (it == pso_lookup.end()) {
         TypedArray<StringName> flags = render_pass->renderer->scene_proxy->get_flags_from_mask(flags_mask);
@@ -45,7 +41,7 @@ Ref<ORC_PSO> ORC_PSOFactory::get_or_create_pso_from_data(const Ref<ORC_ProxyData
         String vertex_src = ORC_ShaderPreprocessor::preprocess(String(), uber_vertex_shader_src, flags);
         String fragment_src = ORC_ShaderPreprocessor::preprocess(String(), uber_fragment_shader_src, flags);
         
-        Ref<ORC_PSO> pso = create_pso_from_data(proxy_data, vertex_src, fragment_src);
+        Ref<ORC_PSO> pso = create_pso(flags_mask, vertex_format, vertex_src, fragment_src);
         if (!pso.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_PSO>(), ERR_PSO_CREATION_FAILED);
         
         pso_lookup[flags_mask] = pso;
@@ -54,8 +50,8 @@ Ref<ORC_PSO> ORC_PSOFactory::get_or_create_pso_from_data(const Ref<ORC_ProxyData
     return pso_lookup[flags_mask];
 }
 
-DEFINE_GD_OVERRIDABLE_METHOD_3_ARGS(ORC_PSOFactory, Ref<ORC_PSO>, create_pso_from_data, const Ref<ORC_ProxyData>&, proxy_data, const String&, vertex_src, const String&, fragment_src)
-Ref<ORC_PSO> ORC_PSOFactory::create_pso_from_data_impl(const Ref<ORC_ProxyData>& proxy_data, const String& vertex_src, const String& fragment_src) {
+DEFINE_GD_OVERRIDABLE_METHOD_4_ARGS(ORC_PSOFactory, Ref<ORC_PSO>, create_pso, const int64_t, flags_mask,  const int64_t, vertex_format, const String&, vertex_src, const String&, fragment_src)
+Ref<ORC_PSO> ORC_PSOFactory::create_pso_impl(const int64_t flags_mask,  const int64_t vertex_format, const String& vertex_src, const String& fragment_src) {
     ERR_FAIL_V_MSG(Ref<ORC_PSO>(), ERR_CREATE_PSO_NOT_IMPLEMENTED);
 }
 

@@ -28,6 +28,7 @@ void ORC_SceneProxyBase::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("create_queue", "queue_name", "init_query", "processors"), &ORC_SceneProxyBase::create_queue, DEFVAL(TypedArray<ORC_QueueProcessor>()));
 	ClassDB::bind_method(D_METHOD("fetch_queue_data", "queue_name"), &ORC_SceneProxyBase::fetch_queue_data);
 	
+	ClassDB::bind_method(D_METHOD("get_flags_from_mask", "mask"), &ORC_SceneProxyBase::get_flags_from_mask);
 	ClassDB::bind_method(D_METHOD("dump_registry"), &ORC_SceneProxyBase::dump_registry);
 
 	ClassDB::bind_method(D_METHOD("setup", "scene"), &ORC_SceneProxyBase::setup);

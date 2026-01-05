@@ -37,8 +37,8 @@ public:
     String get_uber_fragment_shader_src() const { return uber_fragment_shader_src; }
     void set_uber_fragment_shader_src(const String& src) { uber_fragment_shader_src = src; }
 
-    Ref<ORC_PSO> get_or_create_pso_from_data(const Ref<ORC_ProxyData>& proxy_data);
-    DECLARE_GD_OVERRIDABLE_METHOD(Ref<ORC_PSO>, create_pso_from_data, const Ref<ORC_ProxyData>&, const String&, const String&)
+    Ref<ORC_PSO> get_or_create_pso(const int64_t flags_mask,  const int64_t vertex_format);
+    DECLARE_GD_OVERRIDABLE_METHOD(Ref<ORC_PSO>, create_pso, const int64_t flags_mask,  const int64_t vertex_format, const String&, const String&)
     void cleanup();
 };
 
