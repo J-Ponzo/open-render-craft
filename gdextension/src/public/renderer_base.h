@@ -28,6 +28,7 @@ public:
 
 	void create_render_pass(const StringName& pass_name, const Ref<ORC_RenderPassBase>& render_pass);
 	Ref<ORC_RenderPassBase> get_render_pass(const StringName& pass_name) const;
+	TypedArray<StringName> get_all_pass_names() const;
 
 	void create_attachment(const StringName& attachment_name, const RID& attachment);
 	RID get_attachment(const StringName& attachment_name) const;

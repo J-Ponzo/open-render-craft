@@ -23,6 +23,7 @@ void ORC_RendererBase::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("create_render_pass", "pass_name", "render_pass"), &ORC_RendererBase::create_render_pass);
 	ClassDB::bind_method(D_METHOD("get_render_pass", "pass_name"), &ORC_RendererBase::get_render_pass);
+	ClassDB::bind_method(D_METHOD("get_all_pass_names"), &ORC_RendererBase::get_all_pass_names);
 
 	ClassDB::bind_method(D_METHOD("create_attachment", "attachment_name", "attachment"), &ORC_RendererBase::create_attachment);
 	ClassDB::bind_method(D_METHOD("get_attachment", "attachment_name"), &ORC_RendererBase::get_attachment);
@@ -47,6 +48,14 @@ Ref<ORC_RenderPassBase> ORC_RendererBase::get_render_pass(const StringName& pass
 		ERR_FAIL_V_MSG(Ref<ORC_RenderPassBase>(), vformat(ERR_RB_RENDER_PASS_NOT_FOUND, String(pass_name)));
 	}
 	return it->second;
+}
+
+TypedArray<StringName> ORC_RendererBase::get_all_pass_names() const {
+	TypedArray<StringName> names;
+	for (const auto& pair : render_passes) {
+		names.append(pair.first);
+	}
+	return names;
 }
 
 void ORC_RendererBase::create_attachment(const StringName& attachment_name, const RID& attachment) {
