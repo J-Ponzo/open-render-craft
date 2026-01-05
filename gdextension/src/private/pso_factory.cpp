@@ -34,7 +34,8 @@ void ORC_PSOFactory::_bind_methods() {
 }
 
 Ref<ORC_PSO> ORC_PSOFactory::get_or_create_pso(const int64_t flags_mask,  const int64_t vertex_format) {
-    auto it = pso_lookup.find(flags_mask);
+    PSOKey key{flags_mask, vertex_format};
+    auto it = pso_lookup.find(key);
     if (it == pso_lookup.end()) {
         TypedArray<StringName> flags = render_pass->renderer->scene_proxy->get_flags_from_mask(flags_mask);
         
@@ -44,10 +45,10 @@ Ref<ORC_PSO> ORC_PSOFactory::get_or_create_pso(const int64_t flags_mask,  const 
         Ref<ORC_PSO> pso = create_pso(flags_mask, vertex_format, vertex_src, fragment_src);
         if (!pso.is_valid()) ERR_FAIL_V_MSG(Ref<ORC_PSO>(), ERR_PSO_CREATION_FAILED);
         
-        pso_lookup[flags_mask] = pso;
+        pso_lookup[key] = pso;
     }
     
-    return pso_lookup[flags_mask];
+    return pso_lookup[key];
 }
 
 DEFINE_GD_OVERRIDABLE_METHOD_4_ARGS(ORC_PSOFactory, Ref<ORC_PSO>, create_pso, const int64_t, flags_mask,  const int64_t, vertex_format, const String&, vertex_src, const String&, fragment_src)

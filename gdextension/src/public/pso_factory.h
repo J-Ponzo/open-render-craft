@@ -12,6 +12,21 @@
 
 namespace godot {
 
+struct PSOKey {
+    int64_t flags_mask;
+    int64_t vertex_format;
+    
+    bool operator==(const PSOKey& other) const {
+        return flags_mask == other.flags_mask && vertex_format == other.vertex_format;
+    }
+};
+
+struct PSOKeyHash {
+    std::size_t operator()(const PSOKey& key) const noexcept {
+        return static_cast<std::size_t>(key.flags_mask ^ (key.vertex_format * 0x9e3779b97f4a7c15ULL));
+    }
+};
+
 class ORC_PSOFactory : public RefCounted {
     GDCLASS(ORC_PSOFactory, RefCounted)
 
@@ -19,7 +34,7 @@ protected:
     static void _bind_methods();
 
 private:
-    std::unordered_map<int64_t, Ref<ORC_PSO>> pso_lookup;
+    std::unordered_map<PSOKey, Ref<ORC_PSO>, PSOKeyHash> pso_lookup;
 
 public:
     ORC_PSOFactory();
