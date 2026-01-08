@@ -410,6 +410,9 @@ void ORC_ProxyRegistry::clear() {
 	cascade_sources.clear();
 	cascade_targets.clear();
 	next_available_bit = 0;
+#ifdef DEBUG_ENABLED
+    flag_type_lookup.clear();
+#endif
 }
 
 Ref<ORC_ProxyRegistryDump> ORC_ProxyRegistry::dump_registry() const {
