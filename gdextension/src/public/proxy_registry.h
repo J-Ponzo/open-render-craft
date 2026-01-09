@@ -28,11 +28,11 @@ class ORC_ProxyRegistry : public RefCounted {
 
 private:
     static std::unordered_map<StringName, std::type_index>& cpp_types();
-    
-    std::unordered_map<int64_t, std::tuple<Ref<ORC_ProxyData>, int>> id_lookup;
-    std::vector<Ref<ORC_ProxyData>> data_pool;
     std::unordered_map<StringName, uint64_t> flag_mask_lookup;
     uint8_t next_available_bit = 0;
+
+    std::unordered_map<int64_t, std::tuple<Ref<ORC_ProxyData>, int>> id_lookup;
+    std::vector<Ref<ORC_ProxyData>> data_pool;
     std::unordered_map<Ref<ORC_ProxyData>, uint64_t, ProxyDataHash> data_flags;
     std::unordered_map<Ref<ORC_DataQuery>, std::vector<Ref<ORC_ProxyData>>, DataQueryHash> query_cache;
     std::unordered_map<Ref<ORC_ProxyData>, std::vector<Ref<ORC_ProxyData>>, ProxyDataHash> cascade_sources;

@@ -406,10 +406,10 @@ void ORC_ProxyRegistry::clear() {
 	data_pool.clear();
 	data_flags.clear();
 	query_cache.clear();
-	flag_mask_lookup.clear();
+	// flag_mask_lookup.clear();
 	cascade_sources.clear();
 	cascade_targets.clear();
-	next_available_bit = 0;
+	// next_available_bit = 0;
 #ifdef DEBUG_ENABLED
     flag_type_lookup.clear();
 #endif
