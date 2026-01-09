@@ -38,6 +38,7 @@ std::type_index ORC_ProxyRegistry::get_cpp_type_index(const StringName& class_na
 }
 
 void ORC_ProxyRegistry::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("dump_registry"), &ORC_ProxyRegistry::dump_registry);
 }
 
 bool ORC_ProxyRegistry::register_data(const Ref<ORC_ProxyData>& proxy_data, int64_t unique_id) {
