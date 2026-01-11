@@ -70,6 +70,7 @@ public:
     static RenderingDevice* get_rd();
     static int64_t create_vertex_format(const Ref<ORC_VertexFormatInfo>& vertex_format_def);
     static PackedByteArray proj_to_bytes(const Projection& proj);
+    static PackedByteArray projs_to_bytes(const TypedArray<Projection>& projs);
     static Ref<RDSamplerState> create_sampler_state(
         RenderingDevice::SamplerFilter mag_filter = RenderingDevice::SAMPLER_FILTER_LINEAR,
         RenderingDevice::SamplerFilter min_filter = RenderingDevice::SAMPLER_FILTER_LINEAR,

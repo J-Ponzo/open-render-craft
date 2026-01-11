@@ -90,6 +90,7 @@ void ORC_RDHelper::_bind_methods() {
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("get_rd"), &ORC_RDHelper::get_rd);
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("create_vertex_format", "vertex_format_def"), &ORC_RDHelper::create_vertex_format);
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("proj_to_bytes", "proj"), &ORC_RDHelper::proj_to_bytes);
+    ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("projs_to_bytes", "projs"), &ORC_RDHelper::projs_to_bytes);
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("create_sampler_state", "mag_filter", "min_filter", "repeat_u", "repeat_v"), &ORC_RDHelper::create_sampler_state, DEFVAL(RenderingDevice::SAMPLER_FILTER_LINEAR), DEFVAL(RenderingDevice::SAMPLER_FILTER_LINEAR), DEFVAL(RenderingDevice::SAMPLER_REPEAT_MODE_REPEAT), DEFVAL(RenderingDevice::SAMPLER_REPEAT_MODE_REPEAT));
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("create_pso", "pso_info", "framebuffer_format"), &ORC_RDHelper::create_pso);
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("compile_shader", "vertex_src", "fragment_src"), &ORC_RDHelper::compile_shader);
@@ -223,6 +224,18 @@ PackedByteArray ORC_RDHelper::proj_to_bytes(const Projection& proj) {
     byte_array.resize(sizeof(Projection));
     
     memcpy(byte_array.ptrw(), proj.columns, sizeof(Projection));
+    
+    return byte_array;
+}
+
+PackedByteArray ORC_RDHelper::projs_to_bytes(const TypedArray<Projection>& projs) {
+    PackedByteArray byte_array;
+    byte_array.resize(projs.size() * sizeof(Projection));
+    
+    for (int i = 0; i < projs.size(); i++) {
+        const Projection& proj = projs[i];
+        memcpy(byte_array.ptrw() + i * sizeof(Projection), proj.columns, sizeof(Projection));
+    }
     
     return byte_array;
 }
