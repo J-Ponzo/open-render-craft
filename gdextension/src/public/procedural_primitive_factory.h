@@ -52,11 +52,17 @@ class ORC_ProceduralPrimitiveFactory : public RefCounted {
 protected:
     static void _bind_methods();
 
+private:
+    static void generate_vertex_array_from_data(Ref<ORC_ProceduralPrimitive> primitive, int vertex_count, bool is_2d = false);
+
 public:
     ORC_ProceduralPrimitiveFactory();
     ~ORC_ProceduralPrimitiveFactory();
 
     static Ref<ORC_ProceduralPrimitive> create_screen_quad(bool setup_uv = false);
+    static Ref<ORC_ProceduralPrimitive> create_inverted_sphere(int64_t stacks = 32, int64_t slices = 32);
+    static Ref<ORC_ProceduralPrimitive> create_inverted_cone(int64_t slices = 32);
+    static void free_rids(Ref<ORC_ProceduralPrimitive> primitive);
 };
 
 } // namespace godot

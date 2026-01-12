@@ -56,6 +56,7 @@ Ref<ORC_PrimaryData> ORC_ProxyFactory::create_data_from_impl(Node* node, const R
 bool ORC_ProxyFactory::free(const Ref<ORC_ProxyObject>& proxy_object, const Ref<ORC_ProxyRegistry>& registry) {
     DEV_ASSERT(registry.is_valid() && "Registry is not valid.");
     
+    //TODO : extract error msgs to constants
     if (!proxy_object.is_valid()) ERR_FAIL_V_MSG(false, "[ORC] Proxy object is not valid.");
 
     Ref<ORC_PrimaryData> primary = proxy_object->get_primary_data();
