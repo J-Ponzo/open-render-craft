@@ -17,6 +17,7 @@
 #include <pso_factory.h>
 #include <pso_info.h>
 #include <rd_helper.h>
+#include <procedural_primitive_factory.h>
 #include <shader_preprocessor.h>
 #include <impl_registry.h>
 
@@ -67,6 +68,8 @@ void initialize_orc_module(ModuleInitializationLevel p_level) {
 	GDREGISTER_RUNTIME_CLASS(ORC_VertexFormatInfo);
 	GDREGISTER_RUNTIME_CLASS(ORC_PSOInfo);
 	GDREGISTER_RUNTIME_CLASS(ORC_RDHelper);
+	GDREGISTER_RUNTIME_CLASS(ORC_ProceduralPrimitive);
+	GDREGISTER_RUNTIME_CLASS(ORC_ProceduralPrimitiveFactory);
 	GDREGISTER_RUNTIME_CLASS(ORC_ShaderPreprocessor);
 
 #ifdef DEBUG_ENABLED

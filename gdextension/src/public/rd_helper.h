@@ -17,6 +17,7 @@ class ORC_VertexFormatInfo : public Resource {
 protected:
     static void _bind_methods();
 
+// TODO : invert attrs & accessors in public & private sections ?
 private:
     bool is_2d = false;
     bool has_normal = false;
