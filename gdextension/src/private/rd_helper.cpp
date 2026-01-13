@@ -19,6 +19,8 @@
 #define WEIGHT_NB_FLOATS 4
 
 static const char* ERR_RDH_INVALID_VERTEX_FORMAT_INFO = "[ORC] Invalid vertex format info.";
+static const char* ERR_RDH_VERTEX_SHADER_COMPILATION = "[ORC] Vertex shader compilation error:";
+static const char* ERR_RDH_FRAGMENT_SHADER_COMPILATION = "[ORC] Fragment shader compilation error:";
 
 using namespace godot;
 
@@ -295,5 +297,12 @@ RID ORC_RDHelper::compile_shader(const String& vertex_src, const String& fragmen
     shader_source->set_stage_source(RenderingDevice::SHADER_STAGE_FRAGMENT, fragment_src);
 
     Ref<RDShaderSPIRV> spirv = ORC_RDHelper::get_rd()->shader_compile_spirv_from_source(shader_source);
+    
+    String vertex_error = spirv->get_stage_compile_error(RenderingDevice::SHADER_STAGE_VERTEX);
+    if (!vertex_error.is_empty()) ERR_PRINT(String(ERR_RDH_VERTEX_SHADER_COMPILATION) + "\n" + vertex_error);
+    
+    String fragment_error = spirv->get_stage_compile_error(RenderingDevice::SHADER_STAGE_FRAGMENT);
+    if (!fragment_error.is_empty()) ERR_PRINT(String(ERR_RDH_FRAGMENT_SHADER_COMPILATION) + "\n" + fragment_error);
+    
     return ORC_RDHelper::get_rd()->shader_create_from_spirv(spirv);
 }
