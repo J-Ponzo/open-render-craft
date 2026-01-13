@@ -92,6 +92,7 @@ void ORC_RDHelper::_bind_methods() {
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("proj_to_bytes", "proj"), &ORC_RDHelper::proj_to_bytes);
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("projs_to_bytes", "projs"), &ORC_RDHelper::projs_to_bytes);
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("create_sampler_state", "mag_filter", "min_filter", "repeat_u", "repeat_v"), &ORC_RDHelper::create_sampler_state, DEFVAL(RenderingDevice::SAMPLER_FILTER_LINEAR), DEFVAL(RenderingDevice::SAMPLER_FILTER_LINEAR), DEFVAL(RenderingDevice::SAMPLER_REPEAT_MODE_REPEAT), DEFVAL(RenderingDevice::SAMPLER_REPEAT_MODE_REPEAT));
+    ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("create_texture_sampler_uniform", "texture_rid", "sampler_rid", "binding"), &ORC_RDHelper::create_texture_sampler_uniform);
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("create_pso", "pso_info", "framebuffer_format"), &ORC_RDHelper::create_pso);
     ClassDB::bind_static_method("ORC_RDHelper", D_METHOD("compile_shader", "vertex_src", "fragment_src"), &ORC_RDHelper::compile_shader);
 }
@@ -254,6 +255,16 @@ Ref<RDSamplerState> ORC_RDHelper::create_sampler_state(
     sampler_state->set_repeat_u(repeat_u);
     sampler_state->set_repeat_v(repeat_v);
     return sampler_state;
+}
+
+Ref<RDUniform> ORC_RDHelper::create_texture_sampler_uniform(RID texture_rid, RID sampler_rid, int64_t binding) {
+    Ref<RDUniform> uniform;
+    uniform.instantiate();
+    uniform->set_uniform_type(RenderingDevice::UNIFORM_TYPE_SAMPLER_WITH_TEXTURE);
+    uniform->set_binding(binding);
+    uniform->add_id(sampler_rid);
+    uniform->add_id(texture_rid);
+    return uniform;
 }
 
 Ref<ORC_PSO> ORC_RDHelper::create_pso(const Ref<ORC_PSOInfo>& pso_info, int64_t framebuffer_format) {

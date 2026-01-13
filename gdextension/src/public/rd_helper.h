@@ -6,6 +6,7 @@
 #include <godot_cpp/classes/rendering_device.hpp>
 #include <godot_cpp/classes/resource.hpp>
 #include <godot_cpp/classes/rd_sampler_state.hpp>
+#include <godot_cpp/classes/rd_uniform.hpp>
 #include <pso.h>
 #include <pso_info.h>
 
@@ -78,6 +79,7 @@ public:
         RenderingDevice::SamplerRepeatMode repeat_u = RenderingDevice::SAMPLER_REPEAT_MODE_REPEAT,
         RenderingDevice::SamplerRepeatMode repeat_v = RenderingDevice::SAMPLER_REPEAT_MODE_REPEAT
     );
+    static Ref<RDUniform> create_texture_sampler_uniform(RID texture_rid, RID sampler_rid, int64_t binding);
     static Ref<ORC_PSO> create_pso(const Ref<ORC_PSOInfo>& pso_info, int64_t framebuffer_format);
     static RID compile_shader(const String& vertex_src, const String& fragment_src);
 };
