@@ -40,10 +40,21 @@ static func create_query_from_def(scene_proxy : ORC_SceneProxyBase, query_def : 
 		return scene_proxy.create_query_cpp(cpp_impl_def.cpp_class_name, query_def.flag_names, query_def.flag_values)
 	return null
 
+# TODO move to C++ so C++ impl can use it too
 static func create_attachment(renderer_inst : ORC_RendererBase, attach_format_def : ORC_AttachmentFormat_Def) -> RID:
 	var attachment : RID = create_texture_attachment(attach_format_def)
 	renderer_inst.create_attachment(attach_format_def.attachment_name, attachment)
 	return attachment
+
+# TODO move to C++ so C++ impl can use it too
+static func create_attachment_format(attach_format_def : ORC_AttachmentFormat_Def) -> RDAttachmentFormat:
+	var attach_format : RDAttachmentFormat = RDAttachmentFormat.new()
+	attach_format.format = attach_format_def.format
+	attach_format.samples = attach_format_def.samples
+	attach_format.usage_flags = 0
+	for usage_flag in attach_format_def.usage_flags:
+		attach_format.usage_flags |= usage_flag
+	return attach_format
 
 static func create_texture_attachment(attach_format_def : ORC_AttachmentFormat_Def) -> RID:
 	var width : int = attach_format_def.width
