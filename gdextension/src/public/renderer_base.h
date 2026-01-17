@@ -15,13 +15,18 @@ class ORC_RendererBase : public RefCounted {
 	GDCLASS(ORC_RendererBase, RefCounted)
 
 private:
+	static Ref<ORC_RendererBase> instance;
+
 	std::unordered_map<StringName, Ref<ORC_RenderPassBase>> render_passes;
 	std::unordered_map<StringName, RID> attachments;
 
 protected:
 	static void _bind_methods();
+	static void set_instance(const Ref<ORC_RendererBase>& instance);
 
 public:
+	static Ref<ORC_RendererBase> get_instance();
+
 	Ref<ORC_SceneProxyBase> scene_proxy;
 	Ref<ORC_SceneProxyBase> get_scene_proxy() const { return scene_proxy; }
 	void set_scene_proxy(const Ref<ORC_SceneProxyBase>& scene_proxy) { this->scene_proxy = scene_proxy; }

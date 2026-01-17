@@ -78,6 +78,7 @@ func _put_custom_renderer_offline(renderer_idx : int) -> void:
 		for pso_factory_name : StringName in render_pass.pso_factories:
 			(render_pass.pso_factories[pso_factory_name] as ORC_PSOFactory).cleanup()
 	renderers[renderer_idx].scene_proxy.cleanup()
+	ORC_RendererBase._set_instance(null)
 
 	custom_canvas_layer.visible = false
 
@@ -92,6 +93,7 @@ func _put_native_renderer_online() -> void:
 	RenderingServer.viewport_set_disable_3d(root_vp_rid, false)
 
 func _put_custom_renderer_online(renderer_idx : int) -> void:
+	ORC_RendererBase._set_instance(renderers[renderer_idx])
 	renderers[renderer_idx].setup()
 	for pass_name : StringName in renderers[renderer_idx].get_all_pass_names():
 		var render_pass : ORC_RenderPassBase = renderers[renderer_idx].get_render_pass(pass_name)

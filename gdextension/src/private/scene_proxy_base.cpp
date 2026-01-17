@@ -29,6 +29,7 @@ void ORC_SceneProxyBase::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("fetch_queue_data", "queue_name"), &ORC_SceneProxyBase::fetch_queue_data);
 	
 	ClassDB::bind_method(D_METHOD("get_flags_from_mask", "mask"), &ORC_SceneProxyBase::get_flags_from_mask);
+	ClassDB::bind_method(D_METHOD("get_mask_from_flags", "flags"), &ORC_SceneProxyBase::get_mask_from_flags);
 	ClassDB::bind_method(D_METHOD("dump_registry"), &ORC_SceneProxyBase::dump_registry);
 
 	ClassDB::bind_method(D_METHOD("setup", "scene"), &ORC_SceneProxyBase::setup);
@@ -174,6 +175,17 @@ TypedArray<StringName> ORC_SceneProxyBase::get_flags_from_mask(int64_t mask) con
     }
     
     return result;
+}
+
+int64_t ORC_SceneProxyBase::get_mask_from_flags(const TypedArray<StringName>& flags) const {
+	int64_t mask = 0;
+    
+    for (const StringName& flag : flags) {
+        auto it = proxy_registry->flag_mask_lookup.find(flag);
+			mask |= proxy_registry->get_or_create_flag_mask(flag);
+    }
+    
+    return mask;
 }
 
 Ref<ORC_ProxyRegistryDump> ORC_SceneProxyBase::dump_registry() const {

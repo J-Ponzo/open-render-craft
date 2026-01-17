@@ -11,12 +11,26 @@
 
 using namespace godot;
 
+Ref<ORC_RendererBase> ORC_RendererBase::instance;
+
 #define ERR_RB_RENDER_PASS_ALREADY_EXISTS "ORC_RendererBase::create_render_pass: Render pass '%s' already exists."
 #define ERR_RB_RENDER_PASS_NOT_FOUND "ORC_RendererBase::get_render_pass: Render pass '%s' not found."
 #define ERR_RB_ATTACHMENT_ALREADY_EXISTS "ORC_RendererBase::create_attachment: Attachment '%s' already exists."
 #define ERR_RB_ATTACHMENT_NOT_FOUND "ORC_RendererBase::get_attachment: Attachment '%s' not found."
 
+Ref<ORC_RendererBase> ORC_RendererBase::get_instance() {
+	return ORC_RendererBase::instance;
+}
+
+void ORC_RendererBase::set_instance(const Ref<ORC_RendererBase>& instance) {
+	ORC_RendererBase::instance = instance;
+}
+
 void ORC_RendererBase::_bind_methods() {
+	ClassDB::bind_static_method("ORC_RendererBase", D_METHOD("get_instance"), &ORC_RendererBase::get_instance);
+	// TODO : find a way to setup descriptions in exposed methods so that we can say to NOT using it directly
+	ClassDB::bind_static_method("ORC_RendererBase", D_METHOD("_set_instance", "instance"), &ORC_RendererBase::set_instance);
+
 	ClassDB::bind_method(D_METHOD("get_scene_proxy"), &ORC_RendererBase::get_scene_proxy);
     ClassDB::bind_method(D_METHOD("set_scene_proxy", "scene_proxy"), &ORC_RendererBase::set_scene_proxy);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "scene_proxy", PROPERTY_HINT_RESOURCE_TYPE, "ORC_SceneProxyBase"), "set_scene_proxy", "get_scene_proxy");

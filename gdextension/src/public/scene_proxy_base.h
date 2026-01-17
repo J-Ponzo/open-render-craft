@@ -61,6 +61,7 @@ public:
 	TypedArray<ORC_ProxyData> fetch_queue_data(const StringName& queue_name) const;
 	
 	TypedArray<StringName> get_flags_from_mask(int64_t mask) const;
+	int64_t get_mask_from_flags(const TypedArray<StringName>& flags) const;
 
 	Ref<ORC_ProxyRegistryDump> dump_registry() const;
 };
