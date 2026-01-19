@@ -23,6 +23,7 @@ void ORC_SafeRID::set_rid(const RID& rid) {
 void ORC_SafeRID::free_rid() {
     if (is_valid()) {
 		ORC_RDHelper::get_rd()->free_rid(rid);
+        rid = RID();
     }
 }
 
