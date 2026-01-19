@@ -28,7 +28,6 @@ public:
     Dictionary get_direct_psos() const { return direct_psos; }
     void set_direct_psos(const Dictionary& direct_psos) { this->direct_psos = direct_psos; }
 
-    // TODO maybe not useful to support multiple factories per pass ?
     Dictionary pso_factories;
     Dictionary get_pso_factories() const { return pso_factories; }
     void set_pso_factories(const Dictionary& pso_factories) { this->pso_factories = pso_factories; }
