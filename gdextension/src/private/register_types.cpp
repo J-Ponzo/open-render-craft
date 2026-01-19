@@ -20,6 +20,7 @@
 #include <procedural_primitive_factory.h>
 #include <shader_preprocessor.h>
 #include <impl_registry.h>
+#include <safe_rid.h>
 
 #include <gdextension_interface.h>
 #include <godot_cpp/core/defs.hpp>
@@ -71,6 +72,13 @@ void initialize_orc_module(ModuleInitializationLevel p_level) {
 	GDREGISTER_RUNTIME_CLASS(ORC_ProceduralPrimitive);
 	GDREGISTER_RUNTIME_CLASS(ORC_ProceduralPrimitiveFactory);
 	GDREGISTER_RUNTIME_CLASS(ORC_ShaderPreprocessor);
+	GDREGISTER_RUNTIME_CLASS(ORC_SafeRID);
+	GDREGISTER_RUNTIME_CLASS(ORC_BufferRID);
+	GDREGISTER_RUNTIME_CLASS(ORC_SetRID);
+	GDREGISTER_RUNTIME_CLASS(ORC_SamplerRID);
+	GDREGISTER_RUNTIME_CLASS(ORC_VertexArrayRID);
+	GDREGISTER_RUNTIME_CLASS(ORC_IndexArrayRID);
+	GDREGISTER_RUNTIME_CLASS(ORC_TextureRID);
 
 #ifdef DEBUG_ENABLED
     UtilityFunctions::print("Registering test classes (DEBUG build)");
