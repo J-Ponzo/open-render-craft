@@ -21,14 +21,6 @@ void ORC_RenderPassBase::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_pso_factories", "pso_factories"), &ORC_RenderPassBase::set_pso_factories);
     ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "pso_factories"), "set_pso_factories", "get_pso_factories");
 
-    // ClassDB::bind_method(D_METHOD("get_framebuffer_format"), &ORC_RenderPassBase::get_framebuffer_format);
-    // ClassDB::bind_method(D_METHOD("set_framebuffer_format", "framebuffer_format"), &ORC_RenderPassBase::set_framebuffer_format);
-    // ADD_PROPERTY(PropertyInfo(Variant::INT, "framebuffer_format"), "set_framebuffer_format", "get_framebuffer_format");
-
-    // ClassDB::bind_method(D_METHOD("get_framebuffer"), &ORC_RenderPassBase::get_framebuffer);
-    // ClassDB::bind_method(D_METHOD("set_framebuffer", "framebuffer"), &ORC_RenderPassBase::set_framebuffer);
-    // ADD_PROPERTY(PropertyInfo(Variant::RID, "framebuffer"), "set_framebuffer", "get_framebuffer");
-
     ClassDB::bind_method(D_METHOD("create_framebuffer", "fb_name", "fb_format", "fb"), &ORC_RenderPassBase::create_framebuffer);
     ClassDB::bind_method(D_METHOD("get_framebuffer_format", "attachment_name"), &ORC_RenderPassBase::get_framebuffer_format);
     ClassDB::bind_method(D_METHOD("get_framebuffer", "attachment_name"), &ORC_RenderPassBase::get_framebuffer);
