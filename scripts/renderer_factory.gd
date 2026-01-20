@@ -83,15 +83,17 @@ static func create_render_pass(renderer_inst : ORC_RendererBase, render_pass_def
 	render_pass_inst.renderer = renderer_inst
 	renderer_inst.create_render_pass(render_pass_def.pass_name, render_pass_inst)
 
-	render_pass_inst.framebuffer_format = create_framebuffer_format_from_def(render_pass_def.fb_format_def, renderer_def.attachment_format_defs)
-
-	var named_attachments : Array[RID]
-	for name in render_pass_def.fb_format_def.get_all_attachment_keys():
-		named_attachments.append(renderer_inst.get_attachment(name))
-	render_pass_inst.framebuffer = ORC_RDHelper.get_rd().framebuffer_create(named_attachments, render_pass_inst.framebuffer_format)
+	for key : StringName in render_pass_def.fb_format_defs.keys():
+		var fb_format_def : ORC_FramebufferFormat_Def = render_pass_def.fb_format_defs[key]
+		var fb_format : int = create_framebuffer_format_from_def(fb_format_def, renderer_def.attachment_format_defs)
+		var named_attachments : Array[RID]
+		for name in fb_format_def.get_all_attachment_keys():
+			named_attachments.append(renderer_inst.get_attachment(name))
+		var fb : RID = ORC_RDHelper.get_rd().framebuffer_create(named_attachments, fb_format)
+		render_pass_inst.create_framebuffer(key, fb_format, fb)
 
 	for key : StringName in render_pass_def.direct_pso_defs.keys():
-		render_pass_inst.direct_psos[key] = create_pso_from_def(render_pass_def.direct_pso_defs[key], render_pass_inst.framebuffer_format)
+		render_pass_inst.direct_psos[key] = create_pso_from_def(render_pass_def.direct_pso_defs[key], render_pass_inst.get_framebuffer_format("Main"))
 
 	for key : StringName in render_pass_def.pso_factory_defs.keys():
 		render_pass_inst.pso_factories[key] = create_pso_factory(render_pass_inst, render_pass_def.pso_factory_defs[key])
