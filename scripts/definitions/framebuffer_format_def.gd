@@ -1,12 +1,4 @@
 extends Resource
 class_name ORC_FramebufferFormat_Def
 
-@export var depth_key : StringName
-@export var color_keys : Array[StringName]
-
-func get_all_attachment_keys() -> Array[StringName]:
-	var keys : Array[StringName] = []
-	if !depth_key.is_empty():
-		keys.append(depth_key)
-	keys.append_array(color_keys)
-	return keys
+@export var attachment_refs : Array[ORC_AttachmentRef_Def]

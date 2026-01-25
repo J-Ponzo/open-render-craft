@@ -46,6 +46,7 @@ static func create_attachment(renderer_inst : ORC_RendererBase, attach_format_de
 	renderer_inst.create_attachment(attach_format_def.attachment_name, attachment)
 	return attachment
 
+# TODO : may be useless now we define shadow maps in renderer defs
 # TODO move to C++ so C++ impl can use it too
 static func create_attachment_format(attach_format_def : ORC_AttachmentFormat_Def) -> RDAttachmentFormat:
 	var attach_format : RDAttachmentFormat = RDAttachmentFormat.new()
@@ -71,9 +72,30 @@ static func create_texture_attachment(attach_format_def : ORC_AttachmentFormat_D
 	tf.width = width
 	tf.height = height
 	tf.format = attach_format_def.format
+	tf.texture_type = attach_format_def.texture_type
+	tf.array_layers = attach_format_def.array_layers
+	tf.samples = attach_format_def.samples
 	var view = RDTextureView.new();
 
 	return ORC_RDHelper.get_rd().texture_create(tf, view)
+
+static func create_framebuffer_format_from_def(fb_format_def : ORC_FramebufferFormat_Def, attachment_format_defs : Array[ORC_AttachmentFormat_Def]) -> int:
+	var attachment_formats : Array[RDAttachmentFormat]
+	var attachments_by_name : Dictionary = {}
+	for attach_def in attachment_format_defs:
+		attachments_by_name[attach_def.attachment_name] = attach_def
+
+	for attachment_ref : ORC_AttachmentRef_Def in fb_format_def.attachment_refs:
+		var attach_key : StringName = attachment_ref.attachment_name
+		var attachment_format : RDAttachmentFormat = RDAttachmentFormat.new()
+		attachment_format.format = attachments_by_name[attach_key].format
+
+		attachment_format.usage_flags = 0
+		for bit in attachments_by_name[attach_key].usage_flags:
+			attachment_format.usage_flags |= bit
+		attachment_formats.append(attachment_format)
+
+	return ORC_RDHelper.get_rd().framebuffer_format_create(attachment_formats)
 
 static func create_render_pass(renderer_inst : ORC_RendererBase, render_pass_def : ORC_RenderPassDef, renderer_def : ORC_Renderer_Def) -> ORC_RenderPassBase:
 	var render_pass_inst = ORC_ImplFactory.create_impl(render_pass_def.pass_impl) as ORC_RenderPassBase
@@ -86,14 +108,20 @@ static func create_render_pass(renderer_inst : ORC_RendererBase, render_pass_def
 	for key : StringName in render_pass_def.fb_format_defs.keys():
 		var fb_format_def : ORC_FramebufferFormat_Def = render_pass_def.fb_format_defs[key]
 		var fb_format : int = create_framebuffer_format_from_def(fb_format_def, renderer_def.attachment_format_defs)
-		var named_attachments : Array[RID]
-		for name in fb_format_def.get_all_attachment_keys():
-			named_attachments.append(renderer_inst.get_attachment(name))
-		var fb : RID = ORC_RDHelper.get_rd().framebuffer_create(named_attachments, fb_format)
+		var attachments : Array[RID]
+		for attachment_ref : ORC_AttachmentRef_Def in fb_format_def.attachment_refs:
+			var attachment : RID = renderer_inst.get_attachment(attachment_ref.attachment_name)
+			if attachment_ref.layer < 0:
+				attachments.append(attachment)
+			else :
+				var layer_rid : RID = ORC_RDHelper.get_rd().texture_create_shared_from_slice(RDTextureView.new(), attachment, attachment_ref.layer, 0)
+				attachments.append(layer_rid)
+		var fb : RID = ORC_RDHelper.get_rd().framebuffer_create(attachments, fb_format)
+
 		render_pass_inst.create_framebuffer(key, fb_format, fb)
 
 	for key : StringName in render_pass_def.direct_pso_defs.keys():
-		render_pass_inst.direct_psos[key] = create_pso_from_def(render_pass_def.direct_pso_defs[key], render_pass_inst.get_framebuffer_format("Main"))
+		render_pass_inst.direct_psos[key] = create_pso_from_def(render_pass_def.direct_pso_defs[key], render_pass_inst.get_framebuffer_format("Main"))	# TODO : PSODef needs framebuffer ?
 
 	for key : StringName in render_pass_def.pso_factory_defs.keys():
 		render_pass_inst.pso_factories[key] = create_pso_factory(render_pass_inst, render_pass_def.pso_factory_defs[key])
@@ -118,22 +146,6 @@ static func create_pso_factory(render_pass_inst : ORC_RenderPassBase, pso_factor
 		factory.render_pass = render_pass_inst
 
 	return factory
-
-static func create_framebuffer_format_from_def(fb_format_def : ORC_FramebufferFormat_Def, attachment_format_defs : Array[ORC_AttachmentFormat_Def]) -> int:
-	var attachment_formats : Array[RDAttachmentFormat]
-	var attachments_by_name : Dictionary = {}
-	for attach_def in attachment_format_defs:
-		attachments_by_name[attach_def.attachment_name] = attach_def
-
-	for attach_key : StringName in fb_format_def.get_all_attachment_keys():
-		var attachment_format : RDAttachmentFormat = RDAttachmentFormat.new()
-		attachment_format.format = attachments_by_name[attach_key].format
-		attachment_format.usage_flags = 0
-		for bit in attachments_by_name[attach_key].usage_flags:
-			attachment_format.usage_flags |= bit
-		attachment_formats.append(attachment_format)
-
-	return ORC_RDHelper.get_rd().framebuffer_format_create(attachment_formats)
 
 #TODO move to C++ so C++ impl can use it too
 static func create_pso_from_def(pso_def : ORC_PSODef, framebuffer_format : int) -> ORC_PSO:
