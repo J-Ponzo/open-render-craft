@@ -38,6 +38,7 @@ void ORC_RenderPassBase::create_framebuffer(const StringName& fb_name, const int
 	framebuffers[fb_name] = fb;
 }
 
+// TODO : get_framebuffer_format() and get_framebuffer() returns framebuffer format / RID but the param is named attachment. Check this it's misleading
 int64_t ORC_RenderPassBase::get_framebuffer_format(const StringName& attachment_name) const {
 	auto it = framebuffer_formats.find(attachment_name);
 	if (it == framebuffer_formats.end()) {
